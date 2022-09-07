@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -167,11 +167,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a0b036c794e8d945aff335a671bdd84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &453913251 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8992210086617048007, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-  m_PrefabInstance: {fileID: 1561655983}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &455643789
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,71 +654,17 @@ MonoBehaviour:
       StorageFileTemplate: FrozenWorld-[Machine]-[Timestamp].hkfw
       MaxKilobytesPerFile: 2048
       MaxNumberOfFiles: 64
---- !u!1001 &1561655983
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1041222162775995102, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_Name
-      value: CryptexButtonsArrows
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_RootOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -6.63
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -6.39
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 21.71
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995103, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2241268552195432420, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: SliderVertical
-      value: 
-      objectReference: {fileID: 453913251}
-    - target: {fileID: 2241268552195432420, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
-      propertyPath: SliderHorizontal
-      value: 
-      objectReference: {fileID: 453913251}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: c94c025f70cc24442b16cba76a43aa77, type: 3}
+--- !u!114 &1656330268 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2141607835060887176, guid: d04101907f6497f4fb6ae0efe8ffdd00, type: 3}
+  m_PrefabInstance: {fileID: 2090776039}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18c0693d15bf47b4d8d351932fa32077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1797572342
 GameObject:
   m_ObjectHideFlags: 0
@@ -868,7 +809,7 @@ Transform:
   m_Children:
   - {fileID: 2064919540}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1932567553
 MonoBehaviour:
@@ -956,7 +897,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2064919539
 GameObject:
@@ -1081,7 +1022,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1041222162775995103, guid: d04101907f6497f4fb6ae0efe8ffdd00, type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1041222162775995103, guid: d04101907f6497f4fb6ae0efe8ffdd00, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1123,7 +1064,23 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2241268552195432420, guid: d04101907f6497f4fb6ae0efe8ffdd00, type: 3}
+      propertyPath: Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241268552195432420, guid: d04101907f6497f4fb6ae0efe8ffdd00, type: 3}
+      propertyPath: InputForCryptex
+      value: 
+      objectReference: {fileID: 1656330268}
+    - target: {fileID: 3275932149709737229, guid: d04101907f6497f4fb6ae0efe8ffdd00, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3349621516878311575, guid: d04101907f6497f4fb6ae0efe8ffdd00, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6199491154931507966, guid: d04101907f6497f4fb6ae0efe8ffdd00, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}

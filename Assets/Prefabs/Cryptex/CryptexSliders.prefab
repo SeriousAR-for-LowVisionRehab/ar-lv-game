@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1041222162775995103}
   m_Layer: 0
-  m_Name: CryptexWithSliders
+  m_Name: CryptexSliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

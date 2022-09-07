@@ -188,7 +188,7 @@ Transform:
   m_GameObject: {fileID: 2899108701821348959}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.0255, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2899108703198168813}
@@ -256,8 +256,8 @@ MonoBehaviour:
   tickMarks: {fileID: 2899108702018511530}
   thumbVisuals: {fileID: 2899108703489238737}
   sliderAxis: 0
-  sliderStartDistance: -0.12499666
-  sliderEndDistance: 0.071745396
+  sliderStartDistance: -0.124996826
+  sliderEndDistance: 0.07174556
   OnValueUpdated:
     m_PersistentCalls:
       m_Calls: []
