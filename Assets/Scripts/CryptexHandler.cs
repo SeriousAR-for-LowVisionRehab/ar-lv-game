@@ -9,6 +9,7 @@ public class CryptexHandler : MonoBehaviour
 {
     public GameObject SliderHorizontal;
     public GameObject SliderVertical;
+    public InputGenericHandler InputForCryptex;
 
     private Microsoft.MixedReality.Toolkit.UI.PinchSlider _pinchSliderHorizontal;
     private Microsoft.MixedReality.Toolkit.UI.PinchSlider _pinchSliderVertical;
