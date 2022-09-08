@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -10,15 +8,21 @@ using UnityEngine;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private bool _gameStarted = false;
+    private bool _gameFinished = false;
 
-    // Update is called once per frame
-    void Update()
+    [SerializeField]
+    private GameObject[] puzzlesPrefabs;
+
+    /// <summary>
+    /// Function Called to Start the Game: the player is free to start the game.
+    /// </summary>
+    public void InitializeGame()
     {
-        
+        if (!_gameStarted)
+        {
+            GameObject puzzle0 = Instantiate(puzzlesPrefabs[0], transform, false);
+            _gameStarted = true;
+        }
     }
 }

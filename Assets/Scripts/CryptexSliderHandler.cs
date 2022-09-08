@@ -12,6 +12,7 @@ public class CryptexSliderHandler : MonoBehaviour
     private Microsoft.MixedReality.Toolkit.UI.PinchSlider _pinchSliderHorizontal;
     private Microsoft.MixedReality.Toolkit.UI.PinchSlider _pinchSliderVertical;
 
+    private Transform _cylindersHolder;
     private Transform _selectedCylinder;
     private Transform _current_emission_holder;
     private float _currentSliderHorizontalValue;
@@ -21,6 +22,7 @@ public class CryptexSliderHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _cylindersHolder = transform.Find("Cylinders");
         _pinchSliderHorizontal = SliderHorizontal.GetComponent<Microsoft.MixedReality.Toolkit.UI.PinchSlider>();
         _pinchSliderVertical = SliderVertical.GetComponent<Microsoft.MixedReality.Toolkit.UI.PinchSlider>();
     }
@@ -65,10 +67,10 @@ public class CryptexSliderHandler : MonoBehaviour
     /// <param name="InputValue"></param>
     private Transform MapInputValueToCylinderName(float InputValue)
     {
-        if (InputValue == 0.25) return transform.Find("Cylinder1");  
-        if (InputValue == 0.50) return transform.Find("Cylinder2");  
-        if (InputValue == 0.75) return transform.Find("Cylinder3");  
-        if (InputValue == 1.00) return transform.Find("Cylinder4");  
+        if (InputValue == 0.25) return _cylindersHolder.Find("Cylinder1");  
+        if (InputValue == 0.50) return _cylindersHolder.Find("Cylinder2");  
+        if (InputValue == 0.75) return _cylindersHolder.Find("Cylinder3");  
+        if (InputValue == 1.00) return _cylindersHolder.Find("Cylinder4");  
 
         return null;
     }

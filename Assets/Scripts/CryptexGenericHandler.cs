@@ -10,9 +10,7 @@ public class CryptexGenericHandler : MonoBehaviour
     public InputGenericHandler InputForCryptex;
     public InputGenericHandler.InputTypes Type;
 
-    //private Microsoft.MixedReality.Toolkit.UI.PinchSlider _pinchSliderHorizontal;
-    //private Microsoft.MixedReality.Toolkit.UI.PinchSlider _pinchSliderVertical;
-
+    private Transform _cylindersHolder;
     private Transform _selectedCylinder;
     private Transform _current_emission_holder;
     private float _currentSliderHorizontalValue;
@@ -22,20 +20,19 @@ public class CryptexGenericHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _cylindersHolder = transform.Find("Cylinders");
         InputForCryptex.Type = Type;
-        //_pinchSliderHorizontal = SliderHorizontal.GetComponent<Microsoft.MixedReality.Toolkit.UI.PinchSlider>();
-        //_pinchSliderVertical = SliderVertical.GetComponent<Microsoft.MixedReality.Toolkit.UI.PinchSlider>();
     }
 
     // Update is called once per frame
     void Update()
     {
         // if user has selected a new cylinder
-        if( _currentSliderHorizontalValue != InputForCryptex.HorizontalValue)  // _pinchSliderHorizontal.SliderValue)
+        if( _currentSliderHorizontalValue != InputForCryptex.HorizontalValue)
         {
             // deactivate the glow/highlight of the previously selected cylinder
             if(_current_emission_holder != null) _current_emission_holder.gameObject.SetActive(false);
-            _currentSliderHorizontalValue = InputForCryptex.HorizontalValue;  // _pinchSliderHorizontal.SliderValue;
+            _currentSliderHorizontalValue = InputForCryptex.HorizontalValue;
         }
 
         // Apply glow/highlight
@@ -47,10 +44,10 @@ public class CryptexGenericHandler : MonoBehaviour
         }
 
         // Rotate Cylinder based on Vertical TouchSlider
-        if( _currentSliderVerticalValue != InputForCryptex.VerticalValue)  // _pinchSliderVertical.SliderValue)
+        if( _currentSliderVerticalValue != InputForCryptex.VerticalValue) 
         {            
             SetRotationBasedOnInputValue(_selectedCylinder, InputForCryptex.VerticalValue - _currentSliderVerticalValue);
-            _currentSliderVerticalValue = InputForCryptex.VerticalValue;  // _pinchSliderVertical.SliderValue;
+            _currentSliderVerticalValue = InputForCryptex.VerticalValue;
         }        
         
     }
@@ -69,18 +66,18 @@ public class CryptexGenericHandler : MonoBehaviour
     {
         if(InputForCryptex.Type == InputGenericHandler.InputTypes.ButtonSquare || InputForCryptex.Type == InputGenericHandler.InputTypes.Radio)
         {
-            if (InputValue == 1.00) return transform.Find("Cylinder1");  
-            if (InputValue == 2.00) return transform.Find("Cylinder2");  
-            if (InputValue == 3.00) return transform.Find("Cylinder3");  
-            if (InputValue == 4.00) return transform.Find("Cylinder4");
+            if (InputValue == 1.00) return _cylindersHolder.Find("Cylinder1");  
+            if (InputValue == 2.00) return _cylindersHolder.Find("Cylinder2");  
+            if (InputValue == 3.00) return _cylindersHolder.Find("Cylinder3");  
+            if (InputValue == 4.00) return _cylindersHolder.Find("Cylinder4");
         }
 
         if (InputForCryptex.Type == InputGenericHandler.InputTypes.Slider)
         {
-            if (InputValue == 0.25) return transform.Find("Cylinder1");  
-            if (InputValue == 0.50) return transform.Find("Cylinder2");  
-            if (InputValue == 0.75) return transform.Find("Cylinder3");  
-            if (InputValue == 1.00) return transform.Find("Cylinder4");  
+            if (InputValue == 0.25) return _cylindersHolder.Find("Cylinder1");  
+            if (InputValue == 0.50) return _cylindersHolder.Find("Cylinder2");  
+            if (InputValue == 0.75) return _cylindersHolder.Find("Cylinder3");  
+            if (InputValue == 1.00) return _cylindersHolder.Find("Cylinder4");  
         }
 
         return null;
