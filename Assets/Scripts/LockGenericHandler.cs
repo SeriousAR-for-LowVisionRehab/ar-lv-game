@@ -8,7 +8,6 @@ public class LockGenericHandler : MonoBehaviour
     {
         result = new int[] { 5, 5, 5 };
         correctCombination = new int[] { 3, 7, 9 };
-        RotateGenericHandler.Rotated += CheckResults;
     }
 
     private void CheckResults(string wheelName, int number)
@@ -36,6 +35,6 @@ public class LockGenericHandler : MonoBehaviour
 
     private void OnDestroy()
     {
-        RotateGenericHandler.Rotated -= CheckResults;
+        Debug.Log(name + ": Destroyed!");
     }
 }
