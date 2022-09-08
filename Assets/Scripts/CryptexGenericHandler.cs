@@ -48,9 +48,9 @@ public class CryptexGenericHandler : MonoBehaviour
 
         // Rotate Cylinder based on Vertical TouchSlider
         if( _currentSliderVerticalValue != InputForCryptex.VerticalValue)  // _pinchSliderVertical.SliderValue)
-        {
+        {            
+            SetRotationBasedOnInputValue(_selectedCylinder, InputForCryptex.VerticalValue - _currentSliderVerticalValue);
             _currentSliderVerticalValue = InputForCryptex.VerticalValue;  // _pinchSliderVertical.SliderValue;
-            SetRotationBasedOnInputValue(_selectedCylinder, _currentSliderVerticalValue);
         }        
         
     }
@@ -67,7 +67,7 @@ public class CryptexGenericHandler : MonoBehaviour
     /// <param name="InputValue"></param>
     private Transform MapInputValueToCylinderName(float InputValue)
     {
-        if(InputForCryptex.Type == InputGenericHandler.InputTypes.ButtonSquare)
+        if(InputForCryptex.Type == InputGenericHandler.InputTypes.ButtonSquare || InputForCryptex.Type == InputGenericHandler.InputTypes.Radio)
         {
             if (InputValue == 1.00) return transform.Find("Cylinder1");  
             if (InputValue == 2.00) return transform.Find("Cylinder2");  
@@ -87,12 +87,15 @@ public class CryptexGenericHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// Based on the Vertical's Input Value, the selected cylinder rotates
+    /// Based on the Vertical's Input Value (positive or negative), the selected cylinder rotates by 90°C on its local y-axis
+    /// 
+    /// WARNING: sensible to SelectedCylinder and parent rotations; test for side effect of Space.Self vs Space.World.
+    /// 
     /// </summary>
     /// <param name="SelectedCylinder"></param>
     /// <param name="InputValue"></param>
     private void SetRotationBasedOnInputValue(Transform SelectedCylinder, float InputValue)
     {
-        SelectedCylinder.Rotate(90.0f, 0.0f, 0.0f, Space.World);
+        SelectedCylinder.Rotate(0.0f, -90.0f * InputValue, 0.0f, Space.Self);
     }
 }

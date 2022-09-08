@@ -1,3 +1,4 @@
+using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 
 /// <summary>
@@ -16,12 +17,34 @@ public class InputGenericHandler : MonoBehaviour
     private float _horizontalValue, _verticalValue;
     public float HorizontalValue { 
         get { return _horizontalValue; }
-        private set { _horizontalValue += value; } }
+        private set { 
+            if( Type == InputTypes.ButtonSquare)
+            {
+                _horizontalValue += value;
+            }
+            else
+            {
+                _horizontalValue = value;
+            }
+            
+        } 
+    }
     public float VerticalValue {
         get { return _verticalValue; }
-        private set { _verticalValue += value; } }
+        private set { 
+            if (Type == InputTypes.ButtonSquare || Type == InputTypes.Radio)
+            {
+                _verticalValue += value;
+            }
+            else
+            {
+                _verticalValue = value;
+            }
+            
+        } 
+    }
 
-    public enum InputTypes { Slider, ButtonSquare}
+    public enum InputTypes { Slider, ButtonSquare, Radio}
     private InputTypes _type;
     public InputTypes Type
     {
@@ -34,8 +57,8 @@ public class InputGenericHandler : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log("Left, Right, Up, Down: " + _leftValue + ", " + _rightValue + ", " + _upValue + ", " + _downValue);
-        Debug.Log("Horizontal, Vertical values: " + _horizontalValue + ", " + _verticalValue);
+        // Debug.Log("Left, Right, Up, Down: " + _leftValue + ", " + _rightValue + ", " + _upValue + ", " + _downValue);
+        // Debug.Log("Horizontal, Vertical values: " + _horizontalValue + ", " + _verticalValue);
     }
 
     /// <summary>
@@ -47,4 +70,10 @@ public class InputGenericHandler : MonoBehaviour
     public void IncreaseRightValue() { _rightValue++; HorizontalValue = 1; }
     public void IncreaseUpValue() { _upValue++; VerticalValue = 1; }
     public void IncreaseDownValue() { _downValue++; VerticalValue = -1; }
+
+    public void RadioSetHorizontalValue()
+    {
+        InteractableToggleCollection myToggle = GetComponentInChildren<InteractableToggleCollection>();
+        HorizontalValue = myToggle.CurrentIndex + 1;
+    }
 }
