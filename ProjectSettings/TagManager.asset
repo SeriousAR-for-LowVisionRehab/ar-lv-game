@@ -35,7 +35,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - AppearUnderFlashlight
   - Spatial Awareness
   m_SortingLayers:
   - name: Default
