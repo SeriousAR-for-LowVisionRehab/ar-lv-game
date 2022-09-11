@@ -206,9 +206,41 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 405926493, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: toolsPrefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 405926493, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: puzzlesPrefabs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 405926493, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: toolsPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 1147965471979518, guid: 0ddea81a21def2441b61569e0a44ca14, type: 3}
+    - target: {fileID: 405926493, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: puzzlesPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 1041222162775995102, guid: 8d54575f78cdf9b4fb84f037e3c738e5, type: 3}
     - target: {fileID: 2747513853535534648, guid: d649ed7a595875544802799abd42b572, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2747513853535534662, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: m_text
+      value: Cryptex Slider
+      objectReference: {fileID: 0}
+    - target: {fileID: 2868444690761154463, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 687606933}
+    - target: {fileID: 2868444690761154463, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: InstantiateTool0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2868444690761154463, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PrepMenuHandler, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3600092089202033355, guid: d649ed7a595875544802799abd42b572, type: 3}
       propertyPath: m_Mesh
@@ -217,6 +249,22 @@ PrefabInstance:
     - target: {fileID: 4651597958740459698, guid: d649ed7a595875544802799abd42b572, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4651597958740459724, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: m_text
+      value: Flashlight
+      objectReference: {fileID: 0}
+    - target: {fileID: 4711374097365795093, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 687606933}
+    - target: {fileID: 4711374097365795093, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: InstantiatePuzzle1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4711374097365795093, guid: d649ed7a595875544802799abd42b572, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PrepMenuHandler, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 6043504902597860711, guid: d649ed7a595875544802799abd42b572, type: 3}
       propertyPath: m_Name
@@ -268,6 +316,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d649ed7a595875544802799abd42b572, type: 3}
+--- !u!114 &687606933 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 405926493, guid: d649ed7a595875544802799abd42b572, type: 3}
+  m_PrefabInstance: {fileID: 687606932}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36ad4a1fd29e74b4393ee731b8f9acd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -789,7 +848,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1932567549
 BoxCollider:
   m_ObjectHideFlags: 0
