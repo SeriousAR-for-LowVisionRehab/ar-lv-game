@@ -1,6 +1,9 @@
 using System.IO;
 using UnityEngine;
 
+/// <summary>
+/// Dummy Script to Export Data to an local CSV file, using StreamWriter
+/// </summary>
 public class DataExportManager : MonoBehaviour
 {
     private string _dummyText = "Test Dummy Text";
