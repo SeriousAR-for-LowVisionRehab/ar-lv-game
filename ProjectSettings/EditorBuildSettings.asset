@@ -8,9 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/TestCryptexSliders.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/TestCryptexButtons.unity
     guid: 4ff9e1432518bc047931a657076b8ad4
+  - enabled: 1
+    path: Assets/Scenes/TestFullv0.unity
+    guid: 8f2e40ff7957dc34981010734c4771e8
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: d791a60193f843e44806900a7aab9d1a, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: f380b76d34569e1418a8bdcc900d5539, type: 2}
