@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1041222162775995103}
+  - component: {fileID: 7920039846245836360}
+  - component: {fileID: 1190173242934901035}
   m_Layer: 0
   m_Name: CryptexSliders
   m_TagString: Untagged
@@ -31,9 +33,111 @@ Transform:
   - {fileID: 2241268552195432421}
   - {fileID: 427013913185955383}
   - {fileID: 4227808442970178168}
+  - {fileID: 7044620011620749046}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7920039846245836360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041222162775995102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a98de877dee5fc341b4eb59dfdab266c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoConstraintSelection: 1
+  selectedConstraints: []
+--- !u!114 &1190173242934901035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041222162775995102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181cd563a8349c34ea8978b0bc8d9c7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hostTransform: {fileID: 1041222162775995103}
+  manipulationType: 2
+  twoHandedManipulationType: 3
+  allowFarManipulation: 1
+  useForcesForNearManipulation: 0
+  oneHandRotationModeNear: 1
+  oneHandRotationModeFar: 1
+  releaseBehavior: 3
+  transformSmoothingLogicType:
+    reference: Microsoft.MixedReality.Toolkit.Utilities.DefaultTransformSmoothingLogic,
+      Microsoft.MixedReality.Toolkit.SDK
+  smoothingFar: 1
+  smoothingNear: 1
+  moveLerpTime: 0.001
+  rotateLerpTime: 0.001
+  scaleLerpTime: 0.001
+  enableConstraints: 1
+  constraintsManager: {fileID: 7920039846245836360}
+  elasticsManager: {fileID: 0}
+  onManipulationStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onManipulationEnded:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExited:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1 &4821510507439972919
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7044620011620749046}
+  - component: {fileID: 1075728369943090463}
+  m_Layer: 0
+  m_Name: TheAdjusterFixed
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &7044620011620749046
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821510507439972919}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1041222162775995103}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1075728369943090463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821510507439972919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b074ba52962ad9e48b9c239fc6f94689, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1041222162685228209
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51,15 +155,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1254744896116435796, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.799
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1254744896116435796, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.7338543
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1254744896116435796, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -21.4765
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1254744896116435796, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -140,7 +244,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2899108701960183589, guid: b4a7da349d644564c84827e6e97c73c6, type: 3}
       propertyPath: sliderEndDistance
-      value: 0.07174556
+      value: 0.07174564
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b4a7da349d644564c84827e6e97c73c6, type: 3}
       propertyPath: sliderStartDistance
@@ -152,15 +256,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b4a7da349d644564c84827e6e97c73c6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.865
+      value: 0.106
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b4a7da349d644564c84827e6e97c73c6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.607
+      value: -0.234
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b4a7da349d644564c84827e6e97c73c6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -21.778
+      value: -0.25
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b4a7da349d644564c84827e6e97c73c6, type: 3}
       propertyPath: m_LocalRotation.w
@@ -218,6 +322,14 @@ PrefabInstance:
       value: PinchSliderVertical
       objectReference: {fileID: 0}
     - target: {fileID: 8854968263891267261, guid: 6510cdd7db8ce8445b6e1cb2b9617866, type: 3}
+      propertyPath: sliderEndDistance
+      value: 0.071784854
+      objectReference: {fileID: 0}
+    - target: {fileID: 8854968263891267261, guid: 6510cdd7db8ce8445b6e1cb2b9617866, type: 3}
+      propertyPath: sliderStartDistance
+      value: -0.12971409
+      objectReference: {fileID: 0}
+    - target: {fileID: 8854968263891267261, guid: 6510cdd7db8ce8445b6e1cb2b9617866, type: 3}
       propertyPath: sliderStepDivisions
       value: 4
       objectReference: {fileID: 0}
@@ -231,15 +343,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8854968263891267262, guid: 6510cdd7db8ce8445b6e1cb2b9617866, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.114
+      value: 0.417
       objectReference: {fileID: 0}
     - target: {fileID: 8854968263891267262, guid: 6510cdd7db8ce8445b6e1cb2b9617866, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.841
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 8854968263891267262, guid: 6510cdd7db8ce8445b6e1cb2b9617866, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -21.778
+      value: -0.25
       objectReference: {fileID: 0}
     - target: {fileID: 8854968263891267262, guid: 6510cdd7db8ce8445b6e1cb2b9617866, type: 3}
       propertyPath: m_LocalRotation.w

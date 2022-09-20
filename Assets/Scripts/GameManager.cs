@@ -1,9 +1,7 @@
 using Microsoft.MixedReality.WorldLocking.Core;
 using System;
 using System.IO;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// GameManager is a Singleton.
@@ -22,9 +20,21 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    private bool _gameStarted = false;
-    private bool _gameFinished = false;
+    private bool _isGameStarted = false;  // true if the player has started a new game
+    public bool IsGameStarted
+    {
+        get { return _isGameStarted; }
+        set { _isGameStarted = value; }
+    }
+
+    // private bool _gameFinished = false;  // true if the player solved the entire escape room
+
     private bool _isGamePrepared = false;  // true if the escape room has been setup
+    public bool IsGamePrepared
+    { 
+        get { return _isGamePrepared; }
+        set { _isGamePrepared = value; }        
+    }
     private PlayerData _playerData;
     private string _savePathDir;
     private string _playerDatafileName = "PlayerData.json";
@@ -54,54 +64,6 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Load the scene to setup the escape room: this is for the therapist/medical staff.
-    /// In that scene, the GameObjects puzzles are places/displayed.
-    /// </summary>
-    public void StartSetupGame()
-    {
-        SceneManager.LoadScene(1);
-    }
-
-    /// <summary>
-    /// Save the prepared escape room.
-    /// </summary>
-    public void SaveSetupGame()
-    {
-        WorldLockingManager.GetInstance().Save();
-        _isGamePrepared = true;
-    }
-
-    /// <summary>
-    /// Load an existing game for the player.
-    /// The anchors etc. are loaded from the previous session.
-    /// </summary>
-    public void LoadExistingGame()
-    {
-        if (!_gameStarted)
-        {
-            Debug.Log("No current game available. Please start a New Game.");
-            return;
-        }
-
-        SceneManager.LoadScene(2);
-    }
-
-    /// <summary>
-    /// Load a NEW game for the player.
-    /// In that scene, the GameObjects puzzles are solved by the player. Anchors are reset.
-    /// </summary>
-    public void StartNewGame()
-    {
-        if (!_isGamePrepared)
-        {
-            Debug.Log("Escape room need to be prepared first. Please ask your support team.");
-            return;
-        }
-
-        SceneManager.LoadScene(2);
-    }
-
-    /// <summary>
     /// Save Game Data: include player data // and possibly others...
     /// </summary>
     public void SaveGame()
@@ -110,18 +72,6 @@ public class GameManager : MonoBehaviour
         SavePlayerDataToJson(_playerData);
     }
 
-
-    /// <summary>
-    /// Terminate Exit any of the scene: the actual game or the setup game.
-    /// </summary>
-    public void ExitGameApplication()
-    {
-#if UNITY_EDITOR
-        EditorApplication.ExitPlaymode();
-#else
-        Application.Quit();
-#endif
-    }
 
     /// <summary>
     /// Data of the player that will be saved across sessions
