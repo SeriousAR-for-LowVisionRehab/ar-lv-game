@@ -1,20 +1,16 @@
 using Microsoft.MixedReality.WorldLocking.Core;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 /// <summary>
 /// GameManager is a Singleton.
 /// 
-/// The GameManager handles
-///  - load and save of PlayerData
-///  - load and save of scenes: setup scene, new game
-///  - exit of application
+/// The GameManager handles:
+///  - load and save of PlayerData,
+///  - list the available prefabs and tools to create the escape room
 ///  
-/// Scenes numbers
-///  0) start menu
-///  1) setup game
-///  2) actual game: currently TestFullV0
 /// </summary>
 public class GameManager : MonoBehaviour
 {
@@ -29,22 +25,30 @@ public class GameManager : MonoBehaviour
 
     // private bool _gameFinished = false;  // true if the player solved the entire escape room
 
+    [SerializeField]
     private bool _isGamePrepared = false;  // true if the escape room has been setup
     public bool IsGamePrepared
     { 
         get { return _isGamePrepared; }
         set { _isGamePrepared = value; }        
     }
-    private PlayerData _playerData;
+    private PlayerData _thePlayerData;
+    public PlayerData ThePlayerData { get { return _thePlayerData; } }
+
     private string _savePathDir;
     private string _playerDatafileName = "PlayerData.json";
 
     [SerializeField]
-    private GameObject[] puzzlesPrefabs;
+    private List<GameObject> _availablePuzzlesPrefabs;
+    public List<GameObject> AvailablePuzzlesPrefabs{get { return _availablePuzzlesPrefabs;}}
 
-    // private WorldLockingManager worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
+    [SerializeField]
+    private List<GameObject> _availableToolsPrefabs;
+    public List<GameObject> AvailableToolsPrefabs { get { return _availableToolsPrefabs; } }
 
-    // Awake() is called at the object's creation
+    /// <summary>
+    /// Awake() is called at the object's creation. Ensure that GameManager is a Singleton.
+    /// </summary>
     private void Awake()
     {
         // keep only a single GameManager GameObject
@@ -61,15 +65,6 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
-
-    /// <summary>
-    /// Save Game Data: include player data // and possibly others...
-    /// </summary>
-    public void SaveGame()
-    {
-        WorldLockingManager.GetInstance().Save();
-        SavePlayerDataToJson(_playerData);
     }
 
 
@@ -95,7 +90,7 @@ public class GameManager : MonoBehaviour
         string fullPath = Path.Combine(_savePathDir, _playerDatafileName);
 
         // Serialize
-        string jsonString = JsonUtility.ToJson(_playerData);
+        string jsonString = JsonUtility.ToJson(_thePlayerData);
         File.WriteAllText(fullPath, jsonString);
 
         Debug.Log("Player data is saved under: " + fullPath);
@@ -110,6 +105,6 @@ public class GameManager : MonoBehaviour
         string fullPath = Path.Combine(_savePathDir, _playerDatafileName);
 
         string json = File.ReadAllText(fullPath);
-        _playerData = JsonUtility.FromJson<PlayerData>(json);
+        _thePlayerData = JsonUtility.FromJson<PlayerData>(json);
     }
 }

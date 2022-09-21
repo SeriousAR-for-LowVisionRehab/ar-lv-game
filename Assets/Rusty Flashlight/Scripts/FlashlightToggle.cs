@@ -57,8 +57,8 @@ public class FlashlightToggle : MonoBehaviour
         }
         else
         {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.up) * 1000, Color.white);
-            Debug.Log("Did not Hit");
+            //Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.up) * 1000, Color.white);
+            //Debug.Log("Did not Hit");
         }
     }
 }

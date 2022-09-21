@@ -4,12 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class StartMenuHandler : MonoBehaviour
 {
-    private GameManager _gameManager;
-
-    private void Start()
-    {
-        _gameManager = FindObjectOfType<GameManager>();
-    }
 
     /// <summary>
     /// Load an existing game for the player.
@@ -17,9 +11,9 @@ public class StartMenuHandler : MonoBehaviour
     /// </summary>
     public void LoadExistingGame()
     {
-        if (!_gameManager.IsGameStarted)
+        if (!GameManager.Instance.IsGameStarted)
         {
-            Debug.Log("No current game available. Please start a New Game.");
+            Debug.Log("[StartMenuHandler] No current game available. Please start a New Game.");
             return;
         }
 
@@ -32,9 +26,9 @@ public class StartMenuHandler : MonoBehaviour
     /// </summary>
     public void StartNewGame()
     {
-        if (!_gameManager.IsGamePrepared)
+        if (!GameManager.Instance.IsGamePrepared)
         {
-            Debug.Log("Escape room need to be prepared first. Please ask your support team.");
+            Debug.Log("[StartMenuHandler] Escape room need to be prepared first. Please ask your support team.");
             return;
         }
 
