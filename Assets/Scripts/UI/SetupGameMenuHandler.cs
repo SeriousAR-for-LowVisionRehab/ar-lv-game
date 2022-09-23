@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// Handle the actions possible by the menu in the SetupGame scene: to prepare the escape room
 /// </summary>
-public class SetupGameMenuHandler : MonoBehaviour
+public class SetUpGameMenuHandler : MonoBehaviour
 {
 
     /// <summary>
