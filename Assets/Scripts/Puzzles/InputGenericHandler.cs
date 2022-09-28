@@ -8,13 +8,19 @@ using UnityEngine;
 /// </summary>
 public class InputGenericHandler : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject _controlledPuzzle;
+
     // The number of effective clicks for each four directions
     private float _leftValue;
     private float _rightValue;
     private float _upValue;
     private float _downValue;
-    // The value of the axes as Properties
+
+    private InputTypes _type;
     private float _horizontalValue, _verticalValue;
+
+    // The value of the axes as Properties
     public float HorizontalValue { 
         get { return _horizontalValue; }
         private set { 
@@ -26,6 +32,12 @@ public class InputGenericHandler : MonoBehaviour
             {
                 _horizontalValue = value;
             }
+            if (_horizontalValue <= 0) _horizontalValue = 1;
+            if (_horizontalValue > _controlledPuzzle.GetComponent<CryptexGenericHandler>().NumberOfCylinders)
+            {
+                _horizontalValue = _controlledPuzzle.GetComponent<CryptexGenericHandler>().NumberOfCylinders;
+            }
+            
             
         } 
     }
@@ -45,7 +57,7 @@ public class InputGenericHandler : MonoBehaviour
     }
 
     public enum InputTypes { Slider, ButtonSquare, Radio}
-    private InputTypes _type;
+    
     public InputTypes Type
     {
         get { return _type; }
@@ -53,12 +65,6 @@ public class InputGenericHandler : MonoBehaviour
         {
             _type = value;
         }
-    }
-
-    private void Update()
-    {
-        // Debug.Log("Left, Right, Up, Down: " + _leftValue + ", " + _rightValue + ", " + _upValue + ", " + _downValue);
-        // Debug.Log("Horizontal, Vertical values: " + _horizontalValue + ", " + _verticalValue);
     }
 
     /// <summary>
@@ -77,3 +83,4 @@ public class InputGenericHandler : MonoBehaviour
         HorizontalValue = myToggle.CurrentIndex + 1;
     }
 }
+

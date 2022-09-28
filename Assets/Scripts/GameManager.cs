@@ -14,37 +14,38 @@ using UnityEngine;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
-
+    private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
     private bool _isGameStarted = false;  // true if the player has started a new game
+    // private bool _gameFinished = false;  // true if the player solved the entire escape room
+    [SerializeField]
+    private bool _isGamePrepared = false;  // true if the escape room has been setup
+    private PlayerData _thePlayerData;
+    private string _savePathDir;
+    private string _playerDatafileName = "PlayerData.json";
+    [SerializeField]
+    private List<GameObject> _availablePuzzlesPrefabs;  // what the player has to solve
+    [SerializeField]
+    private List<GameObject> _availableToolsPrefabs;  // what the player can use to solve the puzzles
+
+    /// <summary>
+    /// Use current instance of WorldLockingManager.
+    /// </summary>
+    public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
     public bool IsGameStarted
     {
         get { return _isGameStarted; }
         set { _isGameStarted = value; }
     }
-
-    // private bool _gameFinished = false;  // true if the player solved the entire escape room
-
-    [SerializeField]
-    private bool _isGamePrepared = false;  // true if the escape room has been setup
     public bool IsGamePrepared
-    { 
+    {
         get { return _isGamePrepared; }
-        set { _isGamePrepared = value; }        
+        set { _isGamePrepared = value; }
     }
-    private PlayerData _thePlayerData;
     public PlayerData ThePlayerData { get { return _thePlayerData; } }
-
-    private string _savePathDir;
-    private string _playerDatafileName = "PlayerData.json";
-
-    [SerializeField]
-    private List<GameObject> _availablePuzzlesPrefabs;
-    public List<GameObject> AvailablePuzzlesPrefabs{get { return _availablePuzzlesPrefabs;}}
-
-    [SerializeField]
-    private List<GameObject> _availableToolsPrefabs;
+    public List<GameObject> AvailablePuzzlesPrefabs { get { return _availablePuzzlesPrefabs; } }
     public List<GameObject> AvailableToolsPrefabs { get { return _availableToolsPrefabs; } }
+    
+    public static GameManager Instance;
 
     /// <summary>
     /// Awake() is called at the object's creation. Ensure that GameManager is a Singleton.
@@ -54,14 +55,11 @@ public class GameManager : MonoBehaviour
         // keep only a single GameManager GameObject
         if(Instance != null)
         {
-            WorldLockingManager.GetInstance().Load();
             Destroy(gameObject);
             return;
         }
 
-        WorldLockingManager.GetInstance();
-
-        Debug.Log("FrozenWorldFileName : " + WorldLockingManager.GetInstance().FrozenWorldFileName);
+        Debug.Log("FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
 
         Instance = this;
         DontDestroyOnLoad(gameObject);

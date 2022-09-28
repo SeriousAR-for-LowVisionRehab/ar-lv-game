@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 1041222162775995103}
   - component: {fileID: 7920039846245836360}
   - component: {fileID: 1190173242934901035}
+  - component: {fileID: -7549348345643226435}
+  - component: {fileID: 4821396179808810077}
   m_Layer: 0
   m_Name: CryptexSliders
   m_TagString: Untagged
@@ -27,13 +29,12 @@ Transform:
   m_GameObject: {fileID: 1041222162775995102}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2241268552195432421}
   - {fileID: 427013913185955383}
   - {fileID: 4227808442970178168}
-  - {fileID: 7044620011620749046}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -94,45 +95,29 @@ MonoBehaviour:
   onHoverExited:
     m_PersistentCalls:
       m_Calls: []
---- !u!1 &4821510507439972919
-GameObject:
+--- !u!54 &-7549348345643226435
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7044620011620749046}
-  - component: {fileID: 1075728369943090463}
-  m_Layer: 0
-  m_Name: TheAdjusterFixed
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7044620011620749046
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821510507439972919}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1041222162775995103}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1075728369943090463
+  m_GameObject: {fileID: 1041222162775995102}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &4821396179808810077
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4821510507439972919}
+  m_GameObject: {fileID: 1041222162775995102}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b074ba52962ad9e48b9c239fc6f94689, type: 3}

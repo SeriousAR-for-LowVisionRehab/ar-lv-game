@@ -53,6 +53,7 @@ public class StartMenuHandler : MonoBehaviour
 #if UNITY_EDITOR
         EditorApplication.ExitPlaymode();
 #else
+        GameManager.Instance.WorldLockingManager.Save();
         Application.Quit();
 #endif
     }

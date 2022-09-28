@@ -1,3 +1,4 @@
+using Microsoft.MixedReality.Toolkit.UI;
 using TMPro;
 using UnityEngine;
 
@@ -8,8 +9,12 @@ using UnityEngine;
 public class SolutionCryptexHandler : MonoBehaviour
 {
     [SerializeField]
+    private GameObject _messageSolutionDialog;
+    [SerializeField]
     private string[] _selectedValues, _solutionValues;
     private bool _isSolved = false;
+    private string _titleDialog = "You cracked it! Awesome! Here is the message:";
+    private string _descriptionDialog = " - Diary notes - 05/10/1957 - \r\nToday, still in the Andes, we walked near a lake with a breath-taking view on a dormant volcano on the Argetina-Chile border. Its white top is wonderful. Tomorrow will be the start of our hike to get clother this highest peak in Chile.";
 
     // Start is called before the first frame update
     void Start()
@@ -57,7 +62,18 @@ public class SolutionCryptexHandler : MonoBehaviour
         {
             if(_selectedValues[i] == _solutionValues[i]) { _nbCorrect++; }
         }
-        if (_nbCorrect == _selectedValues.Length) { Debug.Log("Lock Opened!"); _isSolved = true; }
+        if (_nbCorrect == _selectedValues.Length) { LockOpened(); }
+    }
+
+    /// <summary>
+    /// Is called once the puzzle is solved.
+    /// Opens a Dialog with a message and an OK button, placed at near interaction range (direct hand interaction)
+    /// </summary>
+    private void LockOpened()
+    {
+        Debug.Log("Lock Opened!");
+        Dialog.Open(_messageSolutionDialog, DialogButtonType.OK, _titleDialog, _descriptionDialog, true);
+        _isSolved = true;
     }
 
     private void OnDestroy()

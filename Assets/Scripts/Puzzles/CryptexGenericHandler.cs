@@ -6,9 +6,9 @@ using UnityEngine;
 /// </summary>
 public class CryptexGenericHandler : MonoBehaviour
 {
-    //public GameObject SliderHorizontal    
+    public int NumberOfCylinders = 4;
     public InputGenericHandler InputForCryptex;
-    public InputGenericHandler.InputTypes Type;
+    public InputGenericHandler.InputTypes TypeOfInput;
 
     private Transform _cylindersHolder;
     private Transform _selectedCylinder;
@@ -21,7 +21,7 @@ public class CryptexGenericHandler : MonoBehaviour
     void Start()
     {
         _cylindersHolder = transform.Find("Cylinders");
-        InputForCryptex.Type = Type;
+        InputForCryptex.Type = TypeOfInput;
     }
 
     // Update is called once per frame
@@ -85,9 +85,6 @@ public class CryptexGenericHandler : MonoBehaviour
 
     /// <summary>
     /// Based on the Vertical's Input Value (positive or negative), the selected cylinder rotates by 90°C on its local y-axis
-    /// 
-    /// WARNING: sensible to SelectedCylinder and parent rotations; test for side effect of Space.Self vs Space.World.
-    /// 
     /// </summary>
     /// <param name="SelectedCylinder"></param>
     /// <param name="InputValue"></param>

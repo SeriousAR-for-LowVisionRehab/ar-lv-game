@@ -7,6 +7,10 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class PlayerMenuHandler : MonoBehaviour
 {
+    private void Awake()
+    {
+        GameManager.Instance.WorldLockingManager.Load();
+    }
 
     /// <summary>
     /// Save Game Data: include player data // and possibly others...

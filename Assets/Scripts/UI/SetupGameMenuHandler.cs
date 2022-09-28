@@ -7,15 +7,18 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class SetUpGameMenuHandler : MonoBehaviour
 {
+    private void Awake()
+    {
+        GameManager.Instance.WorldLockingManager.Load();
+    }
 
     /// <summary>
     /// Save the prepared escape room.
     /// </summary>
     public void SaveSetupGame()
     {
-        WorldLockingManager.GetInstance().Save();
+        GameManager.Instance.WorldLockingManager.Save();
         GameManager.Instance.IsGamePrepared = true;
-        Debug.Log("[SetupGameMenuHandler] Setup of Escape Room is saved.");
     }
 
     /// <summary>
@@ -32,10 +35,9 @@ public class SetUpGameMenuHandler : MonoBehaviour
     /// </summary>
     public void InstantiatePuzzle0()
     {
-        GameObject puzzle0 = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[0], transform, false);
-        puzzle0.transform.position += new Vector3(0, 0, .5f);
-        Debug.Log("[SetupGameMenuHandler] " + puzzle0.name + " at position " + puzzle0.transform.position);
-        Debug.Log("[SetupGameMenuHandler] PrepMenuHandler position = " + transform.position);
+        //GameObject puzzle0 = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[0], transform, false);
+        GameObject puzzle0 = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[0], new Vector3(0, 0, 0.75f), Quaternion.identity);
+        //puzzle0.transform.position += new Vector3(0, 0, .5f);
     }
 
     /// <summary>
@@ -45,8 +47,6 @@ public class SetUpGameMenuHandler : MonoBehaviour
     {
         GameObject puzzle1 = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[1], transform, false);
         puzzle1.transform.position += new Vector3(0, 0, .5f);
-        Debug.Log("[SetupGameMenuHandler] " + puzzle1.name + " at position " + puzzle1.transform.position);
-        Debug.Log("[SetupGameMenuHandler] PrepMenuHandler position = " + transform.position);
     }
 
     /// <summary>
@@ -56,7 +56,5 @@ public class SetUpGameMenuHandler : MonoBehaviour
     {
         GameObject tool0 = Instantiate(GameManager.Instance.AvailableToolsPrefabs[0], transform, false);
         tool0.transform.position += new Vector3(0, 0, .5f);
-        Debug.Log("[SetupGameMenuHandler] " + tool0.name + " at position " + tool0.transform.position);
-        Debug.Log("[SetupGameMenuHandler] PrepMenuHandler position = " + transform.position);
     }
 }
