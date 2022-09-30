@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - GameManager
+  - DangerousObstacle
+  - StartPuzzle
+  - EndPuzzle
   layers:
   - Default
   - TransparentFX
@@ -34,7 +37,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - StartOfPuzzle
   - EndOfPuzzle
   - AppearUnderFlashlight
   - Spatial Awareness
