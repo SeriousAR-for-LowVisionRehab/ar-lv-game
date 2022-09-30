@@ -8,6 +8,11 @@ public class FlashlightToggle : MonoBehaviour
     public GameObject lightGO; //light gameObject to work with
     private bool isOn = true; //is flashlight on or off?
 
+    private int layerMask = 1 << 30;  // Bit shift the index of the layer(30) to get a bit mask
+                                      // This cast rays only against colliders in layer 30.
+                                      // If instead we want to collide against everything except layer 30.
+                                      // The ~ operator does this, it inverts a bitmask e.g.: layerMask = ~layerMask;
+
     // Use this for initialization
     void Start()
     {
@@ -39,15 +44,17 @@ public class FlashlightToggle : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Bit shift the index of the layer (30) to get a bit mask
-        int layerMask = 1 << 30;
+        CheckRaycast(layerMask);
+    }
 
-        // This would cast rays only against colliders in layer 30.
-        // But instead we want to collide against everything except layer 30. The ~ operator does this, it inverts a bitmask.
-        // layerMask = ~layerMask;
-
+    /// <summary>
+    /// Check if the ray intersect any objects on the given layer
+    /// </summary>
+    /// <param name="layerMask"></param>
+    private void CheckRaycast(int layerMask)
+    {
         RaycastHit hit;
-        // Does the ray intersect any objects excluding the player layer
+
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), out hit, Mathf.Infinity, layerMask))
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.up) * hit.distance, Color.yellow);
