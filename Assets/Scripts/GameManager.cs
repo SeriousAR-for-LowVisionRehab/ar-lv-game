@@ -17,19 +17,13 @@ public class GameManager : MonoBehaviour
     private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
     private bool _isGameStarted = false;  // true if the player has started a new game
     // private bool _gameFinished = false;  // true if the player solved the entire escape room
-    [SerializeField]
-    private bool _isGamePrepared = false;  // true if the escape room has been setup
+    [SerializeField] private bool _isGamePrepared = false;  // true if the escape room has been setup
     private PlayerData _thePlayerData;
     private string _savePathDir;
     private string _playerDatafileName = "PlayerData.json";
-    [SerializeField]
-    private List<GameObject> _availablePuzzlesPrefabs;  // what the player has to solve
-    [SerializeField]
-    private List<GameObject> _availableToolsPrefabs;  // what the player can use to solve the puzzles
+    [SerializeField] private List<GameObject> _availablePuzzlesPrefabs;  // what the player has to solve
+    [SerializeField] private List<GameObject> _availableToolsPrefabs;  // what the player can use to solve the puzzles
 
-    /// <summary>
-    /// Use current instance of WorldLockingManager.
-    /// </summary>
     public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
     public bool IsGameStarted
     {
@@ -41,10 +35,9 @@ public class GameManager : MonoBehaviour
         get { return _isGamePrepared; }
         set { _isGamePrepared = value; }
     }
-    public PlayerData ThePlayerData { get { return _thePlayerData; } }
+    public PlayerData ThePlayerData {get { return _thePlayerData; }}
     public List<GameObject> AvailablePuzzlesPrefabs { get { return _availablePuzzlesPrefabs; } }
-    public List<GameObject> AvailableToolsPrefabs { get { return _availableToolsPrefabs; } }
-    
+    public List<GameObject> AvailableToolsPrefabs { get { return _availableToolsPrefabs; } }    
     public static GameManager Instance;
 
     /// <summary>
@@ -60,6 +53,12 @@ public class GameManager : MonoBehaviour
         }
 
         Debug.Log("FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
+
+        _thePlayerData = new PlayerData();
+        _thePlayerData.PlayerID = "X01480JS";
+        _thePlayerData.NumberOfPuzzlesStarted = 1;
+        _thePlayerData.NumberOfPuzzlesSolved = 0;
+
 
         Instance = this;
         DontDestroyOnLoad(gameObject);

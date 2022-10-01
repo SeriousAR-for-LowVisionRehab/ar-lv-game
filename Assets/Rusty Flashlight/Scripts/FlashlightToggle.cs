@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
+﻿using UnityEngine;
 
 public class FlashlightToggle : MonoBehaviour
 {
     public GameObject lightGO; //light gameObject to work with
+    private TypesOfLight _typeOfLight;
     private bool isOn = true; //is flashlight on or off?
 
     private int layerMask = 1 << 30;  // Bit shift the index of the layer(30) to get a bit mask
@@ -18,6 +16,14 @@ public class FlashlightToggle : MonoBehaviour
 
     public GameObject TheBoardWire0;
     private FollowWireHandler _theBoardScript;
+
+
+    public enum TypesOfLight { Reveal, Follow }
+    public TypesOfLight TypeOfLight
+    {
+        get { return _typeOfLight; }
+        set { _typeOfLight = value; }
+    }
 
     // Use this for initialization
     void Start()
@@ -72,7 +78,9 @@ public class FlashlightToggle : MonoBehaviour
             Debug.Log("Did Hit: " + hit.transform.name);
             MeshRenderer hitMeshRenderer = hit.transform.GetComponent<MeshRenderer>();
             hitMeshRenderer.enabled = true;
-        } else if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskFollowWire))
+        } 
+        
+        if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskFollowWire))
         {
             if (!_theBoardScript.IsPuzzleStarted) _theBoardScript.IsPuzzleStarted = true;
 
@@ -82,17 +90,15 @@ public class FlashlightToggle : MonoBehaviour
             MeshRenderer hitMeshRenderer = hit.transform.GetComponent<MeshRenderer>();
             hitMeshRenderer.enabled = true;
         }
-        else if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskEndPuzzle))
+
+        if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskEndPuzzle))
         {
             Debug.Log("Layer mask END");
         }
-        else if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskStartPuzzle))
+
+        if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskStartPuzzle))
         {
             Debug.Log("Layesr mask START");
-        }
-        else
-        {
-            Debug.DrawRay(thePosition, theDirection * 1000, Color.white);
         }
     }
 }
