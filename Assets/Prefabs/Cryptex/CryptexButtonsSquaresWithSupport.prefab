@@ -6461,6 +6461,10 @@ PrefabInstance:
       propertyPath: SliderHorizontal
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 1254744896116435797, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
+      propertyPath: TypeOfHorizontalInput
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3238245612843272984, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: _messageSolution
       value: 
@@ -6498,7 +6502,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 14
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!4 &2241268552195432421 stripped
 Transform:

@@ -2,6 +2,37 @@ using UnityEngine;
 
 public class OneUniqueSceneMenuHandler : MonoBehaviour
 {
+
+    /// <summary>
+    /// Active / Deactive the Puzzle 0 (if deactivated or activated respectively).
+    /// </summary>
+    public void SetActivePuzzle0()
+    {
+        GameManager.Instance.AvailablePuzzlesPrefabs[0].SetActive(!GameManager.Instance.AvailablePuzzlesPrefabs[0].activeSelf);
+    }
+
+    public void SetActivePuzzle1()
+    {
+        GameManager.Instance.AvailablePuzzlesPrefabs[1].SetActive(!GameManager.Instance.AvailablePuzzlesPrefabs[1].activeSelf);
+    }
+
+    public void SetActivePuzzle2()
+    {
+        GameManager.Instance.AvailablePuzzlesPrefabs[2].SetActive(!GameManager.Instance.AvailablePuzzlesPrefabs[2].activeSelf);
+    }
+
+    public void SetActivePuzzle3()
+    {
+        GameManager.Instance.AvailablePuzzlesPrefabs[3].SetActive(!GameManager.Instance.AvailablePuzzlesPrefabs[3].activeSelf);
+    }
+
+    public void SetActiveTool0()
+    {
+        GameManager.Instance.AvailableToolsPrefabs[0].SetActive(!GameManager.Instance.AvailableToolsPrefabs[0].activeSelf);
+    }
+
+
+
     /// <summary>
     /// Instantiate the Puzzle at index 0
     /// </summary>
@@ -17,6 +48,7 @@ public class OneUniqueSceneMenuHandler : MonoBehaviour
     {
         GameObject puzzle = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[1], new Vector3(-0.25f, 0, 0.75f), Quaternion.identity);
     }
+
 
     /// <summary>
     /// Instantiate the Puzzle at index 2

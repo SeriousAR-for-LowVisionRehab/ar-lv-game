@@ -80,9 +80,21 @@ public class FlashlightToggle : MonoBehaviour
             hitMeshRenderer.enabled = true;
         } 
         
-        if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskFollowWire))
+
+
+
+
+        if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskStartPuzzle))
+        {
+            Debug.Log("Layesr mask START");
+            _theBoardScript.IsPuzzleStarted = true;
+            _theBoardScript.IsOffWire = false;
+
+        }
+        else if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskFollowWire))
         {
             if (!_theBoardScript.IsPuzzleStarted) _theBoardScript.IsPuzzleStarted = true;
+            _theBoardScript.IsOffWire = false;
 
             Debug.DrawRay(thePosition, theDirection * hit.distance, Color.yellow);
             Debug.Log("Did Hit: " + hit.transform.name);
@@ -90,15 +102,21 @@ public class FlashlightToggle : MonoBehaviour
             MeshRenderer hitMeshRenderer = hit.transform.GetComponent<MeshRenderer>();
             hitMeshRenderer.enabled = true;
         }
-
-        if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskEndPuzzle))
+        else if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskEndPuzzle))
         {
             Debug.Log("Layer mask END");
+            _theBoardScript.IsPuzzleFinished = true;
+            _theBoardScript.IsOffWire = true;
         }
-
-        if (Physics.Raycast(thePosition, theDirection, out hit, Mathf.Infinity, _layerMaskStartPuzzle))
+        else
         {
-            Debug.Log("Layesr mask START");
+            // If the player went through the start gate but not the end gate, and
+            // she is off the wire, miss-counter increments:
+            if(_theBoardScript.IsPuzzleStarted && !_theBoardScript.IsPuzzleFinished && !_theBoardScript.IsOffWire)
+            {
+                _theBoardScript.IsOffWire = true;
+                _theBoardScript.OffWireCount++;                
+            }
         }
     }
 }

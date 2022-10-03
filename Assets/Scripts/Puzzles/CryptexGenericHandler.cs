@@ -8,7 +8,7 @@ public class CryptexGenericHandler : MonoBehaviour
 {
     public int NumberOfCylinders = 4;
     public InputGenericHandler InputForCryptex;
-    public InputGenericHandler.InputTypes TypeOfInput;
+    public InputGenericHandler.InputTypes TypeOfHorizontalInput;
 
     private Transform _cylindersHolder;
     private Transform _selectedCylinder;
@@ -21,7 +21,7 @@ public class CryptexGenericHandler : MonoBehaviour
     void Start()
     {
         _cylindersHolder = transform.Find("Cylinders");
-        InputForCryptex.Type = TypeOfInput;
+        InputForCryptex.Type = TypeOfHorizontalInput;
     }
 
     // Update is called once per frame
