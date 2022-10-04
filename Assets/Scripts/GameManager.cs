@@ -1,3 +1,4 @@
+using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.WorldLocking.Core;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        _worldLockingManager.Load();
         Debug.Log("FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
 
         _thePlayerData = new PlayerData();
@@ -114,15 +116,85 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="referencePosition"></param>
     /// <param name="objectPosition"></param>
-    public void resetPuzzleToMidpointAnchorAB(GameObject puzzleToReset)
+    public void ResetPuzzleToMidpointAnchorAB(GameObject puzzleToReset)
     {
         Vector3 midpoint = Vector3.Lerp(_anchors[0].transform.position, _anchors[1].transform.position, 0.5f);
         puzzleToReset.transform.position = midpoint;
     }
 
-    public void resetPuzzleToMidpointAnchorAB(GameObject puzzleToReset, Vector3 offset)
+    public void ResetPuzzleToMidpointAnchorAB(GameObject puzzleToReset, Vector3 offset)
     {
         Vector3 midpoint = Vector3.Lerp(_anchors[0].transform.position, _anchors[1].transform.position, 0.5f);
         puzzleToReset.transform.position = midpoint + offset;
+    }
+
+    /// <summary>
+    /// Freeze the puzzles into their place by deactivating possible manipulation.
+    /// </summary>
+    public void FreezePuzzlesInPlace()
+    {
+        foreach(var puzzle in _availablePuzzlesPrefabs)
+        {
+            ObjectManipulator manipulatorScript = puzzle.GetComponent<ObjectManipulator>();
+            if(manipulatorScript != null)
+            {
+                manipulatorScript.enabled = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Unfreeze the puzzles into their place by activating possible manipulation.
+    /// </summary>
+    public void UnfreezePuzzleInPlace()
+    {
+        foreach (var puzzle in _availablePuzzlesPrefabs)
+        {
+            ObjectManipulator manipulatorScript = puzzle.GetComponent<ObjectManipulator>();
+            if (manipulatorScript != null)
+            {
+                manipulatorScript.enabled = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Deactivate the possibility to solve the puzzles.
+    /// </summary>
+    public void FreezeControllerOfPuzzles()
+    {
+        foreach(var puzzle in _availablePuzzlesPrefabs)
+        {
+            var controller = puzzle.GetComponentInChildren<SolutionCryptexHandler>();
+            var boxCollider = puzzle.GetComponentInChildren<BoxCollider>();
+            if(controller != null)
+            {
+                controller.enabled = false;
+            }
+            if(boxCollider != null)
+            {
+                boxCollider.enabled = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Aactivate the possibility to solve the puzzles.
+    /// </summary>
+    public void UnfreezeControllerOfPuzzles()
+    {
+        foreach (var puzzle in _availablePuzzlesPrefabs)
+        {
+            var controller = puzzle.GetComponentInChildren<SolutionCryptexHandler>();
+            var boxCollider = puzzle.GetComponentInChildren<BoxCollider>();
+            if (controller != null)
+            {
+                controller.enabled = true;
+            }
+            if (boxCollider != null)
+            {
+                boxCollider.enabled = true;
+            }
+        }
     }
 }
