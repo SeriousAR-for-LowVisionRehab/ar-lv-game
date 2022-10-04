@@ -27,22 +27,27 @@ public class SolutionCryptexHandler : MonoBehaviour
     {
         // Check current selected values: the gameObjects that collide with the SolutionChecker's Box Collider
         string otherText = other.GetComponentInChildren<TextMeshPro>().text;
+        
         string otherParentName = other.transform.parent.name;
 
         if (otherParentName == "Cylinder1")
         {
             _selectedValues[0] = otherText;
+            Debug.Log("Updated selected values1");
         }
         else if (otherParentName == "Cylinder2")
         {
             _selectedValues[1] = otherText;
+            Debug.Log("Updated selected values2");
         }
         else if (otherParentName == "Cylinder3")
         {
             _selectedValues[2] = otherText;
+            Debug.Log("Updated selected values3");
         } else if (otherParentName == "Cylinder4")
         {
             _selectedValues[3] = otherText;
+            Debug.Log("Updated selected values4");
         }
         else
         {

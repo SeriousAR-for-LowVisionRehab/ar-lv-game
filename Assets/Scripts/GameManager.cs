@@ -1,4 +1,3 @@
-using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.WorldLocking.Core;
 using System;
 using System.Collections.Generic;
@@ -68,16 +67,6 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Update()
-    {
-        Vector3 midpointAnchor01 = getMidpoint(_anchors[0].transform.position, _anchors[1].transform.position);
-        Debug.Log("[GameManager:Update] midpoint between cube0 and cube1: " + midpointAnchor01);
-        Debug.Log("[GameManager:Update] relative position puzzle 0 to cube 0: " + getRelativePosition(_anchors[0].transform, _availablePuzzlesPrefabs[0].transform.position));
-        Debug.Log("[GameManager:Update] relative position puzzle 0 to cube 1: " + getRelativePosition(_anchors[1].transform, _availablePuzzlesPrefabs[0].transform.position));
-        Debug.Log("[GameManager:Update] relative position puzzle 1 to cube 0: " + getRelativePosition(_anchors[0].transform, _availablePuzzlesPrefabs[1].transform.position));
-        Debug.Log("[GameManager:Update] relative position puzzle 1 to cube 1: " + getRelativePosition(_anchors[1].transform, _availablePuzzlesPrefabs[1].transform.position));
-    }
-
 
     /// <summary>
     /// Data of the player that will be saved across sessions
@@ -120,43 +109,20 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Set the objectPosition to a new position referencePosition, instantly.
+    /// Set the GameObject's position to a new position referencePosition "AnchorAB", instantly.
+    /// Possible to pass a Vector3 for additional offset.
     /// </summary>
     /// <param name="referencePosition"></param>
     /// <param name="objectPosition"></param>
-    public void resetPuzzle0ToMidpointAnchorAB()
+    public void resetPuzzleToMidpointAnchorAB(GameObject puzzleToReset)
     {
-        Vector3 midpoint = getMidpoint(_anchors[0].transform.position, _anchors[1].transform.position);
-        _availablePuzzlesPrefabs[0].transform.position = midpoint;
+        Vector3 midpoint = Vector3.Lerp(_anchors[0].transform.position, _anchors[1].transform.position, 0.5f);
+        puzzleToReset.transform.position = midpoint;
     }
 
-    /// <summary>
-    /// Return the position of the objectPosition relative to the referencePosition.
-    /// </summary>
-    /// <param name="referencePosition"></param>
-    /// <param name="objectPosition"></param>
-    /// <returns></returns>
-    private static Vector3 getRelativePosition(Transform referencePosition, Vector3 objectPosition)
+    public void resetPuzzleToMidpointAnchorAB(GameObject puzzleToReset, Vector3 offset)
     {
-        Vector3 distanceDifference = objectPosition - referencePosition.position;
-
-        float relativePositionX = Vector3.Dot(distanceDifference, referencePosition.right.normalized);
-        float relativePositionY = Vector3.Dot(distanceDifference, referencePosition.up.normalized);
-        float relativePositionZ = Vector3.Dot(distanceDifference, referencePosition.forward.normalized);
-
-        return new Vector3(relativePositionX, relativePositionY, relativePositionZ);
+        Vector3 midpoint = Vector3.Lerp(_anchors[0].transform.position, _anchors[1].transform.position, 0.5f);
+        puzzleToReset.transform.position = midpoint + offset;
     }
-
-
-    /// <summary>
-    /// Return the midpoint position between positionOne and positionTwo
-    /// </summary>
-    /// <param name="positionOne"></param>
-    /// <param name="positionTwo"></param>
-    /// <returns></returns>
-    private static Vector3 getMidpoint(Vector3 positionOne, Vector3 positionTwo)
-    {
-        return Vector3.Lerp(positionOne, positionTwo, 0.5f);
-    }
-
 }
