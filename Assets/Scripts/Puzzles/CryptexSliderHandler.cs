@@ -84,4 +84,5 @@ public class CryptexSliderHandler : MonoBehaviour
     {
         SelectedCylinder.Rotate(90.0f, 0.0f, 0.0f, Space.World);
     }
+
 }

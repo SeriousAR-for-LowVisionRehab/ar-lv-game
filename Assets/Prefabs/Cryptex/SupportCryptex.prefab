@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 198495275186236211}
   - component: {fileID: 6628362090600790931}
   - component: {fileID: 409298655856121941}
+  - component: {fileID: 7027599803401110371}
   m_Layer: 0
   m_Name: SupportBase
   m_TagString: Untagged
@@ -83,6 +84,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7027599803401110371
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2157613618809428427}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.9999999, y: 1, z: 0.99999994}
+  m_Center: {x: 0.000000011175871, y: 0.0000023841858, z: -0.00000053364784}
 --- !u!1 &2216496342286466965
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,6 +108,7 @@ GameObject:
   - component: {fileID: 2161946869973156742}
   - component: {fileID: 2362875038161232794}
   - component: {fileID: 8684766869916214340}
+  - component: {fileID: 5233999614950591830}
   m_Layer: 0
   m_Name: SupportRightColumn
   m_TagString: Untagged
@@ -166,6 +181,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &5233999614950591830
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2216496342286466965}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5000001
+  m_Height: 1.9999999
+  m_Direction: 1
+  m_Center: {x: 0.000000059604645, y: 0.00000029802322, z: -0.00000008940697}
 --- !u!1 &4342679405027012750
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,6 +240,7 @@ GameObject:
   - component: {fileID: 7423096669216135229}
   - component: {fileID: 1627201248153196966}
   - component: {fileID: 5980613673114942901}
+  - component: {fileID: 3851820903863509869}
   m_Layer: 0
   m_Name: SupportLeftColumn
   m_TagString: Untagged
@@ -283,3 +313,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &3851820903863509869
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5051491303922194841}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5000001
+  m_Height: 1.9999999
+  m_Direction: 1
+  m_Center: {x: -0.00000017881393, y: 0.00000029802322, z: -0.00000008940697}

@@ -295,6 +295,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RQ2Exp2EscapeRoom
       objectReference: {fileID: 0}
+    - target: {fileID: 1806475648453545701, guid: 417332cd6536c404e92c486761ab6420, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4488367509333149734, guid: 417332cd6536c404e92c486761ab6420, type: 3}
       propertyPath: m_RootOrder
       value: 9
@@ -914,10 +918,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CryptexRadioAndButtonsSquaresWithSupport
       objectReference: {fileID: 0}
-    - target: {fileID: 1041222162775995102, guid: 3eb8fbd30a39e974b908ed0a4f02a5e0, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1041222162775995103, guid: 3eb8fbd30a39e974b908ed0a4f02a5e0, type: 3}
       propertyPath: m_RootOrder
       value: 13
@@ -969,37 +969,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1041222162775995102, guid: 3eb8fbd30a39e974b908ed0a4f02a5e0, type: 3}
   m_PrefabInstance: {fileID: 1486904216}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1486904218 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2141607835060887176, guid: 3eb8fbd30a39e974b908ed0a4f02a5e0, type: 3}
-  m_PrefabInstance: {fileID: 1486904216}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18c0693d15bf47b4d8d351932fa32077, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &1486904219 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2241268552195432418, guid: 3eb8fbd30a39e974b908ed0a4f02a5e0, type: 3}
-  m_PrefabInstance: {fileID: 1486904216}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1486904220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1486904219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e24e90bc1f4afe2499ad601328fac61e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NumberOfCylinders: 4
-  InputForCryptex: {fileID: 1486904218}
-  TypeOfHorizontalInput: 2
 --- !u!1 &1723714683
 GameObject:
   m_ObjectHideFlags: 0

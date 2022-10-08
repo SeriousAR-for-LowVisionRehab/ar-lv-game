@@ -1,24 +1,39 @@
 using UnityEngine;
 
-public class OneUniqueSceneMenuHandler : MonoBehaviour
+public class RQ2Exp2EscapeRoomMenuHandler : MonoBehaviour
 {
-
     /// <summary>
-    /// Start the escape room game by activating the GameObjects of the puzzles.
+    /// Activate the puzzles available and let the user place them. Solving the puzzles is not possible.
     /// </summary>
-    public void StartGame()
+    public void SetupRoom()
     {
+        GameManager.Instance.UnfreezePuzzleInPlace();  // make it possible to move puzzles around
+
+        Vector3 offset = new Vector3(0, 0.3f, 0);
+
         foreach (var puzzle in GameManager.Instance.AvailablePuzzlesPrefabs)
         {
             puzzle.SetActive(true);
+            GameManager.Instance.ResetPuzzleToMidpointAnchorAB(puzzle, offset);
+            offset += offset;  // increment the offset to aline the puzzles on the z-axis (in-depth)
         }
     }
 
     /// <summary>
-    /// Save data of the player
+    /// Save the escape room game: the user won't be able to move the puzzles anymore, only solve them.
+    /// </summary>
+    public void SaveRoom()
+    {
+        GameManager.Instance.FreezePuzzlesInPlace();  // make it impossible to move puzzles around
+
+    }
+
+    /// <summary>
+    /// Save anchors and data of the player
     /// </summary>
     public void SaveGame()
     {
+        GameManager.Instance.WorldLockingManager.Save();
         GameManager.Instance.SavePlayerDataToJson(GameManager.Instance.ThePlayerData);
     }
 }

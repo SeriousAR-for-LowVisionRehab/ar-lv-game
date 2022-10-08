@@ -80,9 +80,4 @@ public class SolutionCryptexHandler : MonoBehaviour
         Dialog.Open(_messageSolutionDialog, DialogButtonType.OK, _titleDialog, _descriptionDialog, true);
         _isSolved = true;
     }
-
-    private void OnDestroy()
-    {
-        Debug.Log(name + ": Destroyed!");
-    }
 }

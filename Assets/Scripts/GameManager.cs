@@ -56,7 +56,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        _worldLockingManager.Load();
         Debug.Log("FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
 
         _thePlayerData = new PlayerData();
@@ -135,10 +134,10 @@ public class GameManager : MonoBehaviour
     {
         foreach(var puzzle in _availablePuzzlesPrefabs)
         {
-            ObjectManipulator manipulatorScript = puzzle.GetComponent<ObjectManipulator>();
-            if(manipulatorScript != null)
+            ObjectManipulator objectManipulatorScript = puzzle.GetComponent<ObjectManipulator>();
+            if(objectManipulatorScript != null)
             {
-                manipulatorScript.enabled = false;
+                objectManipulatorScript.enabled = false;
             }
         }
     }
@@ -150,51 +149,23 @@ public class GameManager : MonoBehaviour
     {
         foreach (var puzzle in _availablePuzzlesPrefabs)
         {
-            ObjectManipulator manipulatorScript = puzzle.GetComponent<ObjectManipulator>();
-            if (manipulatorScript != null)
+            ObjectManipulator objectManipulatorScript = puzzle.GetComponent<ObjectManipulator>();
+            if (objectManipulatorScript != null)
             {
-                manipulatorScript.enabled = true;
+                objectManipulatorScript.enabled = true;
             }
         }
     }
 
     /// <summary>
-    /// Deactivate the possibility to solve the puzzles.
+    /// Desable the Mesh Renderer of the marker, i.e. the Spatial pin.
     /// </summary>
-    public void FreezeControllerOfPuzzles()
+    public void HideSpatialPinMarkers()
     {
-        foreach(var puzzle in _availablePuzzlesPrefabs)
+        foreach (var marker in GameManager.Instance.Anchors)
         {
-            var controller = puzzle.GetComponentInChildren<SolutionCryptexHandler>();
-            var boxCollider = puzzle.GetComponentInChildren<BoxCollider>();
-            if(controller != null)
-            {
-                controller.enabled = false;
-            }
-            if(boxCollider != null)
-            {
-                boxCollider.enabled = false;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Aactivate the possibility to solve the puzzles.
-    /// </summary>
-    public void UnfreezeControllerOfPuzzles()
-    {
-        foreach (var puzzle in _availablePuzzlesPrefabs)
-        {
-            var controller = puzzle.GetComponentInChildren<SolutionCryptexHandler>();
-            var boxCollider = puzzle.GetComponentInChildren<BoxCollider>();
-            if (controller != null)
-            {
-                controller.enabled = true;
-            }
-            if (boxCollider != null)
-            {
-                boxCollider.enabled = true;
-            }
+            var markerMesh = marker.GetComponent<MeshRenderer>();
+            markerMesh.enabled = false;
         }
     }
 }
