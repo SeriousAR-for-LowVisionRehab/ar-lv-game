@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="FlashlightToggle" Collapsed="true">
+    <Position X="11.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQAEAAAgiAAAAAAAAABAAABAAAAAAAAAAgAQEAAQIg=</HashCode>
+      <FileName>Assets\Rusty Flashlight\Scripts\FlashlightToggle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerScriptableObject" Collapsed="true">
+    <Position X="11.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAIAAAAAAgAQAAgAAAAAgAAAAAAAQAAAAA=</HashCode>
+      <FileName>Assets\ScriptableObjects\PlayerScriptableObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerData" Collapsed="true">
+    <Position X="13.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Assets\Scripts\GameData\PlayerData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameManager" Collapsed="true">
+    <Position X="11.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACEAEAAEAAAAAAMAAAAAAAACAgAAABAQQAIAwAAAgEA=</HashCode>
+      <FileName>Assets\Scripts\GameManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CryptexGenericHandler">
+    <Position X="5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAAAAAAEAAEEAAIIAAAAAAACBAACAAIAQA=</HashCode>
+      <FileName>Assets\Scripts\Puzzles\CryptexGenericHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CryptexSliderHandler">
+    <Position X="2.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAQCAAAAAAEAAEEAAAAAAAAAAAKBAAAAAIDQA=</HashCode>
+      <FileName>Assets\Scripts\Puzzles\CryptexSliderHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FollowWireHandler">
+    <Position X="0.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAgAQAAAAAAAAABAAAAAAIAAAAAAI=</HashCode>
+      <FileName>Assets\Scripts\Puzzles\FollowWireHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InputGenericHandler">
+    <Position X="7.25" Y="0.5" Width="2" />
+    <NestedTypes>
+      <Enum Name="InputGenericHandler.InputTypes" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Puzzles\InputGenericHandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAQEAEAAACAAAQAAIEACABAACMAAAAAAQAIAIAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Puzzles\InputGenericHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SolutionCryptexHandler">
+    <Position X="9.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQBCAAAACEAAAAAAAACABAAAAQQIAAgQAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Puzzles\SolutionCryptexHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ToolForFollowWireHandler" Collapsed="true">
+    <Position X="13.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAEAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Tools\ToolForFollowWireHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OneUniqueSceneMenuHandler" Collapsed="true">
+    <Position X="13.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\UI\OneUniqueSceneMenuHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerMenuHandler" Collapsed="true">
+    <Position X="11.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAEAAAAAAIAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\UI\PlayerMenuHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SetUpGameMenuHandler" Collapsed="true">
+    <Position X="13.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAEAAEAAAAAAAAAAAEEA=</HashCode>
+      <FileName>Assets\Scripts\UI\SetUpGameMenuHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StartMenuHandler" Collapsed="true">
+    <Position X="11.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAggAAgAAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\UI\StartMenuHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
