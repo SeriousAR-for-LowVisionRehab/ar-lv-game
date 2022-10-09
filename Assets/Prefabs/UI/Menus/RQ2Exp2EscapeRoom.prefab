@@ -1892,17 +1892,17 @@ MonoBehaviour:
   sortType: 1
   surfaceType: 1
   orientType: 3
-  layout: 1
+  layout: 0
   anchor: 4
   anchorAlongAxis: 0
-  columnAlignment: 0
+  columnAlignment: 1
   rowAlignment: 1
   radius: 2
   radialRange: 180
   distance: 0
-  rows: 1
-  columns: 3
-  cellWidth: 0.095
+  rows: 2
+  columns: 2
+  cellWidth: 0.09
   cellHeight: 0.05
   assetVersion: 1
 --- !u!1 &6056165052336180571
@@ -2566,7 +2566,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4000010330146594, guid: 2d145caa42b44bd42aac79a42eba3d7c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0356
+      value: 0.049
       objectReference: {fileID: 0}
     - target: {fileID: 4000010330146594, guid: 2d145caa42b44bd42aac79a42eba3d7c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2656,7 +2656,7 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: b5066c514f7f02f4292cf842f3c8b75f, type: 3}
     - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_Name
-      value: ButtonSaveData
+      value: ButtonSaveGame
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_RootOrder
@@ -2676,11 +2676,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.095
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.025
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2738,11 +2738,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 586303850521236049, guid: 9215a7c858170d74fb2257375d5feaf1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 586303850521236049, guid: 9215a7c858170d74fb2257375d5feaf1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 586303850521236049, guid: 9215a7c858170d74fb2257375d5feaf1, type: 3}
       propertyPath: m_LocalScale.z
@@ -3009,9 +3009,13 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875148, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0.06
+      objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_text
-      value: Save Room
+      value: Save Escape Room
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSize
@@ -3059,11 +3063,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.045
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.025
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3115,9 +3119,13 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875148, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0.05
+      objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_text
-      value: Setup Room
+      value: Create Puzzles
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSize
@@ -3153,7 +3161,7 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: cb5a9c3bdc2017d4f9e805e3a7e72b1d, type: 3}
     - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_Name
-      value: ButtonSetupEscapeRoom
+      value: ButtonCreatePuzzles
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_RootOrder
@@ -3173,11 +3181,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.095
+      value: -0.045
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.025
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z

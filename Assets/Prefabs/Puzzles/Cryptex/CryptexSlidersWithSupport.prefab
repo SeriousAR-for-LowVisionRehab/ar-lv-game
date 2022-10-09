@@ -160,10 +160,6 @@ PrefabInstance:
       propertyPath: SliderHorizontal
       value: 
       objectReference: {fileID: 427013913185955386}
-    - target: {fileID: 5761469972515134716, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 99889752098f11140b828315ff87f32e, type: 2}
     m_RemovedComponents:
     - {fileID: 1254744896116435797, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}

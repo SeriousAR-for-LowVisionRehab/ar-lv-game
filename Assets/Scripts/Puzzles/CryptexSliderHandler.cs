@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Cryptex represents a set of cylinders.
@@ -17,6 +18,7 @@ public class CryptexSliderHandler : MonoBehaviour
     private Transform _current_emission_holder;
     private float _currentSliderHorizontalValue;
     private float _currentSliderVerticalValue;
+    private int _inputVerticalValueInteger;
 
 
     // Start is called before the first frame update
@@ -50,7 +52,24 @@ public class CryptexSliderHandler : MonoBehaviour
         if( _currentSliderVerticalValue != _pinchSliderVertical.SliderValue)
         {
             _currentSliderVerticalValue = _pinchSliderVertical.SliderValue;
-            SetRotationBasedOnInputValue(_selectedCylinder, _currentSliderVerticalValue);
+            if (_currentSliderVerticalValue == 0.25)
+            {
+                _inputVerticalValueInteger = 1;
+            }
+            if (_currentSliderVerticalValue == 0.50)
+            {
+                _inputVerticalValueInteger = 2;
+            }
+            if (_currentSliderVerticalValue == 0.75)
+            {
+                _inputVerticalValueInteger = 3;
+            }
+            if (_currentSliderVerticalValue == 1.00)
+            {
+                _inputVerticalValueInteger = 4;
+            }
+
+            SetRotationBasedOnInputValue();
         }        
         
     }
@@ -67,10 +86,27 @@ public class CryptexSliderHandler : MonoBehaviour
     /// <param name="InputValue"></param>
     private Transform MapInputValueToCylinderName(float InputValue)
     {
-        if (InputValue == 0.25) return _cylindersHolder.Find("Cylinder1");  
-        if (InputValue == 0.50) return _cylindersHolder.Find("Cylinder2");  
-        if (InputValue == 0.75) return _cylindersHolder.Find("Cylinder3");  
-        if (InputValue == 1.00) return _cylindersHolder.Find("Cylinder4");  
+        Debug.Log(" CUrrent inputvalue horiiz: " + InputValue);
+        if (InputValue == 0.25)
+        {
+            Debug.Log("1) CUrrent inputvalue horiiz: " + InputValue);
+            return _cylindersHolder.Find("Cylinder1");
+        }
+        if (InputValue == 0.50)
+        {
+            Debug.Log("2) CUrrent inputvalue horiiz: " + InputValue);
+            return _cylindersHolder.Find("Cylinder2");
+        }
+        if (InputValue == 0.75)
+        {
+            Debug.Log("3) CUrrent inputvalue horiiz: " + InputValue);
+            return _cylindersHolder.Find("Cylinder3");
+        }
+        if (InputValue == 1.00)
+        {
+            Debug.Log("4) CUrrent inputvalue horiiz: " + InputValue);
+            return _cylindersHolder.Find("Cylinder4");
+        }
 
         return null;
     }
@@ -80,9 +116,9 @@ public class CryptexSliderHandler : MonoBehaviour
     /// </summary>
     /// <param name="SelectedCylinder"></param>
     /// <param name="InputValue"></param>
-    private void SetRotationBasedOnInputValue(Transform SelectedCylinder, float InputValue)
+    private void SetRotationBasedOnInputValue()
     {
-        SelectedCylinder.Rotate(90.0f, 0.0f, 0.0f, Space.World);
+        _selectedCylinder.Rotate(0.0f, 90.0f * _inputVerticalValueInteger, 0.0f, Space.Self);
     }
 
 }

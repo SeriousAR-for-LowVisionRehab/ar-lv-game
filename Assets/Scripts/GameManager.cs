@@ -1,6 +1,6 @@
+using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.WorldLocking.Core;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -56,28 +56,13 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        Debug.Log("FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
+        Debug.Log("[GameManager:Awake] FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
 
         _thePlayerData = new PlayerData();
-        _thePlayerData.PlayerID = "X01480JS";
-        _thePlayerData.NumberOfPuzzlesStarted = 1;
-        _thePlayerData.NumberOfPuzzlesSolved = 0;
-
+        _thePlayerData.DebugCreateFakeData();
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
-
-
-    /// <summary>
-    /// Data of the player that will be saved across sessions
-    /// </summary>
-    [Serializable]
-    public class PlayerData
-    {
-        public string PlayerID;
-        public int NumberOfPuzzlesSolved;
-        public int NumberOfPuzzlesStarted;
     }
 
     /// <summary>
@@ -158,14 +143,21 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Desable the Mesh Renderer of the marker, i.e. the Spatial pin.
+    /// Desable possible interactions with the marker, i.e. the Spatial pin.
+    /// Only the SpacePin script remains active.
     /// </summary>
     public void HideSpatialPinMarkers()
     {
         foreach (var marker in GameManager.Instance.Anchors)
         {
             var markerMesh = marker.GetComponent<MeshRenderer>();
+            var boxCollider = marker.GetComponent<BoxCollider>();
+            var objectManipulator = marker.GetComponent<ObjectManipulator>();
+            var nearInteractionGrabbable = marker.GetComponent<NearInteractionGrabbable>();
             markerMesh.enabled = false;
+            boxCollider.enabled = false;
+            objectManipulator.enabled = false;
+            nearInteractionGrabbable.enabled = false;
         }
     }
 }

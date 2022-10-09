@@ -15,7 +15,7 @@ public class RQ2Exp2EscapeRoomMenuHandler : MonoBehaviour
         {
             puzzle.SetActive(true);
             GameManager.Instance.ResetPuzzleToMidpointAnchorAB(puzzle, offset);
-            offset += offset;  // increment the offset to aline the puzzles on the z-axis (in-depth)
+            offset += offset;
         }
     }
 
@@ -25,7 +25,17 @@ public class RQ2Exp2EscapeRoomMenuHandler : MonoBehaviour
     public void SaveRoom()
     {
         GameManager.Instance.FreezePuzzlesInPlace();  // make it impossible to move puzzles around
+        GameManager.Instance.HideSpatialPinMarkers();
 
+    }
+
+    /// <summary>
+    /// Load the last sessions' state.
+    /// </summary>
+    public void LoadLastGame()
+    {
+        GameManager.Instance.WorldLockingManager.Load();
+        Debug.Log("[RQ2Exp2EscapeRoomMenuHandler:LoadGame] WLT Loaded: previous session's state restored.");
     }
 
     /// <summary>

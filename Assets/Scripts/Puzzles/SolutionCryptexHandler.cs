@@ -33,21 +33,17 @@ public class SolutionCryptexHandler : MonoBehaviour
         if (otherParentName == "Cylinder1")
         {
             _selectedValues[0] = otherText;
-            Debug.Log("Updated selected values1");
         }
         else if (otherParentName == "Cylinder2")
         {
             _selectedValues[1] = otherText;
-            Debug.Log("Updated selected values2");
         }
         else if (otherParentName == "Cylinder3")
         {
             _selectedValues[2] = otherText;
-            Debug.Log("Updated selected values3");
         } else if (otherParentName == "Cylinder4")
         {
             _selectedValues[3] = otherText;
-            Debug.Log("Updated selected values4");
         }
         else
         {
@@ -76,7 +72,6 @@ public class SolutionCryptexHandler : MonoBehaviour
     /// </summary>
     private void LockOpened()
     {
-        Debug.Log("Lock Opened!");
         Dialog.Open(_messageSolutionDialog, DialogButtonType.OK, _titleDialog, _descriptionDialog, true);
         _isSolved = true;
     }
