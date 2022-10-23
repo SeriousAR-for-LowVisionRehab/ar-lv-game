@@ -73,6 +73,7 @@ public class SolutionCryptexHandler : MonoBehaviour
     private void LockOpened()
     {
         Dialog.Open(_messageSolutionDialog, DialogButtonType.OK, _titleDialog, _descriptionDialog, true);
+        _messageSolutionDialog.transform.position += new Vector3(-0.2f, 0, 0);
         _isSolved = true;
     }
 }
