@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7633891319707209078}
   - component: {fileID: 8820903983673557535}
   m_Layer: 0
-  m_Name: RQ2Exp2EscapeRoom
+  m_Name: RQ2Exp2HomeMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -980,7 +980,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1574278915975875189}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 98c748f3768ab714a8449b60fb9edc5c, type: 3}
   m_Name: 
@@ -1856,6 +1856,7 @@ Transform:
   m_Children:
   - {fileID: 1806475648453543999}
   - {fileID: 458292029655549946}
+  - {fileID: 5100833552533757794}
   - {fileID: 6535908169291855837}
   m_Father: {fileID: 4488367509333149734}
   m_RootOrder: 2
@@ -1883,6 +1884,11 @@ MonoBehaviour:
     Radius: 0
     Transform: {fileID: 458292029655549946}
     Colliders: []
+  - Name: ButtonStartTutorial
+    Offset: {x: 0, y: 0}
+    Radius: 0
+    Transform: {fileID: 5100833552533757794}
+    Colliders: []
   - Name: ButtonSaveData
     Offset: {x: 0, y: 0}
     Radius: 0
@@ -1903,7 +1909,7 @@ MonoBehaviour:
   rows: 2
   columns: 2
   cellWidth: 0.09
-  cellHeight: 0.05
+  cellHeight: 0.04
   assetVersion: 1
 --- !u!1 &6056165052336180571
 GameObject:
@@ -2545,6 +2551,120 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &2726591169881587726
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 6296935968229749958}
+    m_Modifications:
+    - target: {fileID: 7142428831744874934, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875148, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.015
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_text
+      value: Start Tutorial
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_fontSize
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 8820903983673557535}
+    - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: StartTutorial
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: RQ2Exp2EscapeRoomMenuHandler, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875302, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875405, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: iconQuadTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: b5066c514f7f02f4292cf842f3c8b75f, type: 3}
+    - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_Name
+      value: ButtonStartTutorial
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.045
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+--- !u!4 &5100833552533757794 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+  m_PrefabInstance: {fileID: 2726591169881587726}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3078386408271783929
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2602,7 +2722,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 102000010767390410, guid: 2d145caa42b44bd42aac79a42eba3d7c, type: 3}
       propertyPath: m_Text
-      value: Escape Room
+      value: Home Menu
       objectReference: {fileID: 0}
     - target: {fileID: 102000010767390410, guid: 2d145caa42b44bd42aac79a42eba3d7c, type: 3}
       propertyPath: m_FontSize
@@ -2626,13 +2746,27 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875148, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.015
+      objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_text
-      value: Save Game
+      value: 'Start
+
+        Escape Room'
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSize
       value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_margin.x
+      value: -0.0019993763
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_margin.z
+      value: -0.0032888092
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSizeBase
@@ -2644,11 +2778,15 @@ PrefabInstance:
       objectReference: {fileID: 8820903983673557535}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
-      value: SaveGame
+      value: StartGame
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
       value: RQ2Exp2EscapeRoomMenuHandler, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875302, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875405, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: iconQuadTexture
@@ -2656,11 +2794,11 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: b5066c514f7f02f4292cf842f3c8b75f, type: 3}
     - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_Name
-      value: ButtonSaveGame
+      value: ButtonStartEscapeRoom
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalScale.x
@@ -2676,11 +2814,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.045
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.025
+      value: -0.02
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2742,7 +2880,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 586303850521236049, guid: 9215a7c858170d74fb2257375d5feaf1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 586303850521236049, guid: 9215a7c858170d74fb2257375d5feaf1, type: 3}
       propertyPath: m_LocalScale.z
@@ -3015,7 +3153,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_text
-      value: Save Escape Room
+      value: Froze Puzzles
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSize
@@ -3037,13 +3175,17 @@ PrefabInstance:
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
       value: RQ2Exp2EscapeRoomMenuHandler, Assembly-CSharp
       objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875302, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875405, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: iconQuadTexture
       value: 
       objectReference: {fileID: 2800000, guid: cb5a9c3bdc2017d4f9e805e3a7e72b1d, type: 3}
     - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_Name
-      value: ButtonSaveEscapeRoom
+      value: ButtonFrozePuzzles
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_RootOrder
@@ -3067,7 +3209,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.025
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3185,7 +3327,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.025
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
