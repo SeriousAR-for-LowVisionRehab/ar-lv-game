@@ -13,7 +13,7 @@ public class CryptexGenericHandler : MonoBehaviour
     private Transform _cylindersHolder;
     private Transform _selectedCylinder;
     private Transform _current_emission_holder;
-    private float _currentSliderHorizontalValue;
+    private float _currentSliderHorizontalValue = 1;
     private float _currentSliderVerticalValue;
 
 

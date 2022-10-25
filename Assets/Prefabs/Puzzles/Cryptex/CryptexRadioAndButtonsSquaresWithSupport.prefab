@@ -409,13 +409,15 @@ GameObject:
   - component: {fileID: 1041222162775995103}
   - component: {fileID: -9108309173311409394}
   - component: {fileID: -1450306677062954087}
+  - component: {fileID: -5770488341550010810}
+  - component: {fileID: -3710464590376384332}
   m_Layer: 0
   m_Name: CryptexRadioAndButtonsSquaresWithSupport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1041222162775995103
 Transform:
   m_ObjectHideFlags: 0
@@ -463,7 +465,7 @@ MonoBehaviour:
   hostTransform: {fileID: 1041222162775995103}
   manipulationType: -1
   twoHandedManipulationType: 3
-  allowFarManipulation: 1
+  allowFarManipulation: 0
   useForcesForNearManipulation: 0
   oneHandRotationModeNear: 1
   oneHandRotationModeFar: 1
@@ -477,7 +479,7 @@ MonoBehaviour:
   rotateLerpTime: 0.001
   scaleLerpTime: 0.001
   enableConstraints: 1
-  constraintsManager: {fileID: -9108309173311409394}
+  constraintsManager: {fileID: 7920039846245836360, guid: 8d54575f78cdf9b4fb84f037e3c738e5, type: 3}
   elasticsManager: {fileID: 0}
   onManipulationStarted:
     m_PersistentCalls:
@@ -491,6 +493,33 @@ MonoBehaviour:
   onHoverExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-5770488341550010810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041222162775995102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5afd5316c63705643b3daba5a6e923bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTetherWhenManipulating: 0
+  IsBoundsHandles: 0
+--- !u!65 &-3710464590376384332
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041222162775995102}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.80490714, y: 0.7026225, z: 0.2829328}
+  m_Center: {x: 0.004097285, y: 0.13257794, z: 0.019097874}
 --- !u!1 &1470017569833475175
 GameObject:
   m_ObjectHideFlags: 0
@@ -1242,7 +1271,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3275932149223496835}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.20999998, y: -0.059, z: -0.118}
+  m_LocalPosition: {x: -0.20999998, y: 0.094, z: -0.118}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2298,7 +2327,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6199491154310525808}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.21, y: 0.164, z: -0.118}
+  m_LocalPosition: {x: -0.21, y: 0.317, z: -0.118}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3854,7 +3883,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1186701952142051262, guid: 46595b1566f20b14580174693a6d6c49, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.162
+      value: -0.02
       objectReference: {fileID: 0}
     - target: {fileID: 1186701952142051262, guid: 46595b1566f20b14580174693a6d6c49, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4159,7 +4188,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1254744896116435796, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 1254744896116435796, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: m_LocalPosition.z

@@ -15,6 +15,9 @@ using UnityEngine;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private GameObject _homeMenu;
+    [SerializeField] private GameObject _tutorialMenu;
+    private GameObject _currentMenu;
     private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
     private bool _isGameStarted = false;  // true if the player has started a new game
     // private bool _gameFinished = false;  // true if the player solved the entire escape room
@@ -22,6 +25,7 @@ public class GameManager : MonoBehaviour
     private PlayerData _thePlayerData;
     private string _savePathDir;
     private string _playerDatafileName = "PlayerData.json";
+    [SerializeField] private List<GameObject> _availableTutorialPrefabs;  // to learn handling gestures
     [SerializeField] private List<GameObject> _availablePuzzlesPrefabs;  // what the player has to solve
     [SerializeField] private List<GameObject> _availableToolsPrefabs;  // what the player can use to solve the puzzles
     [SerializeField] private List<GameObject> _anchors;
@@ -39,6 +43,7 @@ public class GameManager : MonoBehaviour
         set { _isGamePrepared = value; }
     }
     public PlayerData ThePlayerData {get { return _thePlayerData; }}
+    public List<GameObject> AvailableTutorialPrefabs { get { return _availableTutorialPrefabs; } }
     public List<GameObject> AvailablePuzzlesPrefabs { get { return _availablePuzzlesPrefabs; } }
     public List<GameObject> AvailableToolsPrefabs { get { return _availableToolsPrefabs; } }    
     public List<GameObject> Anchors { get { return _anchors; } }
@@ -60,6 +65,10 @@ public class GameManager : MonoBehaviour
 
         _thePlayerData = new PlayerData();
         _thePlayerData.DebugCreateFakeData();
+
+        // Activate Home Menu
+        _currentMenu = _homeMenu;
+        _currentMenu.SetActive(true);
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
@@ -159,5 +168,25 @@ public class GameManager : MonoBehaviour
             objectManipulator.enabled = false;
             nearInteractionGrabbable.enabled = false;
         }
+    }
+
+    /// <summary>
+    /// Deactivate current menu, and set Tutorial Menu as current and active.
+    /// </summary>
+    public void SwitchToTutorialMenu()
+    {
+        _currentMenu.SetActive(false);
+        _currentMenu = _tutorialMenu;
+        _currentMenu.SetActive(true);
+    }
+
+    /// <summary>
+    /// Deactivate current menu, and set Home Menu as current and active.
+    /// </summary>
+    public void SwitchToHomeMenu()
+    {
+        _currentMenu.SetActive(false);
+        _currentMenu = _homeMenu;
+        _currentMenu.SetActive(true);
     }
 }

@@ -9,7 +9,7 @@ public class RQ2Exp2EscapeRoomMenuHandler : MonoBehaviour
     {
         GameManager.Instance.UnfreezePuzzleInPlace();  // make it possible to move puzzles around
 
-        Vector3 offset = new Vector3(0, 0.3f, 0);
+        Vector3 offset = new Vector3(0.5f, 0, 0);
 
         foreach (var puzzle in GameManager.Instance.AvailablePuzzlesPrefabs)
         {
@@ -27,6 +27,27 @@ public class RQ2Exp2EscapeRoomMenuHandler : MonoBehaviour
         GameManager.Instance.FreezePuzzlesInPlace();  // make it impossible to move puzzles around
         GameManager.Instance.HideSpatialPinMarkers();
 
+    }
+
+    /// <summary>
+    /// Move to Tutorial Mode: show tutorial UI, hide home UI.
+    /// </summary>
+    public void StartTutorial()
+    {
+        // hide any current puzzles
+        foreach (var puzzle in GameManager.Instance.AvailablePuzzlesPrefabs)
+        {
+            puzzle.SetActive(false);
+        }
+        GameManager.Instance.SwitchToTutorialMenu();
+    }
+
+    /// <summary>
+    /// Escape Room begins!
+    /// </summary>
+    public void StartGame()
+    {
+        Debug.Log("Escape Room begins! Have fun!");
     }
 
     /// <summary>

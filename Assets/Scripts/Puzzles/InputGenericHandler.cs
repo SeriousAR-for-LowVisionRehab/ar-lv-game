@@ -18,7 +18,7 @@ public class InputGenericHandler : MonoBehaviour
     private float _downValue;
 
     private InputTypes _type;
-    private float _horizontalValue, _verticalValue;
+    private float _horizontalValue = 1, _verticalValue;
 
     // The value of the axes as Properties
     public float HorizontalValue { 

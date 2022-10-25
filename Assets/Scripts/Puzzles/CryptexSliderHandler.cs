@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
 /// Cryptex represents a set of cylinders.
@@ -16,7 +15,7 @@ public class CryptexSliderHandler : MonoBehaviour
     private Transform _cylindersHolder;
     private Transform _selectedCylinder;
     private Transform _current_emission_holder;
-    private float _currentSliderHorizontalValue;
+    private float _currentSliderHorizontalValue = 1;
     private float _currentSliderVerticalValue;
     private int _inputVerticalValueInteger;
 
@@ -86,25 +85,20 @@ public class CryptexSliderHandler : MonoBehaviour
     /// <param name="InputValue"></param>
     private Transform MapInputValueToCylinderName(float InputValue)
     {
-        Debug.Log(" CUrrent inputvalue horiiz: " + InputValue);
         if (InputValue == 0.25)
         {
-            Debug.Log("1) CUrrent inputvalue horiiz: " + InputValue);
             return _cylindersHolder.Find("Cylinder1");
         }
         if (InputValue == 0.50)
         {
-            Debug.Log("2) CUrrent inputvalue horiiz: " + InputValue);
             return _cylindersHolder.Find("Cylinder2");
         }
         if (InputValue == 0.75)
         {
-            Debug.Log("3) CUrrent inputvalue horiiz: " + InputValue);
             return _cylindersHolder.Find("Cylinder3");
         }
         if (InputValue == 1.00)
         {
-            Debug.Log("4) CUrrent inputvalue horiiz: " + InputValue);
             return _cylindersHolder.Find("Cylinder4");
         }
 

@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 1041222162775995103}
   - component: {fileID: 7920039846245836360}
   - component: {fileID: 1190173242934901035}
+  - component: {fileID: 5991573787496410974}
+  - component: {fileID: -114341967362042922}
   m_Layer: 0
   m_Name: CryptexSlidersWithSupport
   m_TagString: Untagged
@@ -65,7 +67,7 @@ MonoBehaviour:
   hostTransform: {fileID: 1041222162775995103}
   manipulationType: -1
   twoHandedManipulationType: 3
-  allowFarManipulation: 1
+  allowFarManipulation: 0
   useForcesForNearManipulation: 0
   oneHandRotationModeNear: 1
   oneHandRotationModeFar: 1
@@ -93,6 +95,33 @@ MonoBehaviour:
   onHoverExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5991573787496410974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041222162775995102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5afd5316c63705643b3daba5a6e923bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTetherWhenManipulating: 0
+  IsBoundsHandles: 0
+--- !u!65 &-114341967362042922
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041222162775995102}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.8326249, y: 0.717675, z: 0.29709572}
+  m_Center: {x: -0.0073370337, y: 0.14116277, z: 0.0040062517}
 --- !u!1001 &1041222162685228209
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -114,7 +143,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1254744896116435796, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 1254744896116435796, guid: 1a0f65e041b7898419e50e1d17f246f7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -208,11 +237,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5059801395966313365, guid: 1221ae5f67880b341ab523d29f7993d4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.16668868
+      value: 0.474
       objectReference: {fileID: 0}
     - target: {fileID: 5059801395966313365, guid: 1221ae5f67880b341ab523d29f7993d4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.5983567
+      value: -0.212
       objectReference: {fileID: 0}
     - target: {fileID: 5059801395966313365, guid: 1221ae5f67880b341ab523d29f7993d4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -241,6 +270,14 @@ PrefabInstance:
     - target: {fileID: 5059801395966313365, guid: 1221ae5f67880b341ab523d29f7993d4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750888566754035698, guid: 1221ae5f67880b341ab523d29f7993d4, type: 3}
+      propertyPath: sliderEndDistance
+      value: 0.071890935
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750888566754035698, guid: 1221ae5f67880b341ab523d29f7993d4, type: 3}
+      propertyPath: sliderStartDistance
+      value: -0.1298491
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1221ae5f67880b341ab523d29f7993d4, type: 3}
