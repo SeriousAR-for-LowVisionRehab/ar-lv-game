@@ -47,7 +47,16 @@ public class GameManager : MonoBehaviour
     public List<GameObject> AvailablePuzzlesPrefabs { get { return _availablePuzzlesPrefabs; } }
     public List<GameObject> AvailableToolsPrefabs { get { return _availableToolsPrefabs; } }    
     public List<GameObject> Anchors { get { return _anchors; } }
-    
+
+    public enum GameStates
+    {
+        HOME,
+        TUTORIAL,
+        CREATION,
+        ESCAPEROOM,
+    }
+
+    FiniteStateMachine<GameStates> mGameStateMachine = new FiniteStateMachine<GameStates>();
 
     /// <summary>
     /// Awake() is called at the object's creation. Ensure that GameManager is a Singleton.
@@ -73,6 +82,84 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
+
+    private void Start()
+    {
+        // Add the HOME state to the GameManager's state machine
+        mGameStateMachine.Add(
+            new State<GameStates>(
+                "HOME",
+                GameStates.HOME,
+                OnEnterHome, 
+                null, 
+                OnUpdateHome, 
+                null
+                )
+            );
+        // Add the ESCAPEROOM state to the GameManager's state machine
+        mGameStateMachine.Add(
+            new State<GameStates>(
+                "ESCAPEROOM",
+                GameStates.ESCAPEROOM,
+                OnEnterEscapeRoom,
+                null,
+                OnUpdateEscapeRoom,
+                null
+                )
+            );
+
+        // Set current state of the GameManager's state machine
+        mGameStateMachine.SetCurrentState(GameStates.HOME);
+    }
+
+    private void Update()
+    {
+        mGameStateMachine.Update();
+    }
+
+    private void FixedUpdate()
+    {
+        mGameStateMachine.FixedUpdate();
+    }
+
+    void OnEnterHome()
+    {
+        Debug.Log("Game HOME");
+    }
+
+    void OnUpdateHome()
+    {
+        if (Input.anyKeyDown)
+        {
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                Debug.Log("Escape room is ready");
+                mGameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
+            }
+            else
+            {
+                Debug.Log("Nothing is ready yet");
+            }
+        }
+    }
+
+    void OnEnterEscapeRoom()
+    {
+        Debug.Log("Game Escape Room");
+    }
+
+    void OnUpdateEscapeRoom()
+    {
+        if (Input.anyKey)
+        {
+            if (!Input.GetKeyDown(KeyCode.C))
+            {
+                Debug.Log("Escape Room is solved!");
+                mGameStateMachine.SetCurrentState(GameStates.HOME);
+            }
+        }
+    }
+
 
     /// <summary>
     /// Save the PlayerData as a JSON
