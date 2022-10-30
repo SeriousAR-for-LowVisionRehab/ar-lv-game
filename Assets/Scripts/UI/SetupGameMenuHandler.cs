@@ -18,7 +18,7 @@ public class SetUpGameMenuHandler : MonoBehaviour
     public void SaveSetupGame()
     {
         GameManager.Instance.WorldLockingManager.Save();
-        GameManager.Instance.IsGamePrepared = true;
+        //GameManager.Instance.IsGamePrepared = true;
     }
 
     /// <summary>
@@ -47,14 +47,5 @@ public class SetUpGameMenuHandler : MonoBehaviour
     {
         GameObject puzzle1 = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[1], transform, false);
         puzzle1.transform.position += new Vector3(0, 0, .5f);
-    }
-
-    /// <summary>
-    /// Instantiate the Tool at index 0
-    /// </summary>
-    public void InstantiateTool0()
-    {
-        GameObject tool0 = Instantiate(GameManager.Instance.AvailableToolsPrefabs[0], transform, false);
-        tool0.transform.position += new Vector3(0, 0, .5f);
     }
 }

@@ -8,6 +8,8 @@ TagManager:
   - DangerousObstacle
   - StartPuzzle
   - EndPuzzle
+  - CreationPuzzlesStatus
+  - NumberOfPuzzlesSolved
   layers:
   - Default
   - TransparentFX

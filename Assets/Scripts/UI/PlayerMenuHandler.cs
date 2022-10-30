@@ -18,8 +18,8 @@ public class PlayerMenuHandler : MonoBehaviour
     public void SaveGame()
     {
         WorldLockingManager.GetInstance().Save();
-        GameManager.Instance.SavePlayerDataToJson(GameManager.Instance.ThePlayerData);
-        GameManager.Instance.IsGameStarted = true;
+        GameManager.Instance.SavePlayerDataToJson();
+        //GameManager.Instance.IsGameStarted = true;
     }
 
     /// <summary>
@@ -29,16 +29,5 @@ public class PlayerMenuHandler : MonoBehaviour
     public void ReturnToMainMenu()
     {
         SceneManager.LoadScene(0);
-    }
-
-    /// <summary>
-    /// Use the Tool at index 0
-    /// </summary>
-    public void UseTool0()
-    {
-        GameObject tool0 = Instantiate(GameManager.Instance.AvailableToolsPrefabs[0], transform, false);
-        tool0.transform.position += new Vector3(0.2f, 0, 0);
-        Debug.Log("[PlayerMenuHandler] " + tool0.name + " at position " + tool0.transform.position);
-        Debug.Log("[PlayerMenuHandler] PrepMenuHandler position = " + transform.position);
     }
 }

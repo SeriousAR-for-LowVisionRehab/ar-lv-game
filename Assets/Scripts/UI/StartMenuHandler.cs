@@ -11,11 +11,11 @@ public class StartMenuHandler : MonoBehaviour
     /// </summary>
     public void LoadExistingGame()
     {
-        if (!GameManager.Instance.IsGameStarted)
-        {
-            Debug.Log("[StartMenuHandler] No current game available. Please start a New Game.");
-            return;
-        }
+        //if (!GameManager.Instance.IsGameStarted)
+        //{
+        //    Debug.Log("[StartMenuHandler] No current game available. Please start a New Game.");
+        //    return;
+        //}
 
         SceneManager.LoadScene(2);
     }
@@ -26,11 +26,11 @@ public class StartMenuHandler : MonoBehaviour
     /// </summary>
     public void StartNewGame()
     {
-        if (!GameManager.Instance.IsGamePrepared)
-        {
-            Debug.Log("[StartMenuHandler] Escape room need to be prepared first. Please ask your support team.");
-            return;
-        }
+        //if (!GameManager.Instance.IsGamePrepared)
+        //{
+        //    Debug.Log("[StartMenuHandler] Escape room need to be prepared first. Please ask your support team.");
+        //    return;
+        //}
 
         SceneManager.LoadScene(2);
     }

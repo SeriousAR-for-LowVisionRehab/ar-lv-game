@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 7234170700183447317}
   - component: {fileID: 7247335084574251918}
   - component: {fileID: 7633891319707209078}
-  - component: {fileID: 8820903983673557535}
   m_Layer: 0
   m_Name: RQ2Exp2HomeMenu
   m_TagString: Untagged
@@ -207,18 +206,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &8820903983673557535
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 924225858010549179}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fd40be5b45e2254198d65112f89e00d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1113618925088547664
 GameObject:
   m_ObjectHideFlags: 0
@@ -1854,10 +1841,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1806475648453543999}
-  - {fileID: 458292029655549946}
   - {fileID: 5100833552533757794}
   - {fileID: 6535908169291855837}
+  - {fileID: 1806475648453543999}
+  - {fileID: 458292029655549946}
   m_Father: {fileID: 4488367509333149734}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1874,16 +1861,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodeList:
-  - Name: ButtonSetupEscapeRoom
-    Offset: {x: 0, y: 0}
-    Radius: 0
-    Transform: {fileID: 1806475648453543999}
-    Colliders: []
-  - Name: ButtonStartGame
-    Offset: {x: 0, y: 0}
-    Radius: 0
-    Transform: {fileID: 458292029655549946}
-    Colliders: []
   - Name: ButtonStartTutorial
     Offset: {x: 0, y: 0}
     Radius: 0
@@ -1893,6 +1870,16 @@ MonoBehaviour:
     Offset: {x: 0, y: 0}
     Radius: 0
     Transform: {fileID: 6535908169291855837}
+    Colliders: []
+  - Name: ButtonSetupEscapeRoom
+    Offset: {x: 0, y: 0}
+    Radius: 0
+    Transform: {fileID: 1806475648453543999}
+    Colliders: []
+  - Name: ButtonStartGame
+    Offset: {x: 0, y: 0}
+    Radius: 0
+    Transform: {fileID: 458292029655549946}
     Colliders: []
   ignoreInactiveTransforms: 1
   sortType: 1
@@ -1909,7 +1896,7 @@ MonoBehaviour:
   rows: 2
   columns: 2
   cellWidth: 0.09
-  cellHeight: 0.04
+  cellHeight: 0.06
   assetVersion: 1
 --- !u!1 &6056165052336180571
 GameObject:
@@ -2568,7 +2555,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_text
-      value: Start Tutorial
+      value: Tutorial
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSize
@@ -2579,12 +2566,16 @@ PrefabInstance:
       value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 8820903983673557535}
+      objectReference: {fileID: 11500000, guid: 3567cd8519c5c464caf0de4baded8c54, type: 3}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
-      value: StartTutorial
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
@@ -2600,11 +2591,11 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: b5066c514f7f02f4292cf842f3c8b75f, type: 3}
     - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_Name
-      value: ButtonStartTutorial
+      value: ButtonTutorial
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalScale.x
@@ -2624,7 +2615,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.02
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2686,7 +2677,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4000010330146594, guid: 2d145caa42b44bd42aac79a42eba3d7c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.049
+      value: 0.059
       objectReference: {fileID: 0}
     - target: {fileID: 4000010330146594, guid: 2d145caa42b44bd42aac79a42eba3d7c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2722,7 +2713,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 102000010767390410, guid: 2d145caa42b44bd42aac79a42eba3d7c, type: 3}
       propertyPath: m_Text
-      value: Home Menu
+      value: Home
       objectReference: {fileID: 0}
     - target: {fileID: 102000010767390410, guid: 2d145caa42b44bd42aac79a42eba3d7c, type: 3}
       propertyPath: m_FontSize
@@ -2752,9 +2743,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_text
-      value: 'Start
-
-        Escape Room'
+      value: Escape Room
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSize
@@ -2773,9 +2762,13 @@ PrefabInstance:
       value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 8820903983673557535}
+      objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
       value: StartGame
@@ -2794,11 +2787,11 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: b5066c514f7f02f4292cf842f3c8b75f, type: 3}
     - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_Name
-      value: ButtonStartEscapeRoom
+      value: ButtonEscapeRoom
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalScale.x
@@ -2818,7 +2811,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.02
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3153,7 +3146,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_text
-      value: Froze Puzzles
+      value: Settings
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSize
@@ -3164,9 +3157,13 @@ PrefabInstance:
       value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 8820903983673557535}
+      objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
       value: SaveRoom
@@ -3185,11 +3182,11 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: cb5a9c3bdc2017d4f9e805e3a7e72b1d, type: 3}
     - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_Name
-      value: ButtonFrozePuzzles
+      value: ButtonSettings
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalScale.x
@@ -3209,7 +3206,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.02
+      value: -0.03
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3267,7 +3264,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_text
-      value: Create Puzzles
+      value: Creation
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875266, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_fontSize
@@ -3282,9 +3279,13 @@ PrefabInstance:
       value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
+      propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 8820903983673557535}
+      objectReference: {fileID: 0}
     - target: {fileID: 7142428831744875272, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
       value: SetupRoom
@@ -3303,11 +3304,11 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: cb5a9c3bdc2017d4f9e805e3a7e72b1d, type: 3}
     - target: {fileID: 7142428831744875792, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_Name
-      value: ButtonCreatePuzzles
+      value: ButtonCreation
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalScale.x
@@ -3327,7 +3328,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.02
+      value: -0.03
       objectReference: {fileID: 0}
     - target: {fileID: 7142428831744876396, guid: 355e924f5a2c75e4ba8648c12702d84a, type: 3}
       propertyPath: m_LocalPosition.z
