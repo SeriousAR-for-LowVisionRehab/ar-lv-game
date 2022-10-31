@@ -232,7 +232,7 @@ public class GameManager : MonoBehaviour
     void OnEnterCreation()
     {
         Debug.Log("[GameManager:OnEnterCreationMode] Entered Creation Mode state");
-        // display Creation Mode menu
+        // display Creation Mode menu, and markers
         _currentMenu = _menusUI[_menusUIIndexCreation];
         _currentMenu.SetActive(true);
 
@@ -396,14 +396,15 @@ public class GameManager : MonoBehaviour
     {
         foreach (var marker in Instance._markers)
         {
-            var markerMesh = marker.GetComponent<MeshRenderer>();
-            var boxCollider = marker.GetComponent<BoxCollider>();
-            var objectManipulator = marker.GetComponent<ObjectManipulator>();
-            var nearInteractionGrabbable = marker.GetComponent<NearInteractionGrabbable>();
-            markerMesh.enabled = false;
-            boxCollider.enabled = false;
-            objectManipulator.enabled = false;
-            nearInteractionGrabbable.enabled = false;
+            marker.SetActive(false);
+            //var markerMesh = marker.GetComponent<MeshRenderer>();
+            //var boxCollider = marker.GetComponent<BoxCollider>();
+            //var objectManipulator = marker.GetComponent<ObjectManipulator>();
+            //var nearInteractionGrabbable = marker.GetComponent<NearInteractionGrabbable>();
+            //markerMesh.enabled = false;
+            //boxCollider.enabled = false;
+            //objectManipulator.enabled = false;
+            //nearInteractionGrabbable.enabled = false;
         }
     }
 
@@ -414,14 +415,15 @@ public class GameManager : MonoBehaviour
     {
         foreach (var marker in Instance._markers)
         {
-            var markerMesh = marker.GetComponent<MeshRenderer>();
-            var boxCollider = marker.GetComponent<BoxCollider>();
-            var objectManipulator = marker.GetComponent<ObjectManipulator>();
-            var nearInteractionGrabbable = marker.GetComponent<NearInteractionGrabbable>();
-            markerMesh.enabled = true;
-            boxCollider.enabled = true;
-            objectManipulator.enabled = true;
-            nearInteractionGrabbable.enabled = true;
+            marker.SetActive(true);
+            //var markerMesh = marker.GetComponent<MeshRenderer>();
+            //var boxCollider = marker.GetComponent<BoxCollider>();
+            //var objectManipulator = marker.GetComponent<ObjectManipulator>();
+            //var nearInteractionGrabbable = marker.GetComponent<NearInteractionGrabbable>();
+            //markerMesh.enabled = true;
+            //boxCollider.enabled = true;
+            //objectManipulator.enabled = true;
+            //nearInteractionGrabbable.enabled = true;
         }
     }
 
