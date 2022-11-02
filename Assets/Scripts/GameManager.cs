@@ -19,38 +19,60 @@ using UnityEngine.Video;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private PressableButtonHoloLens2[] _homeButtons;
-    [SerializeField] private PressableButtonHoloLens2[] _tutorialButtons;  // the UI
-    [SerializeField] private PressableButtonHoloLens2[] _creationButtons;
-    [SerializeField] private PressableButtonHoloLens2[] _escapeRoomButtons;
-    private PressableButtonHoloLens2 _tutorialGesturePressButton;          // the button to learn the gesture
+    private PressableButtonHoloLens2[] _homeButtons;               // filled it using GetComponentsInChildren
+    private PressableButtonHoloLens2[] _tutorialButtons;           // the UI (filled it using GetComponentsInChildren)
+    private PressableButtonHoloLens2[] _creationButtons;           // filled it using GetComponentsInChildren
+    private PressableButtonHoloLens2[] _escapeRoomButtons;         // filled it using GetComponentsInChildren
+    private PressableButtonHoloLens2 _tutorialGesturePressButton;  // the button to learn the gesture (used GetComponent)
 
     [Tooltip("Include a menu for each GameStates")]
     [SerializeField] private List<GameObject> _menusUI;
-    private int _menusUIIndexHome = 0, _menusUIIndexTutorial = 1, _menusUIIndexCreation = 2, _menusUIIndexEscapeRoom = 3;
+    private int _menusUIIndexHome, _menusUIIndexTutorial, _menusUIIndexCreation, _menusUIIndexEscapeRoom;
     private GameObject _currentMenu;
-    private bool _escapeRoomReady;  // true when creation mode was saved at least once.
+
     private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
     [Tooltip("Markers to place prefabs. These are NOT WLT anchors!")]
-    [SerializeField] private List<GameObject> _markers;
-
+    [SerializeField] private List<GameObject> _markers;                 // added by hand in Inspector
+    
     private PlayerData _thePlayerData;
     private string _savePathDir;
-    private string _playerDatafileName = "PlayerData.json";
+    private int _numberOfPuzzlesToSolve;
+    private DifficultyLevel _currentDifficultyLevel;
 
-    [Tooltip("Prefabs used in the Tutorial state to learn gestures")]
-    [SerializeField] private List<GameObject> _tutorialPrefabs;
-    private int _tutorialPrefabsIndexPress = 0, _tutorialPrefabsIndexBall = 2;  // _tutorialPrefabsIndexPinchSlide = 1
+    [Tooltip("Prefabs used in the Tutorial state to learn gestures")]  
+    [SerializeField] private List<GameObject> _tutorialPrefabs;         // added by hand in Inspector
+    private int _tutorialPrefabsIndexPress, _tutorialPrefabsIndexBall;  // _tutorialPrefabsIndexPinchSlide
     [Tooltip("Videos to illustrate each gestures shown in Tutorial")]
-    [SerializeField] private List<VideoPlayer> _gestureVideos;
+    [SerializeField] private List<VideoPlayer> _gestureVideos;          // added by hand in Inspector
     [Tooltip("Puzzles' Prefabs to be solved by the player in the Escape Room")]
-    [SerializeField] private List<GameObject> _puzzlesPrefabs;
+    [SerializeField] private List<GameObject> _puzzlesPrefabs;          // added by hand in Inspector
 
     public static GameManager Instance;
     public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
     public PlayerData ThePlayerData {get { return _thePlayerData; }}
+    public int NumberOfPuzzlesToSolve { get { return _numberOfPuzzlesToSolve; } }
+    public DifficultyLevel CurrentDifficultyLevel { get { return _currentDifficultyLevel; } }
     public List<GameObject> AvailableTutorialPrefabs { get { return _tutorialPrefabs; } }
     public List<GameObject> AvailablePuzzlesPrefabs { get { return _puzzlesPrefabs; } }
+
+    public enum DifficultyLevel
+    {
+        EASY,
+        NORMAL,
+        EXPERT,
+    }
+
+    public enum TypesOfGesture
+    {
+        PRESS,
+        PINCHSLIDE,
+    }
+
+    public enum HandType
+    {
+        LEFT,
+        RIGHT,
+    }
 
     public enum GameStates
     {
@@ -60,7 +82,16 @@ public class GameManager : MonoBehaviour
         ESCAPEROOM,
     }
 
-    FiniteStateMachine<GameStates> mGameStateMachine = new FiniteStateMachine<GameStates>();
+    public enum EscapeRoomState
+    {
+        READY,
+        BEGIN,
+        PAUSE,
+        SOLVED,
+    }
+
+    private FiniteStateMachine<GameStates> _gameStateMachine = new FiniteStateMachine<GameStates>();
+    private EscapeRoomStateMachine _escapeRoomStateMachine;
 
     /// <summary>
     /// Awake() is called at the object's creation. Ensure that GameManager is a Singleton.
@@ -78,19 +109,26 @@ public class GameManager : MonoBehaviour
 
         // WLT name file
         Debug.Log("[GameManager:Awake] FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
-
-        // Get buttons of UI HOME
-        _homeButtons = _menusUI[_menusUIIndexHome].GetComponentsInChildren<PressableButtonHoloLens2>();
-        _tutorialButtons = _menusUI[_menusUIIndexTutorial].GetComponentsInChildren<PressableButtonHoloLens2>();
-        _creationButtons = _menusUI[_menusUIIndexCreation].GetComponentsInChildren<PressableButtonHoloLens2>();
-        _escapeRoomButtons = _menusUI[_menusUIIndexEscapeRoom].GetComponentsInChildren<PressableButtonHoloLens2>();
-        _tutorialGesturePressButton = _tutorialPrefabs[_tutorialPrefabsIndexPress].GetComponent<PressableButtonHoloLens2>();
     }
 
     private void Start()
     {
+        // Hardcoded details about game: number of puzzles to solve
+        _currentDifficultyLevel = DifficultyLevel.NORMAL;
+        _numberOfPuzzlesToSolve = 6;
+        _menusUIIndexHome = 0;
+        _menusUIIndexTutorial = 1;
+        _menusUIIndexCreation = 2;
+        _menusUIIndexEscapeRoom = 3;
+        _tutorialPrefabsIndexPress = 0;
+        _tutorialPrefabsIndexBall = 2;
+        //_tutorialPrefabsIndexPinchSlide = 1
+
+        // PlayerData initialized
+        _thePlayerData = new PlayerData(_currentDifficultyLevel, _numberOfPuzzlesToSolve);
+
         // Add the HOME state to the GameManager's state machine
-        mGameStateMachine.Add(
+        _gameStateMachine.Add(
             new State<GameStates>(
                 "HOME",
                 GameStates.HOME,
@@ -102,7 +140,7 @@ public class GameManager : MonoBehaviour
             );
 
         // Add TUTORIAL state
-        mGameStateMachine.Add(
+        _gameStateMachine.Add(
             new State<GameStates>(
                 "TUTORIAL",
                 GameStates.TUTORIAL,
@@ -114,7 +152,7 @@ public class GameManager : MonoBehaviour
             );
 
         // Add CREATION state
-        mGameStateMachine.Add(
+        _gameStateMachine.Add(
             new State<GameStates>(
                 "CREATION",
                 GameStates.CREATION,
@@ -126,7 +164,7 @@ public class GameManager : MonoBehaviour
             );
 
         // Add the ESCAPEROOM state
-        mGameStateMachine.Add(
+        _gameStateMachine.Add(
             new State<GameStates>(
                 "ESCAPEROOM",
                 GameStates.ESCAPEROOM,
@@ -138,7 +176,14 @@ public class GameManager : MonoBehaviour
             );
 
         // Set current state of the GameManager's state machine
-        mGameStateMachine.SetCurrentState(GameStates.HOME);
+        _gameStateMachine.SetCurrentState(GameStates.HOME);
+
+        // Get buttons of UI HOME
+        _homeButtons = _menusUI[_menusUIIndexHome].GetComponentsInChildren<PressableButtonHoloLens2>();
+        _tutorialButtons = _menusUI[_menusUIIndexTutorial].GetComponentsInChildren<PressableButtonHoloLens2>();
+        _creationButtons = _menusUI[_menusUIIndexCreation].GetComponentsInChildren<PressableButtonHoloLens2>();
+        _escapeRoomButtons = _menusUI[_menusUIIndexEscapeRoom].GetComponentsInChildren<PressableButtonHoloLens2>();
+        _tutorialGesturePressButton = _tutorialPrefabs[_tutorialPrefabsIndexPress].GetComponent<PressableButtonHoloLens2>();
 
         // Add Listeners to HOME buttons: 0=pin, 1=tuto, 2=escape room, 3=creation, 4=settings
         _homeButtons[1].ButtonPressed.AddListener(SetStateTutorial);
@@ -155,26 +200,25 @@ public class GameManager : MonoBehaviour
         _creationButtons[3].ButtonPressed.AddListener(UnfreezePuzzleInPlace);        
         _creationButtons[4].ButtonPressed.AddListener(SetStateHome);
 
-        // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Play, 2=Save, 3=Home
-        _escapeRoomButtons[1].ButtonPressed.AddListener(StartGame);
-        _escapeRoomButtons[2].ButtonPressed.AddListener(SaveGame);
-        _escapeRoomButtons[3].ButtonPressed.AddListener(SetStateHome);
+        // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
+        _escapeRoomStateMachine = new EscapeRoomStateMachine();
+        _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHome);
     }
 
-    private void SetStateTutorial() { mGameStateMachine.SetCurrentState(GameStates.TUTORIAL); }
-    private void SetStateEscapeRoom() { mGameStateMachine.SetCurrentState(GameStates.ESCAPEROOM); }
-    private void SetStateCreation() { mGameStateMachine.SetCurrentState(GameStates.CREATION); }
+    private void SetStateTutorial() { _gameStateMachine.SetCurrentState(GameStates.TUTORIAL); }
+    private void SetStateEscapeRoom() { _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM); }
+    private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
 
-    private void SetStateHome() { mGameStateMachine.SetCurrentState(GameStates.HOME); }
+    private void SetStateHome() { _gameStateMachine.SetCurrentState(GameStates.HOME); }
 
     private void Update()
     {
-        mGameStateMachine.Update();
+        _gameStateMachine.Update();
     }
 
     private void FixedUpdate()
     {
-        mGameStateMachine.FixedUpdate();
+        _gameStateMachine.FixedUpdate();
     }
 
     void OnEnterHome()
@@ -262,58 +306,20 @@ public class GameManager : MonoBehaviour
     void OnEnterEscapeRoom()
     {
         Debug.Log("[GameManager:OnEnterEscapeRoom] Game Escape Room");
+        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.BEGIN);
+        
         // display escape room menu
         _currentMenu = _menusUI[_menusUIIndexEscapeRoom];
         _currentMenu.SetActive(true);
-
-        //TODO: create real data file for player
-        // Create fake data file
-        _thePlayerData = new PlayerData(_playerDatafileName);
-        _thePlayerData.DebugCreateFakeData();
     }
 
     void OnExitEscapeRoom()
     {
         Debug.Log("[GameManager:OnExitEscapeRoom] Exited Escape Room");
-        // TODO: save game
+        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.PAUSE);
 
         // hide Escape Room menu
         _currentMenu.SetActive(false);
-
-        // hide any current puzzles
-        foreach (var puzzle in Instance.AvailablePuzzlesPrefabs)
-        {
-            puzzle.SetActive(false);
-        }
-    }
-
-    /// <summary>
-    /// Save the PlayerData as a JSON
-    /// </summary>
-    /// <param name="playerData"></param>
-    public void SavePlayerDataToJson()
-    {
-        // Full Path
-        _savePathDir = Application.persistentDataPath;
-        string fullPath = Path.Combine(_savePathDir, _thePlayerData.FileName);
-
-        // Serialize
-        string jsonString = JsonUtility.ToJson(_thePlayerData);
-        File.WriteAllText(fullPath, jsonString);
-
-        Debug.Log("Player data is saved under: " + fullPath);
-    }
-
-    /// <summary>
-    /// Load, from a JSON PlayerData.json on the persistenDataPath, the PlayerData
-    /// </summary>
-    public void LoadPlayerDataFromJson()
-    {
-        _savePathDir = Application.persistentDataPath;
-        string fullPath = Path.Combine(_savePathDir, _thePlayerData.FileName);
-
-        string json = File.ReadAllText(fullPath);
-        _thePlayerData = JsonUtility.FromJson<PlayerData>(json);
     }
 
     /// <summary>
@@ -444,7 +450,8 @@ public class GameManager : MonoBehaviour
         FreezePuzzlesInPlace();  // make it impossible to move puzzles around
         HideMarkers();
         CreationUpdatePuzzlesStatus("Puzzles: Frozen");
-        _escapeRoomReady = true;
+        Debug.Log("[GameManager:SaveCreation] EscapeRoomStateMachine changed state to READY!");
+        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
     }
 
     /// <summary>
@@ -455,39 +462,5 @@ public class GameManager : MonoBehaviour
         int indexPuzzlesStatus = 5;
         Transform puzzleStatus = _menusUI[_menusUIIndexCreation].transform.GetChild(indexPuzzlesStatus);
         puzzleStatus.GetComponent<TextMesh>().text = newText;
-    }
-
-    /// <summary>
-    /// ESCAPE ROOM: Start game counters (global time, time per puzzles, nb clicks per puzzles, nb puzzles solved).
-    /// </summary>
-    public void StartGame()
-    {
-        if (!_escapeRoomReady)
-        {
-            Debug.LogError("[GameManager:StartGame] Escape Room NOT READY. Please go to CREATION mode first!");
-            return;
-        }
-        Debug.Log("[GameManager:StartGame] Starting Escape Room counters...");
-        // Start counters
-        _thePlayerData.EscapeRoomGlobalDuration = Time.time;
-
-        // Show Puzzles
-        // hide any current puzzles
-        foreach (var puzzle in Instance.AvailablePuzzlesPrefabs)
-        {
-            puzzle.SetActive(true);
-        }
-    }
-
-    /// <summary>
-    /// ESCAPE ROOM: Save anchors and data of the player
-    /// </summary>
-    public void SaveGame()
-    {
-        WorldLockingManager.Save();
-        SavePlayerDataToJson();
-
-        // Save Global Duration
-        _thePlayerData.EscapeRoomGlobalDuration = Time.time - _thePlayerData.EscapeRoomGlobalDuration;
     }
 }
