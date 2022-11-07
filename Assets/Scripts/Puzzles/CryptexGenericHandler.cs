@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Cryptex represents a set of cylinders.
-/// Each cylinder can be selected (by an horizontal PinchSlider) and rotated/turned (by a vertical PinchSlider).
+/// Each cylinder can be selected by an horizontal controller and rotated by a vertical controller.
 /// </summary>
 public class CryptexGenericHandler : MonoBehaviour
 {
@@ -15,7 +15,6 @@ public class CryptexGenericHandler : MonoBehaviour
     private Transform _current_emission_holder;
     private float _currentSliderHorizontalValue = 1;
     private float _currentSliderVerticalValue;
-
 
     // Start is called before the first frame update
     void Start()
@@ -54,7 +53,6 @@ public class CryptexGenericHandler : MonoBehaviour
 
     /// <summary>
     /// Return the Transform's Cylinder corresponding to the Input Value
-    /// Slider's value is between 0 and 1 (as defined by MRTK)
     /// Input's value for Button is an int.
     /// 
     /// 0.25=Cylinder1, 0.5=Cylinder2, 0.75=Cylinder3, 1.00=Cylinder4
@@ -64,21 +62,10 @@ public class CryptexGenericHandler : MonoBehaviour
     /// <param name="InputValue"></param>
     private Transform MapInputValueToCylinderName(float InputValue)
     {
-        if(InputForCryptex.Type == InputGenericHandler.InputTypes.ButtonSquare || InputForCryptex.Type == InputGenericHandler.InputTypes.Radio)
-        {
-            if (InputValue == 1.00) return _cylindersHolder.Find("Cylinder1");  
-            if (InputValue == 2.00) return _cylindersHolder.Find("Cylinder2");  
-            if (InputValue == 3.00) return _cylindersHolder.Find("Cylinder3");  
-            if (InputValue == 4.00) return _cylindersHolder.Find("Cylinder4");
-        }
-
-        if (InputForCryptex.Type == InputGenericHandler.InputTypes.Slider)
-        {
-            if (InputValue == 0.25) return _cylindersHolder.Find("Cylinder1");  
-            if (InputValue == 0.50) return _cylindersHolder.Find("Cylinder2");  
-            if (InputValue == 0.75) return _cylindersHolder.Find("Cylinder3");  
-            if (InputValue == 1.00) return _cylindersHolder.Find("Cylinder4");  
-        }
+        if (InputValue == 1.00) return _cylindersHolder.Find("Cylinder1");  
+        if (InputValue == 2.00) return _cylindersHolder.Find("Cylinder2");  
+        if (InputValue == 3.00) return _cylindersHolder.Find("Cylinder3");  
+        if (InputValue == 4.00) return _cylindersHolder.Find("Cylinder4");
 
         return null;
     }

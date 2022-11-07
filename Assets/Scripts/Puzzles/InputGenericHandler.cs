@@ -24,39 +24,29 @@ public class InputGenericHandler : MonoBehaviour
     public float HorizontalValue { 
         get { return _horizontalValue; }
         private set { 
-            if( Type == InputTypes.ButtonSquare)
+            if(_type == InputTypes.ButtonSquare)
             {
-                _horizontalValue += value;
+                _horizontalValue += value;                             // type button
             }
             else
             {
-                _horizontalValue = value;
+                _horizontalValue = value;                              // type radio
             }
-            if (_horizontalValue <= 0) _horizontalValue = 1;
+
+            // checks values (mostly button, but also radio if there are more radios than cylenders...)
+            if (_horizontalValue <= 0) _horizontalValue = 1;          
             if (_horizontalValue > _controlledPuzzle.GetComponent<CryptexGenericHandler>().NumberOfCylinders)
             {
                 _horizontalValue = _controlledPuzzle.GetComponent<CryptexGenericHandler>().NumberOfCylinders;
-            }
-            
-            
+            }  
         } 
     }
     public float VerticalValue {
         get { return _verticalValue; }
-        private set { 
-            if (Type == InputTypes.ButtonSquare || Type == InputTypes.Radio)
-            {
-                _verticalValue += value;
-            }
-            else
-            {
-                _verticalValue = value;
-            }
-            
-        } 
+        private set{ _verticalValue += value; }
     }
 
-    public enum InputTypes { Slider, ButtonSquare, Radio}
+    public enum InputTypes { ButtonSquare, Radio}
     
     public InputTypes Type
     {

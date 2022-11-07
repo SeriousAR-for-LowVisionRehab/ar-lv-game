@@ -19,6 +19,8 @@ using UnityEngine.Video;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    public GameObject HumorMe;
+
     private PressableButtonHoloLens2[] _homeButtons;               // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _tutorialButtons;           // the UI (filled it using GetComponentsInChildren)
     private PressableButtonHoloLens2[] _creationButtons;           // filled it using GetComponentsInChildren
@@ -49,7 +51,17 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance;
     public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
-    public PlayerData ThePlayerData {get { return _thePlayerData; }}
+    public PlayerData ThePlayerData
+    {
+        get
+        {
+            return _thePlayerData;
+        }
+        set
+        {
+            _thePlayerData = value;
+        }
+    }
     public int NumberOfPuzzlesToSolve { get { return _numberOfPuzzlesToSolve; } }
     public DifficultyLevel CurrentDifficultyLevel { get { return _currentDifficultyLevel; } }
     public List<GameObject> AvailableTutorialPrefabs { get { return _tutorialPrefabs; } }
@@ -124,9 +136,6 @@ public class GameManager : MonoBehaviour
         _tutorialPrefabsIndexBall = 2;
         //_tutorialPrefabsIndexPinchSlide = 1
 
-        // PlayerData initialized
-        _thePlayerData = new PlayerData(_currentDifficultyLevel, _numberOfPuzzlesToSolve);
-
         // Add the HOME state to the GameManager's state machine
         _gameStateMachine.Add(
             new State<GameStates>(
@@ -185,10 +194,13 @@ public class GameManager : MonoBehaviour
         _escapeRoomButtons = _menusUI[_menusUIIndexEscapeRoom].GetComponentsInChildren<PressableButtonHoloLens2>();
         _tutorialGesturePressButton = _tutorialPrefabs[_tutorialPrefabsIndexPress].GetComponent<PressableButtonHoloLens2>();
 
-        // Add Listeners to HOME buttons: 0=pin, 1=tuto, 2=escape room, 3=creation, 4=settings
+        // Add Listeners to HOME buttons: 0=pin, 1=tuto, 2=escape room, 3=creation
+        // TODO: create a UI for 4=settings
         _homeButtons[1].ButtonPressed.AddListener(SetStateTutorial);
         _homeButtons[2].ButtonPressed.AddListener(SetStateEscapeRoom);
         _homeButtons[3].ButtonPressed.AddListener(SetStateCreation);
+
+        _homeButtons[2].gameObject.SetActive(false);                     // by default, the EscapeRoom is not accessible. Need to be created.
 
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
         _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
@@ -205,12 +217,6 @@ public class GameManager : MonoBehaviour
         _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHome);
     }
 
-    private void SetStateTutorial() { _gameStateMachine.SetCurrentState(GameStates.TUTORIAL); }
-    private void SetStateEscapeRoom() { _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM); }
-    private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
-
-    private void SetStateHome() { _gameStateMachine.SetCurrentState(GameStates.HOME); }
-
     private void Update()
     {
         _gameStateMachine.Update();
@@ -219,6 +225,21 @@ public class GameManager : MonoBehaviour
     private void FixedUpdate()
     {
         _gameStateMachine.FixedUpdate();
+    }
+
+    private void SetStateTutorial() { _gameStateMachine.SetCurrentState(GameStates.TUTORIAL); }
+    private void SetStateEscapeRoom() { _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM); }
+    private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
+
+    private void SetStateHome() { _gameStateMachine.SetCurrentState(GameStates.HOME); }
+
+    /// <summary>
+    /// HOME: setter function to activate the EscapeRoom button on the Home UI.
+    /// remark: refer to GameManager.Start() for index reference (hardcoded).
+    /// </summary>
+    public void SetHomeButtonEscapeRoom()
+    {
+        _homeButtons[2].gameObject.SetActive(true);
     }
 
     void OnEnterHome()
@@ -273,6 +294,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// CREATION: entering the CREATION state makes its UI active, the puzzles movable and set between markers.
+    /// </summary>
     void OnEnterCreation()
     {
         Debug.Log("[GameManager:OnEnterCreationMode] Entered Creation Mode state");
@@ -287,14 +311,16 @@ public class GameManager : MonoBehaviour
         ResetPuzzles();
     }
 
+    /// <summary>
+    /// CREATION: when exit CREATION state, hide objects
+    /// </summary>
     void OnExitCreation()
     {
         Debug.Log("[GameManager:OnExitCreationMode] Exited Creation Mode state");
-        // hide Creation Mode
+        // hide UI and markers, and freeze and hide puzzles
         _currentMenu.SetActive(false);
-
-        // Save Creation
-        SaveCreation();
+        HideMarkers();
+        FreezePuzzlesInPlace();        
 
         // Hide the Puzzles
         foreach (var puzzle in Instance.AvailablePuzzlesPrefabs)
@@ -305,9 +331,9 @@ public class GameManager : MonoBehaviour
 
     void OnEnterEscapeRoom()
     {
-        Debug.Log("[GameManager:OnEnterEscapeRoom] Game Escape Room");
+        Debug.Log("[GameManager:OnEnterEscapeRoom] Game Escape Room, set its state machine to BEGIN");
         _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.BEGIN);
-        
+
         // display escape room menu
         _currentMenu = _menusUI[_menusUIIndexEscapeRoom];
         _currentMenu.SetActive(true);
@@ -341,7 +367,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// CREATION: reset the puzzles between the two markers.
+    /// CREATION: show visual markers and reset the puzzles between those two markers.
     /// </summary>
     private void ResetPuzzles()
     {
@@ -372,6 +398,8 @@ public class GameManager : MonoBehaviour
                 objectManipulatorScript.enabled = false;
             }
         }
+
+        CreationUpdatePuzzlesStatus("Puzzles: Frozen");
     }
 
     /// <summary>
@@ -443,15 +471,15 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// CREATION: the user won't be able to move the puzzles anymore, only solve them.
+    /// CREATION: Puzzles are frozen, markers hidden, and EscapeRoomStateMachine set ot READY state.
     /// </summary>
     public void SaveCreation()
     {
-        FreezePuzzlesInPlace();  // make it impossible to move puzzles around
+        FreezePuzzlesInPlace();
         HideMarkers();
-        CreationUpdatePuzzlesStatus("Puzzles: Frozen");
-        Debug.Log("[GameManager:SaveCreation] EscapeRoomStateMachine changed state to READY!");
+        Debug.Log("[GameManager:SaveCreation] Creation saved: puzzles frozen and markers hidden");
         _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
+        Debug.Log("[GameManager:SaveCreation] EscapeRoomStateMachine changed state to READY!");
     }
 
     /// <summary>

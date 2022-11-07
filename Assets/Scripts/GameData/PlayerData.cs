@@ -20,6 +20,11 @@ public class PlayerData
 
     public string _savePathDir;
 
+    /// <summary>
+    /// For each new PlayerData instance, a new file with current time (Time.time) is created
+    /// </summary>
+    /// <param name="difficulty"></param>
+    /// <param name="numberOfPuzzlesToSolve"></param>
     public PlayerData(GameManager.DifficultyLevel difficulty, int numberOfPuzzlesToSolve)
     {
         Difficulty = difficulty;
