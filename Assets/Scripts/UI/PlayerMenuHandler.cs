@@ -18,7 +18,7 @@ public class PlayerMenuHandler : MonoBehaviour
     public void SaveGame()
     {
         WorldLockingManager.GetInstance().Save();
-        GameManager.Instance.SavePlayerDataToJson();
+        GameManager.Instance.ThePlayerData.SavePlayerDataToJson();
         //GameManager.Instance.IsGameStarted = true;
     }
 

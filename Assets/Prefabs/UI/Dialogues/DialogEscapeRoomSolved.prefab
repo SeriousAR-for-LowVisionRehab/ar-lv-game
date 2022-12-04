@@ -109,10 +109,15 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: " - Diary notes - 05/10/1957 - \nToday, still in the Andes, we walked near
-    a lake with a breath-taking view on a dormant volcano on the Argetina-Chile border.
-    Its white top is wonderful. Tomorrow will be the start of our hike to get clother
-    this highest peak in Chile."
+  m_text: 'Dear Descendant,
+
+    Despite the challenges you have faced, your strong
+    will and work ethic lead you to our message. Continue your endeavor like that,
+    as the journey is the reward.
+
+    Yours sincerely,
+
+    ...'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6a84f857bec7e7345843ae29404c57ce, type: 2}
   m_sharedMaterial: {fileID: 21202819797275496, guid: 6a84f857bec7e7345843ae29404c57ce, type: 2}
@@ -2140,7 +2145,7 @@ GameObject:
   - component: {fileID: 4733889500858254147}
   - component: {fileID: 8997744105682115357}
   m_Layer: 0
-  m_Name: DialogPuzzleSolved0
+  m_Name: DialogEscapeRoomSolved
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2154,7 +2159,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2680377478557818543}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.4, y: 10, z: -3}
+  m_LocalPosition: {x: -0.4, y: 0, z: 0.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4448,7 +4453,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'You cracked it! Awesome! Here is the message:'
+  m_text: Congrats on Solving the Mistery!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f137eba12ee10834cb19632437cfdb2e, type: 2}
   m_sharedMaterial: {fileID: 21433621844796372, guid: f137eba12ee10834cb19632437cfdb2e, type: 2}
