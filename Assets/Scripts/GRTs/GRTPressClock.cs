@@ -1,4 +1,5 @@
 using Microsoft.MixedReality.Toolkit.UI;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -8,22 +9,29 @@ using UnityEngine;
 ///  - Assign the GameObjects to _piecesOnClock: order matters w.r.t. _rotationAngles' values
 ///  - Assign the GameObjects to _piecesToSelect
 ///  - Assign the TextMeshes for Time, Turns Left, and Points.
+///  
+/// The following variables have hardcoded initial value in their declarations:
+///  - the angles at which the arrow rotates, see: _rotationAngles
+///  - the time allowed per turn, see: _allowedTime
+///  - the number of turns in this GRT, see: _turnsLeft
 /// </summary>
 public class GRTPressClock : GRTPress
 {
     private bool _isDebugMode = true;
 
     private bool _isGRTTerminated = false;
+    private bool _moveToNextTurn = true;
 
     private int _rotationIndex;        // an index chosen at random: for rotation, and piece on clock
-    private int[] _rotationAngles = {0, 90, 180, 270};   // assume four pieces displayed
+    private int[] _rotationAngles = {0, -90, -180, -270};   // assume four pieces displayed
+    [SerializeField] private GameObject _arrow;
     [SerializeField] private GameObject[] _piecesOnClock;
-    private float _allowedTime = 20f;
+    [SerializeField] private float _allowedTime = 20f;
     private float _remainingTime;
     [SerializeField] private TextMesh _textTimeLeft;
     [SerializeField] private TextMesh _textTurnsLeft;
     [SerializeField] private TextMesh _textPoints;
-    private int _turnsLeft;
+    [SerializeField] private int _turnsLeft = 5;
     private int TurnsLeft
     {
         get { return _turnsLeft; }
@@ -61,9 +69,6 @@ public class GRTPressClock : GRTPress
         base.Start();
         Debug.Log("[GRTPressClock:Start]");
 
-        _remainingTime = _allowedTime;
-        _rotationIndex = GenerateRotationIndex();
-
         if(_isDebugMode) GRTStateMachine.SetCurrentState(GRTState.SOLVING);
 
         // Add listeners to controller' buttons
@@ -85,6 +90,11 @@ public class GRTPressClock : GRTPress
         _textTimeLeft.text = $"Time Left: {Mathf.Round(_remainingTime)}";
 
         ControlGRTStatus();
+        if (_moveToNextTurn)
+        {
+            PlaceArrow();
+            _moveToNextTurn = false;
+        }
     }
 
     protected override void FreezeGRTBox()
@@ -118,8 +128,9 @@ public class GRTPressClock : GRTPress
     /// Reset the clock (arrow and piece), selected piece, and time,
     /// and set a new rotation index for next play
     /// </summary>
-    private void NextPlay()
+    private void PrepareTurn()
     {
+        TurnsLeft -= 1;
         _rotationIndex = GenerateRotationIndex();
         _remainingTime = _allowedTime;
         _isSelectionValidated = false;
@@ -132,6 +143,15 @@ public class GRTPressClock : GRTPress
     private int GenerateRotationIndex()
     {
         return Random.Range(0, _rotationAngles.Length - 1);
+    }
+
+    /// <summary>
+    /// Rotate and Scale the arrow to the generated index (by GenerateRotationIndex)
+    /// </summary>
+    private void PlaceArrow()
+    {
+        _arrow.transform.Rotate(new Vector3(0, 0, _rotationAngles[_rotationIndex]));
+        _arrow.transform.localScale = new Vector3(2, 2, 2);
     }
 
     /// <summary>

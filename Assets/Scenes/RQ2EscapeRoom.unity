@@ -263,6 +263,34 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5546816439317016466, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546816439317016466, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546816439317016466, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546816439317016466, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546816439317016466, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546816439317016466, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546816439317016466, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7378240399200862569, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: m_RootOrder
       value: 15
@@ -324,13 +352,25 @@ PrefabInstance:
       value: GRT_Clock_Press
       objectReference: {fileID: 0}
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: _arrow
+      value: 
+      objectReference: {fileID: 312382714}
+    - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: TimeLeft
       value: 
       objectReference: {fileID: 312382713}
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: _textPoints
+      value: 
+      objectReference: {fileID: 312382715}
+    - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: _textTimeLeft
       value: 
       objectReference: {fileID: 312382713}
+    - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+      propertyPath: _textTurnsLeft
+      value: 
+      objectReference: {fileID: 312382716}
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: _piecesOnClock.Array.size
       value: 4
@@ -413,6 +453,21 @@ GameObject:
 --- !u!102 &312382713 stripped
 TextMesh:
   m_CorrespondingSourceObject: {fileID: 7510106472163658405, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+  m_PrefabInstance: {fileID: 312382711}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &312382714 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3762872999853564414, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+  m_PrefabInstance: {fileID: 312382711}
+  m_PrefabAsset: {fileID: 0}
+--- !u!102 &312382715 stripped
+TextMesh:
+  m_CorrespondingSourceObject: {fileID: 2372143264736622852, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+  m_PrefabInstance: {fileID: 312382711}
+  m_PrefabAsset: {fileID: 0}
+--- !u!102 &312382716 stripped
+TextMesh:
+  m_CorrespondingSourceObject: {fileID: 322140071621394443, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
   m_PrefabInstance: {fileID: 312382711}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &429636523 stripped
