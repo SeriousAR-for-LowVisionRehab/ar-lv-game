@@ -1,15 +1,14 @@
-using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
-using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.WorldLocking.Core;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UnityEngine.Video;
 
 /// <summary>
-/// GameManager is a Singleton.
+/// GameManager is a Singleton. It holds the Home UI.
+/// 
+/// For each UI, an array of buttons is filled manually in the Inspector.
+/// In Start(), listeners are added to each button's ButtonPressed event to change FSM's state and/or move to another UI.
 /// 
 /// The GameManager handles:
 ///  - state machine of the overall game, with 4 states: home, tutorial, creation mode, and escape room
@@ -19,7 +18,7 @@ using UnityEngine.Video;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    public GameObject HumorMe;
+    private bool _isDebugMode = true;                              // allow to go directly to Escape Room
 
     private PressableButtonHoloLens2[] _homeButtons;               // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _tutorialButtons;           // the UI (filled it using GetComponentsInChildren)
@@ -40,6 +39,12 @@ public class GameManager : MonoBehaviour
     private string _savePathDir;
     private int _numberOfPuzzlesToSolve;
     private DifficultyLevel _currentDifficultyLevel;
+
+    // EscapeRoomStateMachine related: welcome message with what to do first
+    [Tooltip("The initial message displayed to the player, with initial clue toward the first puzzle.")]
+    public GameObject WelcomeMessageDialog;
+    public string WelcomeMessageTitle = "Welcome to the Escape Room";
+    public string WelcomeMessageDescription = "Since you find an intriging letter left by your ancestors, heading toward a message left within other of their objects left to you. \r\n\r\nGo to the CRYPTEX they left you. The ARROW  leads the way!";
 
     [Tooltip("Prefabs used in the Tutorial state to learn gestures")]  
     [SerializeField] private List<GameObject> _tutorialPrefabs;         // added by hand in Inspector
@@ -199,7 +204,6 @@ public class GameManager : MonoBehaviour
         _homeButtons[1].ButtonPressed.AddListener(SetStateTutorial);
         _homeButtons[2].ButtonPressed.AddListener(SetStateEscapeRoom);
         _homeButtons[3].ButtonPressed.AddListener(SetStateCreation);
-
         _homeButtons[2].gameObject.SetActive(false);                     // by default, the EscapeRoom is not accessible. Need to be created.
 
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
@@ -215,6 +219,14 @@ public class GameManager : MonoBehaviour
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
         _escapeRoomStateMachine = new EscapeRoomStateMachine();
         _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHome);
+
+        // Debug mode: access possible directly to the escape room
+        if (_isDebugMode)
+        {
+            //_homeButtons[2].gameObject.SetActive(true);
+            OnExitHome();
+            OnEnterEscapeRoom();
+        }
     }
 
     private void Update()

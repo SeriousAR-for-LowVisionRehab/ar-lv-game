@@ -9,16 +9,10 @@ using UnityEngine;
 /// GameManager's CREATION mode to set the state to READY. This is the initial state,
 /// and the BEGIN state is entered once the user click on EscapeRoom button of the HOME UI (cf GameManager.cs)
 /// 
-/// For simplification, we assume the puzzles are solved linearly, one after the other, in a predefined order.
+/// For simplification, we assume the Gamified Rehabilitation Tasks (GRTs) are solved linearly, one after the other, in a predefined order.
 /// </summary>
 public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomState>
 {
-    // Welcome message with what to do first
-    [Tooltip("The initial message displayed to the player, with initial clue toward the first puzzle.")]
-    [SerializeField] private GameObject _welcomeMessageDialog;
-    private string _welcomeMessageTitle = "Welcome to the Escape Room";
-    private string _welcomeMessageDescription = "Since you find an intriging letter left by your ancestors, heading toward a message left within other of their objects left to you. \r\n\r\nGo to the CRYPTEX they left you. The ARROW  leads the way!";
-
     // Variable to keep track of current puzzle (int)
     private int _currentPuzzleIndex;
 
@@ -106,14 +100,19 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
             gameManagerInstance.NumberOfPuzzlesToSolve
             );
         gameManagerInstance.ThePlayerData.EscapeRoomGlobalDuration = Time.time;
+        Debug.Log("[EscapeRoomStateMachine:OnEnterBegin] ThePlayerData created");
 
         // Display welcome message with initial clue
-        Dialog.Open(_welcomeMessageDialog, DialogButtonType.OK, _welcomeMessageTitle, _welcomeMessageDescription, false);
+        Dialog.Open(GameManager.Instance.WelcomeMessageDialog, DialogButtonType.OK, GameManager.Instance.WelcomeMessageTitle, GameManager.Instance.WelcomeMessageDescription, false);
+        Debug.Log("[EscapeRoomStateMachine:OnEnterBegin] Welcome message displayed");
 
-        // Show Puzzles
+        // Show Puzzles and change their FSM's state to SOLVING
         foreach (var puzzle in gameManagerInstance.AvailablePuzzlesPrefabs)
         {
             puzzle.SetActive(true);
+            // TODO: need some abstraction/refactoring
+            // GRTPressCryptex grtScript = puzzle.GetComponent<GRTPressCryptex>();
+            // grtScript.GRTStateMachine.SetCurrentState(GRTGeneric<PressableButtonHoloLens2>.GRTState.SOLVING);
         }
     }
 
