@@ -46,6 +46,14 @@ public class GameManager : MonoBehaviour
     public string WelcomeMessageTitle = "Welcome to the Escape Room";
     public string WelcomeMessageDescription = "Since you find an intriging letter left by your ancestors, heading toward a message left within other of their objects left to you. \r\n\r\nGo to the CRYPTEX they left you. The ARROW  leads the way!";
 
+    private int _numberOfPuzzlesSolved;
+    public int NumberOfPuzzlesSolved
+    {
+        get { return _numberOfPuzzlesSolved; }
+        set { _numberOfPuzzlesSolved = value; }
+    }
+    public TextMesh TextNumberOfPuzzlesSolved;
+
     [Tooltip("Prefabs used in the Tutorial state to learn gestures")]  
     [SerializeField] private List<GameObject> _tutorialPrefabs;         // added by hand in Inspector
     private int _tutorialPrefabsIndexPress, _tutorialPrefabsIndexBall;  // _tutorialPrefabsIndexPinchSlide
@@ -101,8 +109,8 @@ public class GameManager : MonoBehaviour
 
     public enum EscapeRoomState
     {
-        READY,
-        BEGIN,
+        WELCOME,
+        PLAYING,
         PAUSE,
         SOLVED,
     }
@@ -133,6 +141,7 @@ public class GameManager : MonoBehaviour
         // Hardcoded details about game: number of puzzles to solve
         _currentDifficultyLevel = DifficultyLevel.NORMAL;
         _numberOfPuzzlesToSolve = 6;
+        NumberOfPuzzlesSolved = 0;
         _menusUIIndexHome = 0;
         _menusUIIndexTutorial = 1;
         _menusUIIndexCreation = 2;
@@ -343,8 +352,9 @@ public class GameManager : MonoBehaviour
 
     void OnEnterEscapeRoom()
     {
-        Debug.Log("[GameManager:OnEnterEscapeRoom] Game Escape Room, set its state machine to BEGIN");
-        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.BEGIN);
+        //TODO:  should it be READY or BEGIN state ?
+        Debug.Log("[GameManager:OnEnterEscapeRoom] Game Escape Room, set its state machine to WELCOME");
+        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME);
 
         // display escape room menu
         _currentMenu = _menusUI[_menusUIIndexEscapeRoom];
@@ -490,7 +500,7 @@ public class GameManager : MonoBehaviour
         FreezePuzzlesInPlace();
         HideMarkers();
         Debug.Log("[GameManager:SaveCreation] Creation saved: puzzles frozen and markers hidden");
-        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
+        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME);
         Debug.Log("[GameManager:SaveCreation] EscapeRoomStateMachine changed state to READY!");
     }
 

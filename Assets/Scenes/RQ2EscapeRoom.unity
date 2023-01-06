@@ -402,7 +402,7 @@ PrefabInstance:
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: _piecesOnClock.Array.data[3]
       value: 
-      objectReference: {fileID: 429636523}
+      objectReference: {fileID: 1829213725}
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: _piecesToSelect.Array.data[0]
       value: 
@@ -410,15 +410,15 @@ PrefabInstance:
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: _piecesToSelect.Array.data[1]
       value: 
-      objectReference: {fileID: 915732344}
+      objectReference: {fileID: 458287284}
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: _piecesToSelect.Array.data[2]
       value: 
-      objectReference: {fileID: 458287284}
+      objectReference: {fileID: 915732344}
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: _piecesToSelect.Array.data[3]
       value: 
-      objectReference: {fileID: 458287284}
+      objectReference: {fileID: 2059285082}
     - target: {fileID: 8060237322862159557, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
       propertyPath: pieces_on_clock.Array.data[0]
       value: 
@@ -941,21 +941,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 417332cd6536c404e92c486761ab6420, type: 3}
---- !u!114 &871275511 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5100833552533756678, guid: 417332cd6536c404e92c486761ab6420, type: 3}
-  m_PrefabInstance: {fileID: 871275510}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f98e7663599230e419addf153615c144, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &890251754 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 924225858010549179, guid: 417332cd6536c404e92c486761ab6420, type: 3}
   m_PrefabInstance: {fileID: 871275510}
+  m_PrefabAsset: {fileID: 0}
+--- !u!102 &900667953 stripped
+TextMesh:
+  m_CorrespondingSourceObject: {fileID: 3906216320768639653, guid: 3f1b618d4fcb1604188e5a8617ec22dd, type: 3}
+  m_PrefabInstance: {fileID: 1714493576}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &915732344 stripped
 GameObject:
@@ -1353,17 +1347,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 22
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1223845220 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1806475648453545051, guid: 417332cd6536c404e92c486761ab6420, type: 3}
-  m_PrefabInstance: {fileID: 871275510}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f98e7663599230e419addf153615c144, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1249778623
 GameObject:
   m_ObjectHideFlags: 0
@@ -1481,17 +1464,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3763929954737058880, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
   m_PrefabInstance: {fileID: 312382711}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1676352477 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6535908169291854777, guid: 417332cd6536c404e92c486761ab6420, type: 3}
-  m_PrefabInstance: {fileID: 871275510}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f98e7663599230e419addf153615c144, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1714493576
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1900,6 +1872,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1829213725 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8229565915733354704, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+  m_PrefabInstance: {fileID: 312382711}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2009327437
 GameObject:
   m_ObjectHideFlags: 0
@@ -1931,6 +1908,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2059285082 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4373167662651349252, guid: 5b93b2fb49a263f4a8a7ce8e1259ced5, type: 3}
+  m_PrefabInstance: {fileID: 312382711}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2097550402
 GameObject:
   m_ObjectHideFlags: 0
@@ -2451,53 +2433,9 @@ PrefabInstance:
       value: GameManager
       objectReference: {fileID: 0}
     - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: HumorMe
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _homeMenu
-      value: 
-      objectReference: {fileID: 890251754}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _tutorialMenu
-      value: 
-      objectReference: {fileID: 433730581}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _isGamePrepared
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _anchors.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _markers.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _menusUI.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
       propertyPath: WelcomeMessageDialog
       value: 
       objectReference: {fileID: 2680377478557818543, guid: 8ef5169086409fb47b769c61366765c3, type: 3}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: menuUICreationButton
-      value: 
-      objectReference: {fileID: 1223845220}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: menuUITutorialButton
-      value: 
-      objectReference: {fileID: 871275511}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _anchors.Array.data[0]
-      value: 
-      objectReference: {fileID: 1781924008}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _anchors.Array.data[1]
-      value: 
-      objectReference: {fileID: 2115280731}
     - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
       propertyPath: _markers.Array.data[0]
       value: 
@@ -2523,21 +2461,13 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1714493577}
     - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: menuUIEscapeRoomButton
+      propertyPath: TextNumberOfPuzzlesSolved
       value: 
-      objectReference: {fileID: 1676352477}
+      objectReference: {fileID: 900667953}
     - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _gestureVideos.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _puzzlesPrefabs.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _tutorialPrefabs.Array.size
-      value: 3
-      objectReference: {fileID: 0}
+      propertyPath: _textNumberOfPuzzlesSolved
+      value: 
+      objectReference: {fileID: 900667953}
     - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
       propertyPath: _gestureVideos.Array.data[0]
       value: 
@@ -2551,14 +2481,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 312382712}
     - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _puzzlesPrefabs.Array.data[1]
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _puzzlesPrefabs.Array.data[2]
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
       propertyPath: _tutorialPrefabs.Array.data[0]
       value: 
       objectReference: {fileID: 832513289}
@@ -2566,53 +2488,5 @@ PrefabInstance:
       propertyPath: _tutorialPrefabs.Array.data[1]
       value: 
       objectReference: {fileID: 2104455412}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _tutorialPrefabs.Array.data[2]
-      value: 
-      objectReference: {fileID: 1805240900331211294, guid: e7ee9f296c8633f45bf0d75e881d0123, type: 3}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availableToolsPrefabs.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availablePuzzlesPrefabs.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availableToolsPrefabs.Array.data[0]
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availableTutorialPrefabs.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availablePuzzlesPrefabs.Array.data[0]
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availablePuzzlesPrefabs.Array.data[1]
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availablePuzzlesPrefabs.Array.data[2]
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availablePuzzlesPrefabs.Array.data[3]
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availableTutorialPrefabs.Array.data[0]
-      value: 
-      objectReference: {fileID: 832513289}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availableTutorialPrefabs.Array.data[1]
-      value: 
-      objectReference: {fileID: 2104455412}
-    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
-      propertyPath: _availableTutorialPrefabs.Array.data[2]
-      value: 
-      objectReference: {fileID: 1805240900331211294, guid: e7ee9f296c8633f45bf0d75e881d0123, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1312138f29bd92445937228a8886e6f6, type: 3}

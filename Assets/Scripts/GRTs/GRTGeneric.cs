@@ -39,7 +39,6 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
     protected virtual void Start()
     {
-        Debug.Log("[GRTGeneric:Start]");
         GRTStateMachine = new FiniteStateMachine<GRTState>();
         // Add states
         GRTStateMachine.Add(
@@ -83,36 +82,37 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
     private void OnEnterPlacing()
     {
-        Debug.Log("[GRTBox(" + this.name + "):OnEnterPlacing] Entered Placing mode");
+        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterPlacing] Entered Placing mode");
         UnfreezeGRTBox();
     }
 
     private void OnExitPlacing()
     {
-        Debug.Log("[GRTBox(" + this.name + "):OnExitPlacing] Exiting Placing mode");
+        Debug.Log("[GRTGeneric(" + this.name + "):OnExitPlacing] Exiting Placing mode");
         FreezeGRTBox();
     }
 
     private void OnEnterSolving()
     {
-        Debug.Log("[GRTBox(" + this.name + "):OnEnterSolving] Entered Solving mode");
+        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolving] Entered Solving mode");
     }
 
     private void OnExitSolving()
     {
-        Debug.Log("[GRTBox(" + this.name + "):OnExitSolving] Exiting Solving mode");
+        Debug.Log("[GRTGeneric(" + this.name + "):OnExitSolving] Exiting Solving mode");
     }
 
     protected abstract void OnUpdateSolving();
 
     private void OnEnterSolved()
     {
-        Debug.Log("[GRTBox(" + this.name + "):OnEnterSolved] Entered Solved mode");
+        GameManager.Instance.NumberOfPuzzlesSolved += 1;
+        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfPuzzlesSolved + " out of " + GameManager.Instance.NumberOfPuzzlesToSolve + " GRTs");
     }
 
     private void OnExitSolved()
     {
-        Debug.Log("[GRTBox(" + this.name + "):OnExitSolved] Exiting Solved mode");
+        Debug.Log("[GRTGeneric(" + this.name + "):OnExitSolved] Exiting Solved mode");
     }
 
     protected abstract void FreezeGRTBox();

@@ -44,4 +44,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3567cd8519c5c464caf0de4baded8c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  puzzlesPrefabs: []
+  _menusUI:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _markers:
+  - {fileID: 0}
+  - {fileID: 0}
+  WelcomeMessageDialog: {fileID: 2680377478557818543, guid: 8ef5169086409fb47b769c61366765c3, type: 3}
+  WelcomeMessageTitle: Welcome to the Escape Room
+  WelcomeMessageDescription: "Since you find an intriging letter left by your ancestors,
+    heading toward a message left within other of their objects left to you. \r\n\r\nGo
+    to the CRYPTEX they left you. The ARROW  leads the way!"
+  _textNumberOfPuzzlesSolved: {fileID: 0}
+  _tutorialPrefabs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 1805240900331211294, guid: e7ee9f296c8633f45bf0d75e881d0123, type: 3}
+  _gestureVideos:
+  - {fileID: 0}
+  - {fileID: 0}
+  _puzzlesPrefabs:
+  - {fileID: 0}

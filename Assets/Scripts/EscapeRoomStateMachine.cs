@@ -1,13 +1,14 @@
 using Microsoft.MixedReality.Toolkit.UI;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 /// <summary>
 /// State machine of the game itself.
 /// 
 /// Because a new EscapeRoomStateMachine has no default state set, you need the
-/// GameManager's CREATION mode to set the state to READY. This is the initial state,
-/// and the BEGIN state is entered once the user click on EscapeRoom button of the HOME UI (cf GameManager.cs)
+/// GameManager's CREATION mode to set the state to WELCOME. This is the initial state,
+/// and the PLAYING state is entered once the user click on EscapeRoom button of the HOME UI (cf GameManager.cs)
 /// 
 /// For simplification, we assume the Gamified Rehabilitation Tasks (GRTs) are solved linearly, one after the other, in a predefined order.
 /// </summary>
@@ -20,36 +21,39 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     private List<GameObject> _orderedPuzzles = GameManager.Instance.AvailablePuzzlesPrefabs;
 
     // TODO: read the status of the puzzle
-    // TODO: update the BEGIN state with where the player is (which puzzles are solved)
-    // TODO: once all puzzles are solved, exit the BEGIN state and enter the SOLVED state
+    // TODO: update the PLAYING state with where the player is (which puzzles are solved)
+
+
+
+    // TODO: once all puzzles are solved, exit the PLAYING state and enter the SOLVED state
 
 
     /// <summary>
     /// A new EscapeRoomStateMachine has four states available, but no default state set.
-    /// GameManager's CREATION mode is needed to set the state to READY.
+    /// GameManager's CREATION mode is needed to set the state to WELCOME.
     /// </summary>
     public EscapeRoomStateMachine()
     {
-        // Add READY state
+        // Add WELCOME state
         this.Add(
             new State<GameManager.EscapeRoomState>(
-                "READY",
-                GameManager.EscapeRoomState.READY,
-                OnEnterReady,
-                OnExitReady,
+                "WELCOME",
+                GameManager.EscapeRoomState.WELCOME,
+                OnEnterWelcome,
+                OnExitWelcome,
                 null,
                 null
                 )
             );
 
-        // Add BEGIN state
+        // Add PLAYING state
         this.Add(
             new State<GameManager.EscapeRoomState>(
-                "BEGIN",
-                GameManager.EscapeRoomState.BEGIN,
-                OnEnterBegin,
-                OnExitBegin,
-                OnUpdateBegin,
+                "PLAYING",
+                GameManager.EscapeRoomState.PLAYING,
+                OnEnterPlaying,
+                OnExitPlaying,
+                OnUpdatePlaying,
                 null
                 )
             );
@@ -79,32 +83,34 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
             );
     }
 
-    void OnEnterReady()
+    void OnEnterWelcome()
     {
-        Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Entered Ready mode");
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] Entered Welcome mode");
         GameManager.Instance.SetHomeButtonEscapeRoom();
-    }
 
-    void OnExitReady()
-    {
-        Debug.Log("[EscapeRoomStateMachine:OnExitReady] Exited Ready mode");
-    }
-
-    void OnEnterBegin()
-    {
         var gameManagerInstance = GameManager.Instance;
-        Debug.Log("[EscapeRoomStateMachine:OnEnterBegin] Entered Begin mode");
         // Create Player Data File, and start counters
         gameManagerInstance.ThePlayerData = new PlayerData(
             gameManagerInstance.CurrentDifficultyLevel,
             gameManagerInstance.NumberOfPuzzlesToSolve
             );
         gameManagerInstance.ThePlayerData.EscapeRoomGlobalDuration = Time.time;
-        Debug.Log("[EscapeRoomStateMachine:OnEnterBegin] ThePlayerData created");
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] ThePlayerData created");
 
         // Display welcome message with initial clue
-        Dialog.Open(GameManager.Instance.WelcomeMessageDialog, DialogButtonType.OK, GameManager.Instance.WelcomeMessageTitle, GameManager.Instance.WelcomeMessageDescription, false);
-        Debug.Log("[EscapeRoomStateMachine:OnEnterBegin] Welcome message displayed");
+        Dialog.Open(gameManagerInstance.WelcomeMessageDialog, DialogButtonType.OK, gameManagerInstance.WelcomeMessageTitle, GameManager.Instance.WelcomeMessageDescription, false);
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] Welcome message displayed + state = " + GameManager.Instance.WelcomeMessageDialog.GetComponent<DialogShell>().State);
+
+        // once the player click "OK", the EscapeRoom goes from "WELCOME" to "PLAYING" state.
+        
+        Transform buttonOk = gameManagerInstance.WelcomeMessageDialog.transform.Find("ButtonParent").Find("ButtonOk");
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] WelcomeMessageDialog's buttonOk: name = " + buttonOk.name);
+        PressableButtonHoloLens2 buttonOkPressableScript = buttonOk.GetComponent<PressableButtonHoloLens2>();
+        //TODO MAKE IT WORK: SetUpdateState never called for now...
+        buttonOkPressableScript.ButtonPressed.AddListener(SetUpdateState);
+
+        //PressableButtonHoloLens2 okButton = gameManagerInstance.WelcomeMessageDialog.GetComponentInChildren<PressableButtonHoloLens2>();
+        //okButton.ButtonPressed.AddListener(SetUpdateState);
 
         // Show Puzzles and change their FSM's state to SOLVING
         foreach (var puzzle in gameManagerInstance.AvailablePuzzlesPrefabs)
@@ -116,14 +122,25 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         }
     }
 
-    void OnExitBegin()
+    void OnExitWelcome()
     {
-        Debug.Log("[EscapeRoomStateMachine:OnExitBegin] Exited Begin mode");
+        Debug.Log("[EscapeRoomStateMachine:OnExitWelcome] Exited Welcome mode");
     }
 
-    void OnUpdateBegin()
+    void OnEnterPlaying()
     {
-        Debug.Log("[EscapeRoomStateMachine:OnUpdateBegin] Updating Begin mode...");
+        Debug.Log("[EscapeRoomStateMachine:OnEnterPlaying] Entered Playing mode");
+    }
+
+    void OnExitPlaying()
+    {
+        Debug.Log("[EscapeRoomStateMachine:OnExitPlaying] Exited Playing mode");
+    }
+
+    void OnUpdatePlaying()
+    {
+        Debug.Log("[EscapeRoomStateMachine:OnUpdatePlaying] Updating Playing mode...");
+        GameManager.Instance.TextNumberOfPuzzlesSolved.text = $"Puzzles solved: {GameManager.Instance.NumberOfPuzzlesSolved} / 3";
     }
 
     void OnEnterPause()
@@ -154,6 +171,14 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         Debug.Log("[EscapeRoomStateMachine:OnExitSolved] Exited Solved mode");
     }
 
+    /// <summary>
+    /// Set the state of this EscapeRoomStateMachine to PLAYING.
+    /// </summary>
+    private void SetUpdateState()
+    {
+        Debug.Log("[EscapeRoomStateMachine:SetUpdateStated] Set state to PLAYING");
+        this.SetCurrentState(GameManager.EscapeRoomState.PLAYING);
+    }
 
     /// <summary>
     /// ESCAPE ROOM: Save anchors and data of the player

@@ -1,13 +1,15 @@
 using Microsoft.MixedReality.Toolkit.UI;
-using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Concrete Gamified Rehabilitation Task (GRT) using press gesture on a clock-based GRT.
+/// A clock-based GRT using press gesture.
+/// 
+/// The GRT is terminated once the _turnsLeft, each lasting a maximum of _allowedTime seconds, are done.
+/// Default values are: 5 turns (_turnsLeft), each lasting 20 seconds (_allowedTime).
 /// 
 /// ToDo in Inspector:
 ///  - Assign the GameObjects to _piecesOnClock: order matters w.r.t. _rotationAngles' values
-///  - Assign the GameObjects to _piecesToSelect
+///  - Assign the GameObjects to _piecesToSelect: keep same order as on clock
 ///  - Assign the TextMeshes for Time, Turns Left, and Points.
 ///  
 /// The following variables have hardcoded initial value in their declarations:
@@ -19,18 +21,7 @@ public class GRTPressClock : GRTPress
 {
     private bool _isDebugMode = true;
 
-    private bool _isGRTTerminated = false;
-    private bool _moveToNextTurn = true;
-
-    private int _rotationIndex;        // an index chosen at random: for rotation, and piece on clock
-    private int[] _rotationAngles = {0, -90, -180, -270};   // assume four pieces displayed
-    [SerializeField] private GameObject _arrow;
-    [SerializeField] private GameObject[] _piecesOnClock;
-    [SerializeField] private float _allowedTime = 20f;
-    private float _remainingTime;
-    [SerializeField] private TextMesh _textTimeLeft;
-    [SerializeField] private TextMesh _textTurnsLeft;
-    [SerializeField] private TextMesh _textPoints;
+    // Turns per GRT play
     [SerializeField] private int _turnsLeft = 5;
     private int TurnsLeft
     {
@@ -42,6 +33,37 @@ public class GRTPressClock : GRTPress
         }
     }
 
+    [SerializeField] private TextMesh _textTurnsLeft;
+    private bool _isGRTTerminated = false;                    // true if _turnsLeft <= 0
+
+    // Time per turn
+    [SerializeField] private float _allowedTime = 20f;
+    private float _remainingTime;
+    private float RemainingTime
+    {
+        get { return _remainingTime; }
+        set
+        {
+            _remainingTime = value;
+            if (_remainingTime <= 0) _moveToNextTurn = true;
+        }
+    }
+    [SerializeField] private TextMesh _textTimeLeft;
+    private bool _moveToNextTurn = true;                      // true at start, and then only if _remainingTime <= 0
+
+    // Points gained by the user
+    private int _points;
+    [SerializeField] private TextMesh _textPoints;
+
+    // Mechanics of the clock
+    private int _rotationIndex;        // an index chosen at random: for rotation, and piece on clock
+    [SerializeField] private int[] _rotationAngles = { 0, -90, -180, -270 };   // assume four pieces displayed    
+    [SerializeField] private GameObject _arrow;
+    private Vector3 _arrowInitPosition;
+    private Quaternion _arrowInitRotation;
+    [SerializeField] private GameObject[] _piecesOnClock;
+
+    // Mechanics for the user
     [SerializeField] private GameObject[] _piecesToSelect;   // what the user should select
     private PressableButtonHoloLens2 buttonRight;
     private PressableButtonHoloLens2 buttonLeft;
@@ -52,49 +74,73 @@ public class GRTPressClock : GRTPress
         get { return _selectionIndex; }
         set 
         {
-            Debug.Log("Before: " + SelectionIndex);
             _selectionIndex = value;
             if (_selectionIndex < 0) _selectionIndex = 0;
             if (_selectionIndex > _piecesToSelect.Length - 1) _selectionIndex = _piecesToSelect.Length - 1;
-            Debug.Log("After: " + SelectionIndex);
         }
     }
-    private Transform currentPieceHighlight;
+    private Transform _currentSelectionHighlight;
+    private Transform _currentClockPieceHighlight;
     private bool _isSelectionValidated = false;
-    private int _points;
-
-
+    
     protected override void Start()
     {
         base.Start();
-        Debug.Log("[GRTPressClock:Start]");
-
-        if(_isDebugMode) GRTStateMachine.SetCurrentState(GRTState.SOLVING);
 
         // Add listeners to controller' buttons
-        PressableButtonHoloLens2 buttonRight = _controller.ControllerButtons[0];
-        PressableButtonHoloLens2 buttonLeft = _controller.ControllerButtons[1];
-        PressableButtonHoloLens2 buttonValidate = _controller.ControllerButtons[2];
+        buttonRight = _controller.ControllerButtons[0];
+        buttonLeft = _controller.ControllerButtons[1];
+        buttonValidate = _controller.ControllerButtons[2];
         buttonRight.ButtonPressed.AddListener(MoveCursorRight);
         buttonLeft.ButtonPressed.AddListener(MoveCursorLeft);
         buttonValidate.ButtonPressed.AddListener(ValidateChoice);
 
         // Set default starting selection
         _selectionIndex = 0;
-        currentPieceHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
+        _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
+        _rotationIndex = 0;
+        _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
+        _arrowInitPosition = _arrow.transform.position;
+        _arrowInitRotation = _arrow.transform.rotation;
+
+        // Debug Mode
+        if (_isDebugMode)
+        {
+            Debug.Log("[GRTPressClock:Start]");
+            GRTStateMachine.SetCurrentState(GRTState.SOLVING);
+        }
     }
 
+    /// <summary>
+    /// Check turns left, remaining time per turn, and solution per turn.
+    /// </summary>
     protected override void OnUpdateSolving()
     {
-        _remainingTime -= Time.deltaTime;
-        _textTimeLeft.text = $"Time Left: {Mathf.Round(_remainingTime)}";
-
-        ControlGRTStatus();
-        if (_moveToNextTurn)
+        if (!_isGRTTerminated)
         {
-            PlaceArrow();
-            _moveToNextTurn = false;
+            if (!_moveToNextTurn)
+            {
+                RemainingTime -= Time.deltaTime;
+                _textTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
+
+                if (_isSelectionValidated)
+                {
+                    CheckSolution();
+                }
+            }
+            else
+            {
+                PrepareTurn();
+                _moveToNextTurn = false;
+            }
         }
+        else
+        {
+            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _points + " points! Well done!");
+            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
+        }
+        
+
     }
 
     protected override void FreezeGRTBox()
@@ -108,31 +154,22 @@ public class GRTPressClock : GRTPress
     }
 
     /// <summary>
-    /// Logic regarding time and number of turns left
-    /// </summary>
-    private void ControlGRTStatus()
-    {
-        if (_remainingTime <= 0)
-        {
-            Debug.Log("[GRTPressClock:OnUpdateSolving] Time's up: next play!");
-        }
-
-        if (_isGRTTerminated)
-        {
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _points + " points! Well done!");
-            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
-        }
-    }
-
-    /// <summary>
     /// Reset the clock (arrow and piece), selected piece, and time,
     /// and set a new rotation index for next play
     /// </summary>
     private void PrepareTurn()
     {
+        // UI
         TurnsLeft -= 1;
+        _textTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
+        RemainingTime = _allowedTime;
+
+        // Arrow
+        ResetArrow();
         _rotationIndex = GenerateRotationIndex();
-        _remainingTime = _allowedTime;
+        PlaceArrow();
+        
+        // Player's selection
         _isSelectionValidated = false;
     }
 
@@ -150,8 +187,22 @@ public class GRTPressClock : GRTPress
     /// </summary>
     private void PlaceArrow()
     {
-        _arrow.transform.Rotate(new Vector3(0, 0, _rotationAngles[_rotationIndex]));
+        Vector3 newAngle = new Vector3(0, 0, _rotationAngles[_rotationIndex]);
+        _arrow.transform.Rotate(newAngle);
         _arrow.transform.localScale = new Vector3(2, 2, 2);
+
+        _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
+        _currentClockPieceHighlight.gameObject.SetActive(true);
+
+    }
+    
+    /// <summary>
+    /// Rotate and Scale the arrow back to its small initial size without rotation.
+    /// </summary>
+    private void ResetArrow()
+    {
+        _arrow.transform.SetPositionAndRotation(_arrowInitPosition, _arrowInitRotation);
+        _currentClockPieceHighlight.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -159,25 +210,43 @@ public class GRTPressClock : GRTPress
     /// </summary>
     private void ValidateChoice()
     {
-        Debug.Log("[] User has validated her choice.");
+        Debug.Log("[GRTPressClock:ValidateChoice] User has validated her choice.");
         _isSelectionValidated = true;
     }
 
     private void MoveCursorLeft()
     {
-        Debug.Log("[] User clicked on left button");
-        currentPieceHighlight.gameObject.SetActive(false);
+        _currentSelectionHighlight.gameObject.SetActive(false);
         SelectionIndex -= 1;
-        currentPieceHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
-        currentPieceHighlight.gameObject.SetActive(true);
+        _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
+        _currentSelectionHighlight.gameObject.SetActive(true);
     }
 
     private void MoveCursorRight()
     {
-        Debug.Log("[] User clicked on right button");
-        currentPieceHighlight.gameObject.SetActive(false);
+        _currentSelectionHighlight.gameObject.SetActive(false);
         SelectionIndex += 1;
-        currentPieceHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
-        currentPieceHighlight.gameObject.SetActive(true);
+        _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
+        _currentSelectionHighlight.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// Set _moveToNextTurn to true when validated selection is correct.
+    /// </summary>
+    private void CheckSolution()
+    {
+        if(_piecesOnClock[_rotationIndex].name == _piecesToSelect[SelectionIndex].name)
+        {
+            // UI
+            _points += 1;
+            _textPoints.text = $"Points: {Mathf.Round(_points)}";
+            
+            // Game Mechanic
+            _moveToNextTurn = true;
+            _currentSelectionHighlight.gameObject.SetActive(false);
+        }
+
+        // Player's selection
+        _isSelectionValidated = false;
     }
 }
