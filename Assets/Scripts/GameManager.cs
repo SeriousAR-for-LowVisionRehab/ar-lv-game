@@ -18,7 +18,14 @@ using UnityEngine.Video;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    private bool _isDebugMode = true;                              // allow to go directly to Escape Room
+    [Tooltip("Debug elements")]
+    [SerializeField] private bool _isDebugMode = false;            // allow to go directly to Escape Room
+    [SerializeField] private TextMesh _dataGRTPressClock;
+    public TextMesh DataGRTPressClock
+    {
+        get { return _dataGRTPressClock; }
+        set { _dataGRTPressClock = value; }
+    }
 
     private PressableButtonHoloLens2[] _homeButtons;               // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _tutorialButtons;           // the UI (filled it using GetComponentsInChildren)
@@ -109,14 +116,15 @@ public class GameManager : MonoBehaviour
 
     public enum EscapeRoomState
     {
+        READY,
         WELCOME,
         PLAYING,
         PAUSE,
         SOLVED,
     }
 
-    private FiniteStateMachine<GameStates> _gameStateMachine = new FiniteStateMachine<GameStates>();
-    private EscapeRoomStateMachine _escapeRoomStateMachine;
+    private FiniteStateMachine<GameStates> _gameStateMachine; // = new FiniteStateMachine<GameStates>();
+    private EscapeRoomStateMachine _escapeRoomStateMachine; // = new EscapeRoomStateMachine();
 
     /// <summary>
     /// Awake() is called at the object's creation. Ensure that GameManager is a Singleton.
@@ -132,6 +140,9 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        _gameStateMachine = new FiniteStateMachine<GameStates>();
+        _escapeRoomStateMachine = new EscapeRoomStateMachine();
+
         // WLT name file
         Debug.Log("[GameManager:Awake] FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
     }
@@ -140,7 +151,7 @@ public class GameManager : MonoBehaviour
     {
         // Hardcoded details about game: number of puzzles to solve
         _currentDifficultyLevel = DifficultyLevel.NORMAL;
-        _numberOfPuzzlesToSolve = 6;
+        _numberOfPuzzlesToSolve = 1;
         NumberOfPuzzlesSolved = 0;
         _menusUIIndexHome = 0;
         _menusUIIndexTutorial = 1;
@@ -217,17 +228,16 @@ public class GameManager : MonoBehaviour
 
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
         _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
-        _tutorialButtons[1].ButtonPressed.AddListener(SetStateHome);
+        _tutorialButtons[1].ButtonPressed.AddListener(TUTORIALSetStateHome);
 
         // Add Listeners to CREATION buttons: 0=pin, 1=Save, 2=Reset, 3=Unfreeze, 4=Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
         _creationButtons[2].ButtonPressed.AddListener(ResetPuzzles);
         _creationButtons[3].ButtonPressed.AddListener(UnfreezePuzzleInPlace);        
-        _creationButtons[4].ButtonPressed.AddListener(SetStateHome);
+        _creationButtons[4].ButtonPressed.AddListener(CREATIONSetStateHome);
 
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
-        _escapeRoomStateMachine = new EscapeRoomStateMachine();
-        _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHome);
+        _escapeRoomButtons[1].ButtonPressed.AddListener(ESCAPEROOMSetStateHome);
 
         // Debug mode: access possible directly to the escape room
         if (_isDebugMode)
@@ -241,18 +251,43 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         _gameStateMachine.Update();
+        _escapeRoomStateMachine.Update();
     }
 
     private void FixedUpdate()
     {
         _gameStateMachine.FixedUpdate();
+        _escapeRoomStateMachine.FixedUpdate();
     }
 
     private void SetStateTutorial() { _gameStateMachine.SetCurrentState(GameStates.TUTORIAL); }
     private void SetStateEscapeRoom() { _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM); }
     private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
 
-    private void SetStateHome() { _gameStateMachine.SetCurrentState(GameStates.HOME); }
+    private void ESCAPEROOMSetStateHome()
+    {
+        
+        if (_escapeRoomStateMachine.GetCurrentState().Equals(EscapeRoomState.PLAYING))
+        {
+            Debug.Log("[GameManager:ESCAPEROOMSetStateHome] EscapeRoom current state EQUAL to PLAYING. Changing it to PAUSE...");
+            _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.PAUSE);
+        }
+        else
+        {
+            Debug.Log("[GameManager:ESCAPEROOMSetStateHome] EscapeRoom current state NOT equal to PLAYING.");
+        }
+        _gameStateMachine.SetCurrentState(GameStates.HOME);
+    }
+
+    private void CREATIONSetStateHome()
+    {
+        _gameStateMachine.SetCurrentState(GameStates.HOME);
+    }
+
+    private void TUTORIALSetStateHome()
+    {
+        _gameStateMachine.SetCurrentState(GameStates.HOME);
+    }
 
     /// <summary>
     /// HOME: setter function to activate the EscapeRoom button on the Home UI.
@@ -265,7 +300,7 @@ public class GameManager : MonoBehaviour
 
     void OnEnterHome()
     {
-        Debug.Log("[GameManager:OnEnterHome] Game HOME");
+        Debug.Log("[GameManager:OnEnterHome] Entered HOME state");
         // Activate Home Menu
         _currentMenu = _menusUI[_menusUIIndexHome];
         _currentMenu.SetActive(true);
@@ -273,7 +308,7 @@ public class GameManager : MonoBehaviour
 
     void OnExitHome()
     {
-        Debug.Log("[GameManager:OnExitHome] left Home state");
+        Debug.Log("[GameManager:OnExitHome] Exit Home state");
         // Deactivate Home Menu
         _currentMenu.SetActive(false);
     }
@@ -352,8 +387,7 @@ public class GameManager : MonoBehaviour
 
     void OnEnterEscapeRoom()
     {
-        //TODO:  should it be READY or BEGIN state ?
-        Debug.Log("[GameManager:OnEnterEscapeRoom] Game Escape Room, set its state machine to WELCOME");
+        Debug.Log("[GameManager:OnEnterEscapeRoom] Entered EscapeRoom state; set Escape Room State machine's state to WELCOME");
         _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME);
 
         // display escape room menu
@@ -493,15 +527,14 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// CREATION: Puzzles are frozen, markers hidden, and EscapeRoomStateMachine set ot READY state.
+    /// CREATION: Puzzles are frozen, markers hidden
     /// </summary>
     public void SaveCreation()
     {
         FreezePuzzlesInPlace();
         HideMarkers();
-        Debug.Log("[GameManager:SaveCreation] Creation saved: puzzles frozen and markers hidden");
-        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME);
-        Debug.Log("[GameManager:SaveCreation] EscapeRoomStateMachine changed state to READY!");
+        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
+        Debug.Log("[GameManager:SaveCreation] Creation saved");
     }
 
     /// <summary>
@@ -513,4 +546,12 @@ public class GameManager : MonoBehaviour
         Transform puzzleStatus = _menusUI[_menusUIIndexCreation].transform.GetChild(indexPuzzlesStatus);
         puzzleStatus.GetComponent<TextMesh>().text = newText;
     }
+
+    public void SetEscapeRoomToPlayingState()
+    {
+        Debug.Log("Hello World ------------------------------------------------------#############################");
+        _escapeRoomStateMachine.SetCurrentState(EscapeRoomState.PLAYING);
+        WelcomeMessageDialog.SetActive(false);
+    }
+
 }

@@ -1,3 +1,4 @@
+using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 /// <summary>
 /// Generic class defining a Gamified Rehabilitation Task (GRT), whether it uses "press" or "pinch & slide" gesture. A GRTGeneric contains:
@@ -13,18 +14,22 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     public enum GRTState
     {
         PLACING,                       // You can move the GRTBox. But cannot solve the GRT itself, nor interact with controller.
+        READY,                         // GRT is placed and waiting (to be placed again, or start 'solving' state)
         SOLVING,                       // You can solve the GRT itself using the controller. The GRTBox is fixed in place.
         SOLVED,                        // The final solution has been reached, end of the GRT.
     }
 
-    // TODO: avoid the public
     public FiniteStateMachine<GRTState> GRTStateMachine;
 
     [Header("GRT Components")]
     [SerializeField] protected Transform _support;                // on what the GRT itself sits on.
     [SerializeField] protected Transform _grtCore;                // the central element, what must be solved
     [SerializeField] protected GRTController<T> _controller;      // what the player interacts with to change GRT's status
-    [SerializeField] protected Transform _solutionChecker;        // the solution checking mechanism
+    [SerializeField] protected Transform _buttonStart;            // Effectively start the GRT (any count down, counting, etc.)
+
+    // Data
+    private float _timeInGRT;
+
 
     private void Awake()
     {
@@ -34,7 +39,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         _controller.Parent = transform.Find("Controller");
         _controller.ControllerButtons = _controller.Parent.GetComponentsInChildren<T>();
         _grtCore = transform.Find("Core");
-        _solutionChecker = _grtCore.Find("SolutionChecker");
+        _buttonStart = transform.Find("ButtonStart");
     }
 
     protected virtual void Start()
@@ -47,6 +52,16 @@ public abstract class GRTGeneric<T> : MonoBehaviour
                 GRTState.PLACING,
                 OnEnterPlacing,
                 OnExitPlacing,
+                null,
+                null
+                )
+            );
+        GRTStateMachine.Add(
+            new State<GRTState>(
+                "READY",
+                GRTState.READY,
+                OnEnterReady,
+                OnExitReady,
                 null,
                 null
                 )
@@ -73,6 +88,12 @@ public abstract class GRTGeneric<T> : MonoBehaviour
             );
         // Set default state to PLACING
         GRTStateMachine.SetCurrentState(GRTState.PLACING);
+        _buttonStart.gameObject.SetActive(true);
+        _buttonStart.gameObject.GetComponent<PressableButton>().ButtonPressed.AddListener(SetGRTStateToSolving);
+        _controller.Parent.gameObject.SetActive(false);
+
+        // Data
+        _timeInGRT = 0f;
     }
 
     private void Update()
@@ -82,6 +103,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
     private void OnEnterPlacing()
     {
+        GRTStateMachine.SetCurrentState(GRTState.PLACING);
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterPlacing] Entered Placing mode");
         UnfreezeGRTBox();
     }
@@ -92,9 +114,28 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         FreezeGRTBox();
     }
 
+    private void OnEnterReady()
+    {
+        GRTStateMachine.SetCurrentState(GRTState.READY);
+        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterReady] Entered Ready mode");
+        UnfreezeGRTBox();
+    }
+
+    private void OnExitReady()
+    {
+        Debug.Log("[GRTGeneric(" + this.name + "):OnExitReady] Exiting Ready mode");
+    }
+
     private void OnEnterSolving()
     {
+        // Mechanism
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolving] Entered Solving mode");
+        GRTStateMachine.SetCurrentState(GRTState.SOLVING);
+        _buttonStart.gameObject.SetActive(false);
+        _controller.Parent.gameObject.SetActive(true);
+
+        // Data
+        _timeInGRT += Time.deltaTime;
     }
 
     private void OnExitSolving()
@@ -106,8 +147,17 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
     private void OnEnterSolved()
     {
+        // Mechanism
         GameManager.Instance.NumberOfPuzzlesSolved += 1;
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfPuzzlesSolved + " out of " + GameManager.Instance.NumberOfPuzzlesToSolve + " GRTs");
+        GRTStateMachine.SetCurrentState(GRTState.SOLVED);
+        _controller.Parent.gameObject.SetActive(false);
+
+        // Data
+        var gameObjectWithTextText = new GameObject("Temp Text");
+        var tempTextMesh = gameObjectWithTextText.AddComponent<TextMesh>();
+        tempTextMesh.text = "; salut";
+        GameManager.Instance.DataGRTPressClock.text = "salut"; //+= tempTextMesh;
     }
 
     private void OnExitSolved()
@@ -118,4 +168,8 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     protected abstract void FreezeGRTBox();
     protected abstract void UnfreezeGRTBox();
 
+    public void SetGRTStateToSolving()
+    {
+        GRTStateMachine.SetCurrentState(GRTState.SOLVING);
+    }
 }

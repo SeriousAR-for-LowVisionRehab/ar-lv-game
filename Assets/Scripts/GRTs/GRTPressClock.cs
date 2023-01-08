@@ -7,7 +7,7 @@ using UnityEngine;
 /// The GRT is terminated once the _turnsLeft, each lasting a maximum of _allowedTime seconds, are done.
 /// Default values are: 5 turns (_turnsLeft), each lasting 20 seconds (_allowedTime).
 /// 
-/// ToDo in Inspector:
+/// In Inspector, you must:
 ///  - Assign the GameObjects to _piecesOnClock: order matters w.r.t. _rotationAngles' values
 ///  - Assign the GameObjects to _piecesToSelect: keep same order as on clock
 ///  - Assign the TextMeshes for Time, Turns Left, and Points.
@@ -19,7 +19,7 @@ using UnityEngine;
 /// </summary>
 public class GRTPressClock : GRTPress
 {
-    private bool _isDebugMode = true;
+    private bool _isDebugMode = false;
 
     // Turns per GRT play
     [SerializeField] private int _turnsLeft = 5;
@@ -82,6 +82,10 @@ public class GRTPressClock : GRTPress
     private Transform _currentSelectionHighlight;
     private Transform _currentClockPieceHighlight;
     private bool _isSelectionValidated = false;
+
+    // Data to be collected
+    private int _NbClickButtonLeft, _NbClickButtonRight, _NbClickButtonValidate;
+
     
     protected override void Start()
     {
@@ -212,22 +216,31 @@ public class GRTPressClock : GRTPress
     {
         Debug.Log("[GRTPressClock:ValidateChoice] User has validated her choice.");
         _isSelectionValidated = true;
+
+        // Data
+        _NbClickButtonValidate += 1;
     }
 
     private void MoveCursorLeft()
     {
+        // Mechanism
         _currentSelectionHighlight.gameObject.SetActive(false);
         SelectionIndex -= 1;
         _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
         _currentSelectionHighlight.gameObject.SetActive(true);
+        // Data
+        _NbClickButtonLeft += 1;
     }
 
     private void MoveCursorRight()
     {
+        // Mechanism
         _currentSelectionHighlight.gameObject.SetActive(false);
         SelectionIndex += 1;
         _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
         _currentSelectionHighlight.gameObject.SetActive(true);
+        // Data
+        _NbClickButtonRight += 1;
     }
 
     /// <summary>

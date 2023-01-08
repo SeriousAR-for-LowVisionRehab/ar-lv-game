@@ -9,7 +9,7 @@ using UnityEngine;
 [Serializable]
 public class PlayerData
 {
-    public float PlayerID;
+    public DateTime PlayerID;
     public string FileName;
     public GameManager.DifficultyLevel Difficulty;
     public int NumberOfPuzzlesToSolve;
@@ -28,22 +28,18 @@ public class PlayerData
     public PlayerData(GameManager.DifficultyLevel difficulty, int numberOfPuzzlesToSolve)
     {
         Difficulty = difficulty;
-        PlayerID = Time.time;
-        FileName = String.Concat("player_data_", PlayerID);
+        PlayerID = DateTime.Now;  // Time.time;
+        FileName = String.Concat(
+            "PlayerData_", 
+            PlayerID.ToString("ddMMyyyy_HHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo), 
+            ".json"
+        );
         NumberOfPuzzlesToSolve = numberOfPuzzlesToSolve;
         NumberOfPuzzlesStarted = 0;
         NumberOfPuzzlesSolved = 0;
         EscapeRoomGlobalDuration = 0;
     }
 
-
-    /// <summary>
-    /// For debug purpose, create fake and fixed data to the current instance of PlayerData.
-    /// </summary>
-    public void DebugCreateFakeData()
-    {
-        NumberOfPuzzlesStarted = 1;
-    }
 
     /// <summary>
     /// Save the PlayerData as a JSON
