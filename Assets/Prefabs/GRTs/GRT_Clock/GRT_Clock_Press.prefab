@@ -9512,6 +9512,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7378240399200862569}
   - component: {fileID: 8060237322862159557}
+  - component: {fileID: 5064573549707204833}
+  - component: {fileID: 6724348276401941872}
+  - component: {fileID: 2231147684694629057}
+  - component: {fileID: 6039332813122349845}
   m_Layer: 0
   m_Name: GRT_Clock_Press
   m_TagString: Untagged
@@ -9552,16 +9556,108 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _support: {fileID: 4884194108765725010}
   _grtCore: {fileID: 8689277701730838407}
-  _solutionChecker: {fileID: 1854234166624836402}
+  _buttonStart: {fileID: 0}
   _turnsLeft: 5
-  _textTurnsLeft: {fileID: 0}
+  _textTurnsLeft: {fileID: 322140071621394443}
   _allowedTime: 20
-  _textTimeLeft: {fileID: 0}
-  _textPoints: {fileID: 0}
+  _textTimeLeft: {fileID: 7510106472163658405}
+  _textPoints: {fileID: 2372143264736622852}
   _rotationAngles: 00000000a6ffffff4cfffffff2feffff
-  _arrow: {fileID: 0}
-  _piecesOnClock: []
-  _piecesToSelect: []
+  _arrow: {fileID: 3762872999853564414}
+  _piecesOnClock:
+  - {fileID: 6945340660209557890}
+  - {fileID: 9066648173265890030}
+  - {fileID: 8031461175590976000}
+  - {fileID: 8229565915733354704}
+  _piecesToSelect:
+  - {fileID: 3763929954737058880}
+  - {fileID: 6881681080656384289}
+  - {fileID: 4117782595541084276}
+  - {fileID: 4373167662651349252}
+--- !u!65 &5064573549707204833
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7378240399200862570}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 2.0924735, z: 0.11105886}
+  m_Center: {x: 0, y: 0.0130672455, z: 0.0040697306}
+--- !u!114 &6724348276401941872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7378240399200862570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a98de877dee5fc341b4eb59dfdab266c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoConstraintSelection: 1
+  selectedConstraints: []
+--- !u!114 &2231147684694629057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7378240399200862570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181cd563a8349c34ea8978b0bc8d9c7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hostTransform: {fileID: 7378240399200862569}
+  manipulationType: 1
+  twoHandedManipulationType: 7
+  allowFarManipulation: 0
+  useForcesForNearManipulation: 0
+  oneHandRotationModeNear: 1
+  oneHandRotationModeFar: 1
+  releaseBehavior: 3
+  transformSmoothingLogicType:
+    reference: Microsoft.MixedReality.Toolkit.Utilities.DefaultTransformSmoothingLogic,
+      Microsoft.MixedReality.Toolkit.SDK
+  smoothingFar: 1
+  smoothingNear: 1
+  moveLerpTime: 0.001
+  rotateLerpTime: 0.001
+  scaleLerpTime: 0.001
+  enableConstraints: 1
+  constraintsManager: {fileID: 6724348276401941872}
+  elasticsManager: {fileID: 0}
+  onManipulationStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onManipulationEnded:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExited:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &6039332813122349845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7378240399200862570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5afd5316c63705643b3daba5a6e923bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTetherWhenManipulating: 0
+  IsBoundsHandles: 0
 --- !u!1 &7460509531542252585
 GameObject:
   m_ObjectHideFlags: 0

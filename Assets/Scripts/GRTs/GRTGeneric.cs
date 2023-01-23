@@ -156,8 +156,8 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         // Data
         var gameObjectWithTextText = new GameObject("Temp Text");
         var tempTextMesh = gameObjectWithTextText.AddComponent<TextMesh>();
-        tempTextMesh.text = "; salut";
-        GameManager.Instance.DataGRTPressClock.text = "salut"; //+= tempTextMesh;
+        tempTextMesh.text = "; useless data example";
+        GameManager.Instance.DataGRTPressClock.text += tempTextMesh.text; //+= "salut";
     }
 
     private void OnExitSolved()
