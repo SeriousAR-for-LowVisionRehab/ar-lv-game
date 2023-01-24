@@ -147,8 +147,11 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
     private void OnEnterSolved()
     {
-        // Mechanism
+        // Increase counters
         GameManager.Instance.NumberOfPuzzlesSolved += 1;
+        GameManager.Instance.EscapeRoomStateMachine.CurrentPuzzleIndex += 1;
+        
+        // Mechanism
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfPuzzlesSolved + " out of " + GameManager.Instance.NumberOfPuzzlesToSolve + " GRTs");
         GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         _controller.Parent.gameObject.SetActive(false);
@@ -156,8 +159,8 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         // Data
         var gameObjectWithTextText = new GameObject("Temp Text");
         var tempTextMesh = gameObjectWithTextText.AddComponent<TextMesh>();
-        tempTextMesh.text = "; useless data example";
-        GameManager.Instance.DataGRTPressClock.text += tempTextMesh.text; //+= "salut";
+        tempTextMesh.text = "; one more solved";
+        GameManager.Instance.DataGRTPressClock.text += tempTextMesh.text;
     }
 
     private void OnExitSolved()

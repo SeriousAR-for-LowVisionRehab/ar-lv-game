@@ -12,11 +12,11 @@ using UnityEngine;
 /// </summary>
 public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomState>
 {
-    private int _currentPuzzle = 0;
+    private int _currentPuzzleIndex = 0;
 
-    public int CurrentPuzzle { 
-        get { return _currentPuzzle; }
-        set { _currentPuzzle = value; }
+    public int CurrentPuzzleIndex { 
+        get { return _currentPuzzleIndex; }
+        set { _currentPuzzleIndex = value; }
     }
 
     /// <summary>
@@ -131,32 +131,28 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     void OnEnterPlaying()
     {
         Debug.Log("[EscapeRoomStateMachine:OnEnterPlaying] Entered Playing mode");
-        // Show current puzzle
-        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_currentPuzzle];
-        currentGrt.SetActive(true);
-        currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.READY);
-        
     }
 
     void OnExitPlaying()
     {
         Debug.Log("[EscapeRoomStateMachine:OnExitPlaying] Exited Playing mode");
         // Hide current puzzle
-        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_currentPuzzle];
+        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_currentPuzzleIndex];
         currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.PLACING);
         currentGrt.SetActive(false);
     }
 
     void OnUpdatePlaying()
     {
-
-
-        //Debug.Log("[EscapeRoomStateMachine:OnUpdatePlaying] Updating Playing mode...");
         GameManager.Instance.TextNumberOfPuzzlesSolved.text = $"Puzzles solved: {GameManager.Instance.NumberOfPuzzlesSolved} / 3";
 
         if(GameManager.Instance.NumberOfPuzzlesSolved == GameManager.Instance.NumberOfPuzzlesToSolve)
         {
             this.SetCurrentState(GameManager.EscapeRoomState.SOLVED);
+        }
+        else
+        {
+            PrepareNextGRT();
         }
     }
 
@@ -165,7 +161,6 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         Debug.Log("[EscapeRoomStateMachine:OnEnterPause] Entered Pause mode");
         // Save WLT, and write to PlayerData's JSON the data.
         SaveGame();
-
     }
 
     void OnExitPause()
@@ -194,6 +189,17 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         // Save Global Duration
         GameManager.Instance.ThePlayerData.EscapeRoomGlobalDuration = Time.time - GameManager.Instance.ThePlayerData.EscapeRoomGlobalDuration;
         GameManager.Instance.ThePlayerData.SavePlayerDataToJson();
+    }
+
+    /// <summary>
+    /// Set Current GRT active and set its state to READY
+    /// </summary>
+    private void PrepareNextGRT()
+    {
+        // Show current puzzle
+        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_currentPuzzleIndex];
+        currentGrt.SetActive(true);
+        //currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.READY);
     }
 
 }
