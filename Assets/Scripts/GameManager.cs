@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
     {
         // Hardcoded details about game: number of puzzles to solve
         _currentDifficultyLevel = DifficultyLevel.NORMAL;
-        _numberOfPuzzlesToSolve = 1;
+        _numberOfPuzzlesToSolve = 2;
         NumberOfPuzzlesSolved = 0;
         _menusUIIndexHome = 0;
         _menusUIIndexTutorial = 1;
@@ -549,7 +549,7 @@ public class GameManager : MonoBehaviour
 
     public void SetEscapeRoomToPlayingState()
     {
-        Debug.Log("Hello World ------------------------------------------------------#############################");
+        Debug.Log("[GameManager:SetEscapeRoomToPlayingState] Changing EscapeRoom's state to PLAYING...");
         EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PLAYING);
         WelcomeMessageDialog.SetActive(false);
     }

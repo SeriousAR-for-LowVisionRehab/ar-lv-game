@@ -12,11 +12,16 @@ using UnityEngine;
 /// </summary>
 public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomState>
 {
-    private int _currentPuzzleIndex = 0;
+    private int _nextPuzzleToSolveIndex = 0;
+    private bool _isNextPuzzlePrepared = false;
 
-    public int CurrentPuzzleIndex { 
-        get { return _currentPuzzleIndex; }
-        set { _currentPuzzleIndex = value; }
+    public int NextPuzzleToSolveIndex { 
+        get { return _nextPuzzleToSolveIndex; }
+        set 
+        {
+            _isNextPuzzlePrepared = false;     // current puzzle has just been solved, and next is not prepared yet.
+            _nextPuzzleToSolveIndex = value; 
+        }
     }
 
     /// <summary>
@@ -131,13 +136,18 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     void OnEnterPlaying()
     {
         Debug.Log("[EscapeRoomStateMachine:OnEnterPlaying] Entered Playing mode");
+        // Prepare initial puzzle (index == 0)
+        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_nextPuzzleToSolveIndex];
+        currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.PLACING);
+        currentGrt.SetActive(true);
     }
 
     void OnExitPlaying()
     {
         Debug.Log("[EscapeRoomStateMachine:OnExitPlaying] Exited Playing mode");
         // Hide current puzzle
-        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_currentPuzzleIndex];
+        if (NextPuzzleToSolveIndex == 0) NextPuzzleToSolveIndex += 1;   // special case when current puzzle is still the initial one (avoid index == -1)
+        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_nextPuzzleToSolveIndex-1];
         currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.PLACING);
         currentGrt.SetActive(false);
     }
@@ -150,7 +160,9 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         {
             this.SetCurrentState(GameManager.EscapeRoomState.SOLVED);
         }
-        else
+
+        // Preapre next puzzle only if initial puzzle has been solved already
+        if (!_isNextPuzzlePrepared && NextPuzzleToSolveIndex != 0)
         {
             PrepareNextGRT();
         }
@@ -196,10 +208,17 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     /// </summary>
     private void PrepareNextGRT()
     {
-        // Show current puzzle
-        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_currentPuzzleIndex];
-        currentGrt.SetActive(true);
-        //currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.READY);
+        Debug.Log("[EscapeRoomStateMachine:PrepareNextGRT] NextPuzzleToSolveIndex = " + NextPuzzleToSolveIndex);
+        // Hide current solved puzzle
+        if (NextPuzzleToSolveIndex == 0) NextPuzzleToSolveIndex += 1;   // when player exits and is still on initial puzzle
+        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_nextPuzzleToSolveIndex - 1];
+        currentGrt.SetActive(false);
+
+        // Show next puzzle
+        GameObject nextGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_nextPuzzleToSolveIndex];
+        nextGrt.SetActive(true);
+
+        _isNextPuzzlePrepared = true;
     }
 
 }
