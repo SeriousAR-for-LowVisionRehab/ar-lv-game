@@ -4,8 +4,8 @@ public class GRTPressPipes : GRTPress
 {
     private bool _isDebugMode = false;
 
-    [SerializeField]  private bool _isGRTTerminated = false;    // true if _turnsLeft <= 0
-                                                                // Time per turn
+    [SerializeField]  private bool _isGRTTerminated = false;
+
     // Points gained by the user
     private int _points;
     [SerializeField] private TextMesh _textPoints;
@@ -41,11 +41,6 @@ public class GRTPressPipes : GRTPress
     }
 
 
-    protected override void FreezeGRTBox()
-    {
-        Debug.Log("[GRTPressPipes:FreezeGRTBox] nothing done");
-    }
-
     protected override void OnUpdateSolving()
     {
         if (!_isGRTTerminated)
@@ -59,15 +54,11 @@ public class GRTPressPipes : GRTPress
         }
     }
 
-    protected override void UnfreezeGRTBox()
-    {
-        Debug.Log("[GRTPressPipes:UnfreezeGRTBox] nothing done");
-    }
-
+    /// <summary>
+    /// Set the variable _isGRTTerminated to true once all buttons have been clicked
+    /// </summary>
     private void CheckSolution()
     {
-        Debug.Log("_currentButtonIndex=" + _currentButtonIndex + "; _controller.ControllerButtons.Length=" + _controller.ControllerButtons.Length);
-
         // index from 0 to 6 + final extra increment = 7 = nb of buttons
         if (_currentButtonIndex == _controller.ControllerButtons.Length)
         {
@@ -76,12 +67,15 @@ public class GRTPressPipes : GRTPress
         }
     }
 
+    /// <summary>
+    /// Set the key's transform position to the last button pressed, in terms of x and y axis only.
+    /// 
+    /// Hide the last button pressed, Increase points counter and text.
+    /// </summary>
     private void MoveKeyToThisButtonAndHideIt()
     {
         _currentButtonTransform = _controller.ControllerButtons[_currentButtonIndex].transform;
         var _btnPos = _currentButtonTransform.position;
-        // Debug.Log("Btn " + currentBtn.name + " x=" + _btnPos.x + ", y=" + _btnPos.y + ", z=" + _btnPos.z);
-        // Debug.Log("Keyn x=" + _key.transform.position.x + ", y=" + _key.transform.position.y + ", z=" + _key.transform.position.z);
 
         // Key
         _key.transform.position = new Vector3(_btnPos.x, _btnPos.y, _key.transform.position.z);
@@ -91,8 +85,16 @@ public class GRTPressPipes : GRTPress
         _currentButtonIndex += 1;
 
         // Points
+        UpdatePointsGUI();
+    }
+
+    /// <summary>
+    /// Increment by one the points and update the text value
+    /// </summary>
+    private void UpdatePointsGUI()
+    {
         _points += 1;
-        _textPoints.text = $"Points: {Mathf.Round(_points)}";        
+        _textPoints.text = $"Points: {Mathf.Round(_points)}";
     }
 
 }

@@ -147,15 +147,6 @@ public class GRTPressClock : GRTPress
 
     }
 
-    protected override void FreezeGRTBox()
-    {
-        Debug.Log("[GRTPressClock:FreezeGRTBox] nothing done");
-    }
-
-    protected override void UnfreezeGRTBox()
-    {
-        Debug.Log("[GRTPressClock:UnfreezeGRTBox] nothing done");
-    }
 
     /// <summary>
     /// Reset the clock (arrow and piece), selected piece, and time,

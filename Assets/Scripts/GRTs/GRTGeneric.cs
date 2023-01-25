@@ -105,20 +105,20 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     {
         GRTStateMachine.SetCurrentState(GRTState.PLACING);
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterPlacing] Entered Placing mode");
-        UnfreezeGRTBox();
+        //TODO: check if need to UnfreezeGRTBox();    implement again if needed.
     }
 
     private void OnExitPlacing()
     {
         Debug.Log("[GRTGeneric(" + this.name + "):OnExitPlacing] Exiting Placing mode");
-        FreezeGRTBox();
+        //TODO: check if need to FreezeGRTBox();    implement again if needed.
     }
 
     private void OnEnterReady()
     {
         GRTStateMachine.SetCurrentState(GRTState.READY);
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterReady] Entered Ready mode");
-        UnfreezeGRTBox();
+        //TODO: check if need to UnfreezeGRTBox();    implement again if needed.
     }
 
     private void OnExitReady()
@@ -149,7 +149,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     {
         // Increase counters
         GameManager.Instance.NumberOfPuzzlesSolved += 1;
-        GameManager.Instance.EscapeRoomStateMachine.CurrentPuzzleIndex += 1;
+        GameManager.Instance.EscapeRoomStateMachine.NextPuzzleToSolveIndex += 1;
         
         // Mechanism
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfPuzzlesSolved + " out of " + GameManager.Instance.NumberOfPuzzlesToSolve + " GRTs");
@@ -168,8 +168,6 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnExitSolved] Exiting Solved mode");
     }
 
-    protected abstract void FreezeGRTBox();
-    protected abstract void UnfreezeGRTBox();
 
     public void SetGRTStateToSolving()
     {
