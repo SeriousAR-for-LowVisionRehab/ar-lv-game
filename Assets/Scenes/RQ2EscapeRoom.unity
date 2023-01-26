@@ -708,9 +708,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2702427011825443862, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8680259868610658034, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
       propertyPath: m_Name
       value: GRT_Tower_PinchSlideVersion
+      objectReference: {fileID: 0}
+    - target: {fileID: 8680259868610658034, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8680259868610658035, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
       propertyPath: m_RootOrder
@@ -2181,6 +2189,7 @@ MonoBehaviour:
   - {fileID: 145388008}
   _colorLevelOn: {fileID: 2100000, guid: 8e3b5c1269965234f96c87fbdeda3e90, type: 2}
   _colorLevelOff: {fileID: 2100000, guid: b36210068c38a434aa2f9c254eb9f478, type: 2}
+  _coverFinished: {fileID: 2100000, guid: cf71770df82ff4c46a577e1ef183ab76, type: 2}
   _helpDialog: {fileID: 1055762662}
   _shapeSolutionPerLevel:
   - {fileID: 640958635}

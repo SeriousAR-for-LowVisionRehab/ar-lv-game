@@ -17,7 +17,7 @@ using UnityEngine;
 /// </summary>
 public class GRTPinchSlideTower : GRTPinchSlide
 {
-    private bool _isDebugMode = true;
+    private bool _isDebugMode = false;
 
     [SerializeField] private bool _isGRTTerminated = false;
 
@@ -30,10 +30,12 @@ public class GRTPinchSlideTower : GRTPinchSlide
     private float[] _solutionsDegrees = { 90.0f, 270.0f, 0.0f, 180.0f };
     private float _currentSelectionRotationY;
 
+    private Transform finishedCover;
     [Header("Tower's Components")]
     [SerializeField] private GameObject[] _towerComponents;
     [SerializeField] private Material _colorLevelOn;
     [SerializeField] private Material _colorLevelOff;
+    [SerializeField] private Material _coverFinished;
 
     [Header("Help Window")]
     [SerializeField] private GameObject _helpDialog;
@@ -46,6 +48,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
     protected override void Start()
     {
         base.Start();
+
+        finishedCover = _support.Find("FinishedCover");
 
         // Set initial parameters and helper
         _currentTowerLevelIndex = 0;   // start at the bottom
@@ -65,7 +69,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         base.OnEnterSolving();
         UpdateComponentsHighlight(_currentTowerLevelIndex);
-        SetHelpInformation(_currentTowerLevelIndex);
+        UpdateHelpInformation(_currentTowerLevelIndex);
     }
 
     protected override void OnUpdateSolving()
@@ -112,6 +116,9 @@ public class GRTPinchSlideTower : GRTPinchSlide
             if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
             {
                 _isGRTTerminated = true;
+                _helpDialog.transform.parent.gameObject.SetActive(false);
+                finishedCover.gameObject.SetActive(true);
+                finishedCover.GetComponent<Renderer>().material = _coverFinished;
                 return;
             }
 
@@ -149,17 +156,39 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
         ResetControllerPosition();
         UpdateComponentsHighlight(_currentTowerLevelIndex);
-        SetHelpInformation(_currentTowerLevelIndex);
+        UpdateHelpInformation(_currentTowerLevelIndex);
     }
 
     /// <summary>
     /// Update the help dialogue window with the next shape to find
     /// </summary>
     /// <param name="towerLevelIndexToActivate"></param>
-    private void SetHelpInformation(int towerLevelIndexToActivate)
+    private void UpdateHelpInformation(int towerLevelIndexToActivate)
     {
+        // Y position of the dialogue
+        var dialogPosition = _helpDialog.transform.position;
+        var levelPositionY = _towerComponents[_currentTowerLevelIndex].transform.position.y;
+
+        Debug.Log(
+            "[GRTPinchSlideTower:UpdateHelpInformation] dialogPosition = " 
+            + dialogPosition 
+            + "; levelPositionY=" 
+            + levelPositionY
+        );
+
+        _helpDialog.transform.position = new Vector3(dialogPosition.x, levelPositionY, dialogPosition.z);
+
+        // Icone
+        float adjustmentAgainstLevelY = -0.025f;
         if(towerLevelIndexToActivate != 0) _shapeSolutionPerLevel[towerLevelIndexToActivate-1].SetActive(false);
-        _shapeSolutionPerLevel[towerLevelIndexToActivate].SetActive(true);
+        var currentShape = _shapeSolutionPerLevel[towerLevelIndexToActivate];
+        currentShape.SetActive(true);
+        currentShape.transform.position = new Vector3(
+            currentShape.transform.position.x,
+            levelPositionY + adjustmentAgainstLevelY,
+            currentShape.transform.position.z
+        );
+
     }
 
     /// <summary>
