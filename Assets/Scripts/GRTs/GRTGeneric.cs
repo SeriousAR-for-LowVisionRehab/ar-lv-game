@@ -126,7 +126,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnExitReady] Exiting Ready mode");
     }
 
-    private void OnEnterSolving()
+    virtual protected void OnEnterSolving()
     {
         // Mechanism
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolving] Entered Solving mode");

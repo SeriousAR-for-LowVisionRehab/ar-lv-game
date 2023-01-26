@@ -763,6 +763,26 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8680259867810305459, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
   m_PrefabInstance: {fileID: 640958630}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &640958632 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6828736552320424976, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+  m_PrefabInstance: {fileID: 640958630}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &640958633 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6719519109990701141, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+  m_PrefabInstance: {fileID: 640958630}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &640958634 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6296816615616404524, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+  m_PrefabInstance: {fileID: 640958630}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &640958635 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4252771961657242507, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+  m_PrefabInstance: {fileID: 640958630}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1580,6 +1600,34 @@ PrefabInstance:
       propertyPath: sliderValue
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1188421329846981522, guid: 81508a508b434274980feb39443ec448, type: 3}
+      propertyPath: OnInteractionEnded.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1188421329846981522, guid: 81508a508b434274980feb39443ec448, type: 3}
+      propertyPath: OnInteractionEnded.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1188421329846981522, guid: 81508a508b434274980feb39443ec448, type: 3}
+      propertyPath: OnInteractionEnded.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1864302035}
+    - target: {fileID: 1188421329846981522, guid: 81508a508b434274980feb39443ec448, type: 3}
+      propertyPath: OnInteractionEnded.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1188421329846981522, guid: 81508a508b434274980feb39443ec448, type: 3}
+      propertyPath: OnInteractionEnded.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: UpdateMechanismAndCheckSolution
+      objectReference: {fileID: 0}
+    - target: {fileID: 1188421329846981522, guid: 81508a508b434274980feb39443ec448, type: 3}
+      propertyPath: OnInteractionEnded.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: GRTPinchSlideTower, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1188421329846981522, guid: 81508a508b434274980feb39443ec448, type: 3}
+      propertyPath: OnInteractionEnded.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1188421329846981532, guid: 81508a508b434274980feb39443ec448, type: 3}
       propertyPath: m_Name
       value: Slider0
@@ -2131,12 +2179,14 @@ MonoBehaviour:
   - {fileID: 513161900}
   - {fileID: 75110540}
   - {fileID: 145388008}
+  _colorLevelOn: {fileID: 2100000, guid: 8e3b5c1269965234f96c87fbdeda3e90, type: 2}
+  _colorLevelOff: {fileID: 2100000, guid: b36210068c38a434aa2f9c254eb9f478, type: 2}
   _helpDialog: {fileID: 1055762662}
-  _helpPossibleShapes:
-  - {fileID: 1602164396097003388, guid: 69b4116b537d8d141bad443589c1b3a2, type: 3}
-  - {fileID: 4048877097053270521, guid: 0131a0fd80f59f34ea92b3eae4435857, type: 3}
-  - {fileID: 1008563055279578183, guid: 7bc26f636a4b1df4483c13d55f555ab6, type: 3}
-  - {fileID: 1428427177846844263, guid: 7a6dbf58456ff6b459f2f2fe38a9673f, type: 3}
+  _shapeSolutionPerLevel:
+  - {fileID: 640958635}
+  - {fileID: 640958634}
+  - {fileID: 640958633}
+  - {fileID: 640958632}
   _textPoints: {fileID: 0}
 --- !u!1 &1941519935
 GameObject:
