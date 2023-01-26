@@ -40,7 +40,6 @@ public class GRTPressPipes : GRTPress
 
     }
 
-
     protected override void OnUpdateSolving()
     {
         if (!_isGRTTerminated)
