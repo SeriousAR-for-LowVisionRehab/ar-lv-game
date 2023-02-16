@@ -19,7 +19,7 @@ using UnityEngine.Video;
 public class GameManager : MonoBehaviour
 {
     [Tooltip("Debug elements")]
-    [SerializeField] private bool _isDebugMode = false;            // allow to go directly to Escape Room
+    [SerializeField] private bool _isDebugMode = true;            // allow to go directly to Escape Room
     [SerializeField] private TextMesh _dataGRTPressClock;
     public TextMesh DataGRTPressClock
     {
@@ -43,31 +43,30 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<GameObject> _markers;                 // added by hand in Inspector
     
     private PlayerData _thePlayerData;
-    private string _savePathDir;
-    private int _numberOfPuzzlesToSolve;
-    private DifficultyLevel _currentDifficultyLevel;
+    private int _numberOfTasksToSolve;
+    private TypesOfGesture _currentTypeOfGesture;
 
     // EscapeRoomStateMachine related: welcome message with what to do first
-    [Tooltip("The initial message displayed to the player, with initial clue toward the first puzzle.")]
+    [Tooltip("The initial message displayed to the player, with initial clue toward the first task.")]
     public GameObject WelcomeMessageDialog;
     public string WelcomeMessageTitle = "Welcome to the Escape Room";
     public string WelcomeMessageDescription = "Since you find an intriging letter left by your ancestors, heading toward a message left within other of their objects left to you. \r\n\r\nGo to the CRYPTEX they left you. The ARROW  leads the way!";
 
-    private int _numberOfPuzzlesSolved;
-    public int NumberOfPuzzlesSolved
+    private int _numberOfTasksSolved;
+    public int NumberOfTasksSolved
     {
-        get { return _numberOfPuzzlesSolved; }
-        set { _numberOfPuzzlesSolved = value; }
+        get { return _numberOfTasksSolved; }
+        set { _numberOfTasksSolved = value; }
     }
-    public TextMesh TextNumberOfPuzzlesSolved;
+    public TextMesh TextNumberOfTasksSolved;
 
     [Tooltip("Prefabs used in the Tutorial state to learn gestures")]  
     [SerializeField] private List<GameObject> _tutorialPrefabs;         // added by hand in Inspector
     private int _tutorialPrefabsIndexPress, _tutorialPrefabsIndexBall;  // _tutorialPrefabsIndexPinchSlide
     [Tooltip("Videos to illustrate each gestures shown in Tutorial")]
     [SerializeField] private List<VideoPlayer> _gestureVideos;          // added by hand in Inspector
-    [Tooltip("Puzzles' Prefabs to be solved by the player in the Escape Room")]
-    [SerializeField] private List<GameObject> _puzzlesPrefabs;          // added by hand in Inspector
+    [Tooltip("Tasks' Prefabs to be solved by the player in the Escape Room")]
+    [SerializeField] private List<GameObject> _tasksPrefabs;          // added by hand in Inspector
 
     public static GameManager Instance;
     public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
@@ -82,28 +81,18 @@ public class GameManager : MonoBehaviour
             _thePlayerData = value;
         }
     }
-    public int NumberOfPuzzlesToSolve { get { return _numberOfPuzzlesToSolve; } }
-    public DifficultyLevel CurrentDifficultyLevel { get { return _currentDifficultyLevel; } }
-    public List<GameObject> AvailableTutorialPrefabs { get { return _tutorialPrefabs; } }
-    public List<GameObject> AvailablePuzzlesPrefabs { get { return _puzzlesPrefabs; } }
-
-    public enum DifficultyLevel
-    {
-        EASY,
-        NORMAL,
-        EXPERT,
+    public int NumberOfTasksToSolve { get { return _numberOfTasksToSolve; } }
+    public TypesOfGesture CurrentTypeOfGesture { 
+        get { return _currentTypeOfGesture; } 
+        set { _currentTypeOfGesture = value; }
     }
+    public List<GameObject> AvailableTutorialPrefabs { get { return _tutorialPrefabs; } }
+    public List<GameObject> AvailableTasksPrefabs { get { return _tasksPrefabs; } }
 
     public enum TypesOfGesture
     {
         PRESS,
         PINCHSLIDE,
-    }
-
-    public enum HandType
-    {
-        LEFT,
-        RIGHT,
     }
 
     public enum GameStates
@@ -149,26 +138,28 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // Hardcoded details about game: number of puzzles to solve
-        _currentDifficultyLevel = DifficultyLevel.NORMAL;
-        _numberOfPuzzlesToSolve = 2;
-        NumberOfPuzzlesSolved = 0;
+        _numberOfTasksToSolve = 2;
+        NumberOfTasksSolved = 0;
+
+        // Indices w.r.t. _menusUI list
         _menusUIIndexHome = 0;
         _menusUIIndexTutorial = 1;
         _menusUIIndexCreation = 2;
         _menusUIIndexEscapeRoom = 3;
+
+        // Indices w.r.t. _tutorialPrefabs list
         _tutorialPrefabsIndexPress = 0;
-        _tutorialPrefabsIndexBall = 2;
         //_tutorialPrefabsIndexPinchSlide = 1
+        _tutorialPrefabsIndexBall = 2;
 
         // Add the HOME state to the GameManager's state machine
         _gameStateMachine.Add(
             new State<GameStates>(
                 "HOME",
                 GameStates.HOME,
-                OnEnterHome, 
-                OnExitHome, 
-                null, 
+                OnEnterHome,
+                OnExitHome,
+                null,
                 null
                 )
             );
@@ -214,17 +205,18 @@ public class GameManager : MonoBehaviour
 
         // Get buttons of UI HOME
         _homeButtons = _menusUI[_menusUIIndexHome].GetComponentsInChildren<PressableButtonHoloLens2>();
-        _tutorialButtons = _menusUI[_menusUIIndexTutorial].GetComponentsInChildren<PressableButtonHoloLens2>();
-        _creationButtons = _menusUI[_menusUIIndexCreation].GetComponentsInChildren<PressableButtonHoloLens2>();
         _escapeRoomButtons = _menusUI[_menusUIIndexEscapeRoom].GetComponentsInChildren<PressableButtonHoloLens2>();
+
+
+        _creationButtons = _menusUI[_menusUIIndexCreation].GetComponentsInChildren<PressableButtonHoloLens2>();
+
+        _tutorialButtons = _menusUI[_menusUIIndexTutorial].GetComponentsInChildren<PressableButtonHoloLens2>();
         _tutorialGesturePressButton = _tutorialPrefabs[_tutorialPrefabsIndexPress].GetComponent<PressableButtonHoloLens2>();
 
-        // Add Listeners to HOME buttons: 0=pin, 1=tuto, 2=escape room, 3=creation
-        // TODO: create a UI for 4=settings
-        _homeButtons[1].ButtonPressed.AddListener(SetStateTutorial);
-        _homeButtons[2].ButtonPressed.AddListener(SetStateEscapeRoom);
+        // Add Listeners to HOME buttons: 0=pin, 1=Escape Room A (Press Gesture), 2=Escape Room B (Pinch & Slide Gesture), 3=creation
+        _homeButtons[1].ButtonPressed.AddListener(delegate {SetStateEscapeRoom(TypesOfGesture.PRESS); });
+        _homeButtons[2].ButtonPressed.AddListener(delegate {SetStateEscapeRoom(TypesOfGesture.PINCHSLIDE); });
         _homeButtons[3].ButtonPressed.AddListener(SetStateCreation);
-        _homeButtons[2].gameObject.SetActive(false);                     // by default, the EscapeRoom is not accessible. Need to be created.
 
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
         _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
@@ -232,8 +224,8 @@ public class GameManager : MonoBehaviour
 
         // Add Listeners to CREATION buttons: 0=pin, 1=Save, 2=Reset, 3=Unfreeze, 4=Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
-        _creationButtons[2].ButtonPressed.AddListener(ResetPuzzles);
-        _creationButtons[3].ButtonPressed.AddListener(UnfreezePuzzleInPlace);        
+        _creationButtons[2].ButtonPressed.AddListener(ResetTasks);
+        _creationButtons[3].ButtonPressed.AddListener(UnfreezeTasksInPlace);        
         _creationButtons[4].ButtonPressed.AddListener(CREATIONSetStateHome);
 
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
@@ -244,6 +236,7 @@ public class GameManager : MonoBehaviour
         {
             //_homeButtons[2].gameObject.SetActive(true);
             OnExitHome();
+            SaveCreation();
             OnEnterEscapeRoom();
         }
     }
@@ -260,8 +253,15 @@ public class GameManager : MonoBehaviour
         EscapeRoomStateMachine.FixedUpdate();
     }
 
-    private void SetStateTutorial() { _gameStateMachine.SetCurrentState(GameStates.TUTORIAL); }
-    private void SetStateEscapeRoom() { _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM); }
+    /// <summary>
+    /// Set the State of GameManger's State Machine as ESCAPEROOM, 
+    /// with a given TypesOfGesture.
+    /// </summary>
+    /// <param name="escapeRoomGesture"></param>
+    private void SetStateEscapeRoom(TypesOfGesture escapeRoomGesture) { 
+        _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
+        CurrentTypeOfGesture = escapeRoomGesture;
+    }
     private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
 
     private void ESCAPEROOMSetStateHome()
@@ -351,7 +351,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// CREATION: entering the CREATION state makes its UI active, the puzzles movable and set between markers.
+    /// CREATION: entering the CREATION state makes its UI active, the tasks movable and set between markers.
     /// </summary>
     void OnEnterCreation()
     {
@@ -360,11 +360,15 @@ public class GameManager : MonoBehaviour
         _currentMenu = _menusUI[_menusUIIndexCreation];
         _currentMenu.SetActive(true);
 
-        // Unfreeze puzzles by default
-        UnfreezePuzzleInPlace();
+        // Unfreeze tasks by default
+        // UnfreezeTasksInPlace();
 
-        // Display the puzzles
-        ResetPuzzles();
+        // Display the tasks
+        // ResetTasks();
+        foreach (var task in _tasksPrefabs)
+        {
+            task.SetActive(true);
+        }
     }
 
     /// <summary>
@@ -373,15 +377,15 @@ public class GameManager : MonoBehaviour
     void OnExitCreation()
     {
         Debug.Log("[GameManager:OnExitCreationMode] Exited Creation Mode state");
-        // hide UI and markers, and freeze and hide puzzles
+        // hide UI and markers, and freeze and hide tasks
         _currentMenu.SetActive(false);
-        HideMarkers();
-        FreezePuzzlesInPlace();        
+        // HideMarkers();
+        // FreezeTasksInPlace();        
 
-        // Hide the Puzzles
-        foreach (var puzzle in Instance.AvailablePuzzlesPrefabs)
+        // Hide the Tasks
+        foreach (var task in Instance.AvailableTasksPrefabs)
         {
-            puzzle.SetActive(false);
+            task.SetActive(false);
         }
     }
 
@@ -410,73 +414,73 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="referencePosition"></param>
     /// <param name="objectPosition"></param>
-    public void ResetPuzzleToMidpointAnchorAB(GameObject puzzleToReset)
+    public void ResetTaskToMidpointAnchorAB(GameObject taskToReset)
     {
         Vector3 midpoint = Vector3.Lerp(_markers[0].transform.position, _markers[1].transform.position, 0.5f);
-        puzzleToReset.transform.position = midpoint;
+        taskToReset.transform.position = midpoint;
     }
 
-    public void ResetPuzzleToMidpointAnchorAB(GameObject puzzleToReset, Vector3 offset)
+    public void ResetTaskToMidpointAnchorAB(GameObject taskToReset, Vector3 offset)
     {
         Vector3 midpoint = Vector3.Lerp(_markers[0].transform.position, _markers[1].transform.position, 0.5f);
-        puzzleToReset.transform.position = midpoint + offset;
+        taskToReset.transform.position = midpoint + offset;
     }
 
     /// <summary>
-    /// CREATION: show visual markers and reset the puzzles between those two markers.
+    /// CREATION: show visual markers and reset the tasks between those two markers.
     /// </summary>
-    private void ResetPuzzles()
+    private void ResetTasks()
     {
-        Debug.Log("[GameManager:ResetPuzzles] Resetting puzzles' position...");
+        Debug.Log("[GameManager:ResetTasks] Resetting tasks' position...");
 
         ShowMarkers();
 
         Vector3 offset = new Vector3(0.3f, 0, 0);
 
-        foreach (var puzzle in _puzzlesPrefabs)
+        foreach (var task in _tasksPrefabs)
         {
-            puzzle.SetActive(true);
-            ResetPuzzleToMidpointAnchorAB(puzzle, offset);
+            task.SetActive(true);
+            ResetTaskToMidpointAnchorAB(task, offset);
             offset += offset;
         }
     }
 
     /// <summary>
-    /// Freeze the puzzles into their place by deactivating possible manipulation.
+    /// Freeze the tasks into their place by deactivating possible manipulation.
     /// </summary>
-    public void FreezePuzzlesInPlace()
+    public void FreezeTasksInPlace()
     {
-        foreach(var puzzle in _puzzlesPrefabs)
+        foreach(var task in _tasksPrefabs)
         {
-            ObjectManipulator objectManipulatorScript = puzzle.GetComponent<ObjectManipulator>();
+            ObjectManipulator objectManipulatorScript = task.GetComponent<ObjectManipulator>();
             if(objectManipulatorScript != null)
             {
                 objectManipulatorScript.enabled = false;
             }
         }
 
-        CreationUpdatePuzzlesStatus("Puzzles: Frozen");
+        CreationUpdateTasksStatus("Tasks: Frozen");
     }
 
     /// <summary>
-    /// Unfreeze the puzzles into their place by activating possible manipulation.
+    /// Unfreeze the tasks into their place by activating possible manipulation.
     /// </summary>
-    public void UnfreezePuzzleInPlace()
+    public void UnfreezeTasksInPlace()
     {
-        Debug.Log("[GameManager:UnfreezePuzzleInPlace] Unfreezing puzzles...");
+        Debug.Log("[GameManager:UnfreezeTasksInPlace] Unfreezing tasks...");
         
         ShowMarkers();
 
-        foreach (var puzzle in _puzzlesPrefabs)
+        foreach (var task in _tasksPrefabs)
         {
-            ObjectManipulator objectManipulatorScript = puzzle.GetComponent<ObjectManipulator>();
+            ObjectManipulator objectManipulatorScript = task.GetComponent<ObjectManipulator>();
             if (objectManipulatorScript != null)
             {
                 objectManipulatorScript.enabled = true;
             }
         }
 
-        CreationUpdatePuzzlesStatus("Puzzles: Free");
+        CreationUpdateTasksStatus("Tasks: Free");
     }
 
     /// <summary>
@@ -527,24 +531,24 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// CREATION: Puzzles are frozen, markers hidden
+    /// CREATION: Tasks are frozen, markers hidden
     /// </summary>
     public void SaveCreation()
     {
-        FreezePuzzlesInPlace();
+        FreezeTasksInPlace();
         HideMarkers();
         EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
         Debug.Log("[GameManager:SaveCreation] Creation saved");
     }
 
     /// <summary>
-    /// CREATION: in the UI, update the TextMesh element to indicate if puzzles are free (unfrozen) or frozen.
+    /// CREATION: in the UI, update the TextMesh element to indicate if tasks are free (unfrozen) or frozen.
     /// </summary>
-    private void CreationUpdatePuzzlesStatus(string newText)
+    private void CreationUpdateTasksStatus(string newText)
     {
-        int indexPuzzlesStatus = 5;
-        Transform puzzleStatus = _menusUI[_menusUIIndexCreation].transform.GetChild(indexPuzzlesStatus);
-        puzzleStatus.GetComponent<TextMesh>().text = newText;
+        int indexTasksStatus = 5;
+        Transform taskStatus = _menusUI[_menusUIIndexCreation].transform.GetChild(indexTasksStatus);
+        taskStatus.GetComponent<TextMesh>().text = newText;
     }
 
     public void SetEscapeRoomToPlayingState()

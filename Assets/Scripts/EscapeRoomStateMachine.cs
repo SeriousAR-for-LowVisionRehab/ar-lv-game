@@ -1,4 +1,3 @@
-using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 
 /// <summary>
@@ -12,15 +11,15 @@ using UnityEngine;
 /// </summary>
 public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomState>
 {
-    private int _nextPuzzleToSolveIndex = 0;
-    private bool _isNextPuzzlePrepared = false;
+    private int _nextTaskToSolveIndex = 0;
+    private bool _isNextTaskPrepared = false;
 
-    public int NextPuzzleToSolveIndex { 
-        get { return _nextPuzzleToSolveIndex; }
+    public int NextTaskToSolveIndex { 
+        get { return _nextTaskToSolveIndex; }
         set 
         {
-            _isNextPuzzlePrepared = false;     // current puzzle has just been solved, and next is not prepared yet.
-            _nextPuzzleToSolveIndex = value; 
+            _isNextTaskPrepared = false;     // current task has just been solved, and next is not prepared yet.
+            _nextTaskToSolveIndex = value; 
         }
     }
 
@@ -108,11 +107,20 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
 
         var gameManagerInstance = GameManager.Instance;
         // Create Player Data File, and start counters
-        gameManagerInstance.ThePlayerData = new PlayerData(
-            gameManagerInstance.CurrentDifficultyLevel,
-            gameManagerInstance.NumberOfPuzzlesToSolve
-        );
+        gameManagerInstance.ThePlayerData = new PlayerData(gameManagerInstance.NumberOfTasksToSolve);
         gameManagerInstance.ThePlayerData.EscapeRoomGlobalDuration = Time.time;
+        if (gameManagerInstance.CurrentTypeOfGesture == GameManager.TypesOfGesture.PRESS)
+        {
+            _nextTaskToSolveIndex = 0;
+        }
+        else if(gameManagerInstance.CurrentTypeOfGesture == GameManager.TypesOfGesture.PINCHSLIDE)
+        {
+            _nextTaskToSolveIndex = 3;
+        }
+        else
+        {
+            Debug.LogError("[EscapeRoomStateMachine:OnEnterWelcome] gameManager's CurrentTypeOfGesture unknown. Default to nextTaskToSolveIndex = 0");
+        }
         Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] ThePlayerData created");
 
         // Display welcome message with initial clue
@@ -136,8 +144,8 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     void OnEnterPlaying()
     {
         Debug.Log("[EscapeRoomStateMachine:OnEnterPlaying] Entered Playing mode");
-        // Prepare initial puzzle (index == 0)
-        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_nextPuzzleToSolveIndex];
+        // Prepare initial task (index == 0)
+        GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex];
         currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.PLACING);
         currentGrt.SetActive(true);
     }
@@ -145,24 +153,24 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     void OnExitPlaying()
     {
         Debug.Log("[EscapeRoomStateMachine:OnExitPlaying] Exited Playing mode");
-        // Hide current puzzle
-        if (NextPuzzleToSolveIndex == 0) NextPuzzleToSolveIndex += 1;   // special case when current puzzle is still the initial one (avoid index == -1)
-        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_nextPuzzleToSolveIndex-1];
+        // Hide current task
+        if (NextTaskToSolveIndex == 0) NextTaskToSolveIndex += 1;   // special case when current task is still the initial one (avoid index == -1)
+        GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex-1];
         currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.PLACING);
         currentGrt.SetActive(false);
     }
 
     void OnUpdatePlaying()
     {
-        GameManager.Instance.TextNumberOfPuzzlesSolved.text = $"Puzzles solved: {GameManager.Instance.NumberOfPuzzlesSolved} / 3";
+        GameManager.Instance.TextNumberOfTasksSolved.text = $"tasks solved: {GameManager.Instance.NumberOfTasksSolved} / 3";
 
-        if(GameManager.Instance.NumberOfPuzzlesSolved == GameManager.Instance.NumberOfPuzzlesToSolve)
+        if(GameManager.Instance.NumberOfTasksSolved == GameManager.Instance.NumberOfTasksToSolve)
         {
             this.SetCurrentState(GameManager.EscapeRoomState.SOLVED);
         }
 
-        // Preapre next puzzle only if initial puzzle has been solved already
-        if (!_isNextPuzzlePrepared && NextPuzzleToSolveIndex != 0)
+        // Preapre next task only if initial task has been solved already
+        if (!_isNextTaskPrepared && NextTaskToSolveIndex != 0)
         {
             PrepareNextGRT();
         }
@@ -208,17 +216,17 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     /// </summary>
     private void PrepareNextGRT()
     {
-        Debug.Log("[EscapeRoomStateMachine:PrepareNextGRT] NextPuzzleToSolveIndex = " + NextPuzzleToSolveIndex);
-        // Hide current solved puzzle
-        if (NextPuzzleToSolveIndex == 0) NextPuzzleToSolveIndex += 1;   // when player exits and is still on initial puzzle
-        GameObject currentGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_nextPuzzleToSolveIndex - 1];
+        Debug.Log("[EscapeRoomStateMachine:PrepareNextGRT] NexttaskToSolveIndex = " + NextTaskToSolveIndex);
+        // Hide current solved task
+        if (NextTaskToSolveIndex == 0) NextTaskToSolveIndex += 1;   // when player exits and is still on initial task
+        GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex - 1];
         currentGrt.SetActive(false);
 
-        // Show next puzzle
-        GameObject nextGrt = GameManager.Instance.AvailablePuzzlesPrefabs[_nextPuzzleToSolveIndex];
+        // Show next task
+        GameObject nextGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex];
         nextGrt.SetActive(true);
 
-        _isNextPuzzlePrepared = true;
+        _isNextTaskPrepared = true;
     }
 
 }

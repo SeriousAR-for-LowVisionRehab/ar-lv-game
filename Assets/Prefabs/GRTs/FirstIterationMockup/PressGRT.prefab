@@ -7404,14 +7404,13 @@ GameObject:
   - component: {fileID: 3303494897675218791}
   - component: {fileID: 8529753500861961103}
   - component: {fileID: 467254224600072504}
-  - component: {fileID: 2458570627603630942}
   m_Layer: 0
   m_Name: PressGRT
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5121223556999491635
 Transform:
   m_ObjectHideFlags: 0
@@ -7473,7 +7472,7 @@ MonoBehaviour:
   rotateLerpTime: 0.001
   scaleLerpTime: 0.001
   enableConstraints: 1
-  constraintsManager: {fileID: 2458570627603630937}
+  constraintsManager: {fileID: 7079074181401213628, guid: c5ddf0c639e63934189ecbbaac53d2d9, type: 3}
   elasticsManager: {fileID: 0}
   onManipulationStarted:
     m_PersistentCalls:
@@ -7514,37 +7513,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.9157385, y: 0.74654555, z: 0.23699299}
   m_Center: {x: 0.042130783, y: 0.12672752, z: -0.039011765}
---- !u!114 &2458570627603630942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5121223556999491634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad6026ea16124774f8cc71f2e0f25ef1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _support: {fileID: 0}
-  _grtCore: {fileID: 0}
-  _solutionChecker: {fileID: 0}
-  _xAxisTotalClicks: 0
-  _yAxisTotalClicks: 0
-  _xAxisCurrentValue: 0
-  _yAxisCurrentValue: 0
-  _xAxisPreviousValue: 0
-  _yAxisPreviousValue: 0
-  _xAxisType: 0
-  _yAxisType: 0
-  _xAxisDecreaseTotalCount: 0
-  _yAxisDecreaseTotalCount: 0
-  _xAxisIncreaseTotalCount: 0
-  _yAxisIncreaseTotalCount: 0
-  _cylindersHolder: {fileID: 3768373740907962612}
-  _currentEmissionHolder: {fileID: 0}
-  _emissionHolderName: 
-  _selectedPiece: {fileID: 0}
 --- !u!1 &5226632619597272165
 GameObject:
   m_ObjectHideFlags: 0
@@ -8897,7 +8865,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6231717878912720137}
-  - component: {fileID: 4003117392400783836}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -8923,21 +8890,6 @@ Transform:
   m_Father: {fileID: 5121223556999491635}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4003117392400783836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6231717878912720142}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e24e90bc1f4afe2499ad601328fac61e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NumberOfCylinders: 4
-  InputForCryptex: {fileID: 0}
-  TypeOfHorizontalInput: 1
 --- !u!1 &6231717879233853889
 GameObject:
   m_ObjectHideFlags: 0

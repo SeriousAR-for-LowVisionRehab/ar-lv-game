@@ -3289,7 +3289,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9162424574222594056
 Transform:
   m_ObjectHideFlags: 0
@@ -7088,7 +7088,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6069838375229137146}
-  m_Text: "T\xE2che R\xE9ussie, bien jou\xE9!\nSuis la fl\xE8che pour continuer..."
+  m_Text: "T\xE2che R\xE9ussie, bien jou\xE9!"
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -9888,6 +9888,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8680259868610658035}
+  - component: {fileID: 216429840862724251}
+  - component: {fileID: 5366459368007323569}
   m_Layer: 0
   m_Name: GRT_Tower
   m_TagString: Untagged
@@ -9914,6 +9916,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &216429840862724251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8680259868610658034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5afd5316c63705643b3daba5a6e923bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTetherWhenManipulating: 0
+  IsBoundsHandles: 0
+--- !u!65 &5366459368007323569
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8680259868610658034}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.80742717, y: 0.7993674, z: 0.7711378}
+  m_Center: {x: -0.006196022, y: 0.27337396, z: 0.014188737}
 --- !u!1 &8680259869119506408
 GameObject:
   m_ObjectHideFlags: 0
@@ -11553,7 +11582,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Trouve cette forme:'
+  m_text: 'Trouvez cette forme:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f137eba12ee10834cb19632437cfdb2e, type: 2}
   m_sharedMaterial: {fileID: 21433621844796372, guid: f137eba12ee10834cb19632437cfdb2e, type: 2}

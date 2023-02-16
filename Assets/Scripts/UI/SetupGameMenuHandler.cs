@@ -36,7 +36,7 @@ public class SetUpGameMenuHandler : MonoBehaviour
     public void InstantiatePuzzle0()
     {
         //GameObject puzzle0 = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[0], transform, false);
-        GameObject puzzle0 = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[0], new Vector3(0, 0, 0.75f), Quaternion.identity);
+        GameObject puzzle0 = Instantiate(GameManager.Instance.AvailableTasksPrefabs[0], new Vector3(0, 0, 0.75f), Quaternion.identity);
         //puzzle0.transform.position += new Vector3(0, 0, .5f);
     }
 
@@ -45,7 +45,7 @@ public class SetUpGameMenuHandler : MonoBehaviour
     /// </summary>
     public void InstantiatePuzzle1()
     {
-        GameObject puzzle1 = Instantiate(GameManager.Instance.AvailablePuzzlesPrefabs[1], transform, false);
+        GameObject puzzle1 = Instantiate(GameManager.Instance.AvailableTasksPrefabs[1], transform, false);
         puzzle1.transform.position += new Vector3(0, 0, .5f);
     }
 }

@@ -1311,7 +1311,7 @@ GameObject:
   - component: {fileID: 6141641114142400951}
   - component: {fileID: 832513300}
   m_Layer: 0
-  m_Name: ButtonPressMe
+  m_Name: TutorialButtonPressMe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

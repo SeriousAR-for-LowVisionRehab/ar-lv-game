@@ -11,12 +11,11 @@ public class PlayerData
 {
     public DateTime PlayerID;
     public string FileName;
-    public GameManager.DifficultyLevel Difficulty;
-    public int NumberOfPuzzlesToSolve;
-    public int NumberOfPuzzlesStarted;
-    public int NumberOfPuzzlesSolved;
+    public int NumberOfTasksToSolve;
+    public int NumberOfTasksStarted;
+    public int NumberOfTasksSolved;
     public float EscapeRoomGlobalDuration;
-    public List<PuzzleData> DataOfPuzzles;
+    public List<TaskData> DataOfTasks;
 
     public string _savePathDir;
 
@@ -24,19 +23,18 @@ public class PlayerData
     /// For each new PlayerData instance, a new file with current time (Time.time) is created
     /// </summary>
     /// <param name="difficulty"></param>
-    /// <param name="numberOfPuzzlesToSolve"></param>
-    public PlayerData(GameManager.DifficultyLevel difficulty, int numberOfPuzzlesToSolve)
+    /// <param name="numberOfTasksToSolve"></param>
+    public PlayerData(int numberOfTasksToSolve)
     {
-        Difficulty = difficulty;
         PlayerID = DateTime.Now;  // Time.time;
         FileName = String.Concat(
             "PlayerData_", 
             PlayerID.ToString("ddMMyyyy_HHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo), 
             ".json"
         );
-        NumberOfPuzzlesToSolve = numberOfPuzzlesToSolve;
-        NumberOfPuzzlesStarted = 0;
-        NumberOfPuzzlesSolved = 0;
+        NumberOfTasksToSolve = numberOfTasksToSolve;
+        NumberOfTasksStarted = 0;
+        NumberOfTasksSolved = 0;
         EscapeRoomGlobalDuration = 0;
     }
 

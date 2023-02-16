@@ -2,30 +2,28 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// Data of a Puzzle
+/// Data of a Task
 /// </summary>
 [Serializable]
-public class PuzzleData
+public class TaskData
 {
 
     public int BaselineNbClickForSolution;
 
-    public int PuzzleID;
-    public GameManager.TypesOfGesture GestureType;  // press, or pinchSlide
+    public int TaskID;
     public bool IsStarted, IsSolved;
     public int NbClicksTotal;
-    public float TimeOnPuzzle;
+    public float TimeOnTask;
     public ClickData[] ClicksData;
 
-    public PuzzleData(int puzzleID)
+    public TaskData(int taskID)
     {
-        PuzzleID = puzzleID;
-        GestureType = GameManager.TypesOfGesture.PINCHSLIDE;
+        TaskID = taskID;
     }
 
 
     /// <summary>
-    /// For debug purpose, create fake and fixed data to the current instance of PuzzleData.
+    /// For debug purpose, create fake and fixed data to the current instance of TaskData.
     /// </summary>
     public void DebugCreateFakeData()
     {
@@ -37,13 +35,11 @@ public class PuzzleData
     /// </summary>
     public class ClickData
     {
-        private GameManager.HandType _handType;
         private float _timePerClick;
         private List<(int, int)> _timePerPhaseOfClick;
 
-        public ClickData(GameManager.HandType handType, float timePerClick, (int, int) timePerPhaseOfClick)
+        public ClickData(float timePerClick, (int, int) timePerPhaseOfClick)
         {
-            _handType = handType;
             _timePerClick = timePerClick;
             _timePerPhaseOfClick.Add(timePerPhaseOfClick);
         }
