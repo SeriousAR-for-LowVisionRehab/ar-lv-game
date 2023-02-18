@@ -67,9 +67,9 @@ public class GRTPressPipes : GRTPress
     }
 
     /// <summary>
-    /// Set the key's transform position to the last button pressed, in terms of x and y axis only.
-    /// 
-    /// Hide the last button pressed, Increase points counter and text.
+    /// - Set the position of the key to the last button pressed
+    /// - Hide the last button pressed
+    /// - Increase points counter and text.
     /// </summary>
     private void MoveKeyToThisButtonAndHideIt()
     {
