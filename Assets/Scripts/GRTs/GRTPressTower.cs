@@ -1,31 +1,19 @@
 using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 
-/// <summary>
-/// Tower GRT with Pinch&Slide gesture controller.
-/// Each level of the tower is a cube with 4 shapes:
-///  - square  at rotation.y =   0
-///  - diamond at rotation.y =  90
-///  - "sun"   at rotation.y = 180
-///  - round   at rotation.y = 270
-///  
-/// Hardcoded solution:
-///  - level 0 = diamond = 90°
-///  - level 1 = round = 270°
-///  - level 2 = square = 0°
-///  - level 3 = sun = 180°
-/// </summary>
-public class GRTPinchSlideTower : GRTPinchSlide
+public class GRTPressTower : GRTPress
 {
+
     private bool _isDebugMode = false;
 
-    [SerializeField] private bool _isGRTTerminated = false;
+    private bool _isGRTTerminated = false;
 
     //
     // GRT Mechanic
     //
-    private PinchSlider _sliderController;
-    private float _currentSliderValue;
+    private PressableButtonHoloLens2 buttonRight;
+    private PressableButtonHoloLens2 buttonLeft;
+
     private int _currentTowerLevelIndex;
     private float[] _solutionsDegrees = { 90.0f, 270.0f, 0.0f, 180.0f };
     private float _currentSelectionRotationY;
@@ -45,18 +33,18 @@ public class GRTPinchSlideTower : GRTPinchSlide
     private int _points;
     [SerializeField] private TextMesh _textPoints;
 
+    // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
-
         finishedCover = _support.Find("FinishedCover");
 
         // Set initial parameters and helper
         _currentTowerLevelIndex = 0;   // start at the bottom
-        _sliderController = _controller.ControllerButtons[0];
-        _sliderController.OnInteractionEnded.AddListener(delegate { UpdateMechanismAndCheckSolution(); });
-
-        _currentSliderValue = _sliderController.SliderValue;
+        buttonRight = _controller.ControllerButtons[0];
+        buttonLeft = _controller.ControllerButtons[1];
+        buttonRight.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(-1); });
+        buttonLeft.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
 
         // Debug Mode
         if (_isDebugMode)
@@ -82,26 +70,17 @@ public class GRTPinchSlideTower : GRTPinchSlide
         }
     }
 
-    public void UpdateMechanismAndCheckSolution()
+
+    public void UpdateMechanismAndCheckSolution(int direction)
     {
-        UpdateMechanism();
+        UpdateMechanism(direction);
         CheckSolution();
     }
 
-    /// <summary>
-    /// Read any change in slider's value and rotate current level
-    /// </summary>
-    private void UpdateMechanism()
+    private void UpdateMechanism(int direction)
     {
-        float sliderChange = _sliderController.SliderValue - _currentSliderValue;
-
-        // Rotate Level
-        if(sliderChange != 0)
-        {
-            _currentSliderValue = _sliderController.SliderValue;
-            RotateThisLevelToNewPosition(_currentTowerLevelIndex, sliderChange);
-        }
-
+        RotateThisLevelToNewPosition(_currentTowerLevelIndex, direction);
+        CheckSolution();
     }
 
     /// <summary>
@@ -111,6 +90,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
     private void CheckSolution()
     {
         _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
+
+        Debug.Log("[GRTPressTower:CheckSolution] _currentSelectionRotationY = " + _currentSelectionRotationY);
 
         if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
         {
@@ -155,7 +136,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         _currentTowerLevelIndex += 1;
 
-        ResetControllerPosition();
         UpdateComponentsHighlight(_currentTowerLevelIndex);
         UpdateHelpInformation(_currentTowerLevelIndex);
     }
@@ -171,9 +151,9 @@ public class GRTPinchSlideTower : GRTPinchSlide
         var levelPositionY = _towerComponents[_currentTowerLevelIndex].transform.position.y;
 
         Debug.Log(
-            "[GRTPinchSlideTower:UpdateHelpInformation] dialogPosition = " 
-            + dialogPosition 
-            + "; levelPositionY=" 
+            "[GRTPinchSlideTower:UpdateHelpInformation] dialogPosition = "
+            + dialogPosition
+            + "; levelPositionY="
             + levelPositionY
         );
 
@@ -181,7 +161,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
         // Icone
         float adjustmentAgainstLevelY = -0.025f;
-        if(towerLevelIndexToActivate != 0) _shapeSolutionPerLevel[towerLevelIndexToActivate-1].SetActive(false);
+        if (towerLevelIndexToActivate != 0) _shapeSolutionPerLevel[towerLevelIndexToActivate - 1].SetActive(false);
         var currentShape = _shapeSolutionPerLevel[towerLevelIndexToActivate];
         currentShape.SetActive(true);
         currentShape.transform.position = new Vector3(
@@ -193,19 +173,12 @@ public class GRTPinchSlideTower : GRTPinchSlide
     }
 
     /// <summary>
-    /// Place the cursor to the original position on the slider's line
-    /// </summary>
-    private void ResetControllerPosition()
-    {
-        _sliderController.SliderValue = 0.5f;
-    }
-
-    /// <summary>
     /// Turn on highlight for next level, off for previous levels
     /// </summary>
     private void UpdateComponentsHighlight(int towerLevelIndexToActivate)
     {
-        if (towerLevelIndexToActivate != 0) _towerComponents[towerLevelIndexToActivate-1].GetComponent<Renderer>().material = _colorLevelOff;
+        if (towerLevelIndexToActivate != 0) _towerComponents[towerLevelIndexToActivate - 1].GetComponent<Renderer>().material = _colorLevelOff;
         _towerComponents[towerLevelIndexToActivate].GetComponent<Renderer>().material = _colorLevelOn;
     }
+
 }

@@ -93,7 +93,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     void OnEnterReady()
     {
         Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Entered Ready mode");
-        GameManager.Instance.SetHomeButtonEscapeRoom();
+        //GameManager.Instance.SetHomeButtonEscapeRoom();
     }
 
     void OnExitReady()
@@ -103,19 +103,22 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
 
     void OnEnterWelcome()
     {
-        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] Entered Welcome mode");
-
         var gameManagerInstance = GameManager.Instance;
+
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] Entered Welcome mode: " + gameManagerInstance.CurrentTypeOfGesture);
+
         // Create Player Data File, and start counters
         gameManagerInstance.ThePlayerData = new PlayerData(gameManagerInstance.NumberOfTasksToSolve);
         gameManagerInstance.ThePlayerData.EscapeRoomGlobalDuration = Time.time;
         if (gameManagerInstance.CurrentTypeOfGesture == GameManager.TypesOfGesture.PRESS)
         {
-            _nextTaskToSolveIndex = 0;
+            NextTaskToSolveIndex = 0;
+            Debug.Log(" -------  next task to solve index: " + _nextTaskToSolveIndex);
         }
         else if(gameManagerInstance.CurrentTypeOfGesture == GameManager.TypesOfGesture.PINCHSLIDE)
         {
-            _nextTaskToSolveIndex = 3;
+            NextTaskToSolveIndex = 3;
+            Debug.Log(" -------  next task to solve index: " + _nextTaskToSolveIndex);
         }
         else
         {

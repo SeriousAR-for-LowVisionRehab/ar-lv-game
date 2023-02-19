@@ -34,7 +34,6 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         {
             button.OnInteractionEnded.AddListener(delegate { SliderReleased(); });
             button.gameObject.SetActive(false);
-            Debug.Log("name of button: " + button.name);
         }
         _currentSliderIndex = 0;
         _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
@@ -93,7 +92,6 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     /// </summary>
     public void SliderReleased()
     {
-        Debug.Log("[GRTPinchSliderPipes:SliderReleased] OnInteractionEnded:SliderReleased: slider value: " + _currentSlider.SliderValue + " index=" + _currentSliderIndex);
         if (_currentSlider.SliderValue == 1)
         {
             _isNextSliderReady = true;
