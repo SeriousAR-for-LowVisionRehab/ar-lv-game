@@ -1,12 +1,12 @@
 using Microsoft.MixedReality.Toolkit.UI;
-using System.Collections;
 using UnityEngine;
 
 public class GRTPinchSlidePipes : GRTPinchSlide
 {
-    private bool _isDebugMode = true;
+    private bool _isDebugMode = false;
 
     private bool _isGRTTerminated = false;
+    private bool _isNextSliderReady = false;
 
     // Points gained by the user
     [SerializeField] private TextMesh _textPoints;
@@ -18,6 +18,8 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     [SerializeField] private GameObject _key;
     [SerializeField] private GameObject _endGoal;
     [SerializeField] private GameObject[] _keyPositions;  // where the key will move
+    private Transform finishedCover;
+    [SerializeField] private Material _coverFinished;
 
     private int _currentSliderIndex;
     private PinchSlider _currentSlider;
@@ -25,12 +27,12 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     protected override void Start()
     {
         base.Start();
+        finishedCover = _support.Find("FinishedCover");
 
         // Slider
-        foreach(var button in _controller.ControllerButtons)
+        foreach (var button in _controller.ControllerButtons)
         {
-            button.OnInteractionStarted.AddListener(delegate { InteractionHasStarted(); });
-            button.OnInteractionEnded.AddListener(delegate { GrabbedReleased(); });         
+            button.OnInteractionEnded.AddListener(delegate { SliderReleased(); });
             button.gameObject.SetActive(false);
             Debug.Log("name of button: " + button.name);
         }
@@ -48,86 +50,75 @@ public class GRTPinchSlidePipes : GRTPinchSlide
 
     protected override void OnUpdateSolving()
     {
-        if (!_isGRTTerminated)
-        {
-            CheckSolution();
-        }
-        else
+        if(_isGRTTerminated)
         {
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _currentSliderIndex + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
+        }
+        else
+        {
+            if (_isNextSliderReady)
+            {
+                // Actions needed after slider was released:
+                MoveKeyToNextPosition();    
+                _currentSlider.gameObject.SetActive(false);                            // Deactivate Used Slider
+                _currentSliderIndex += 1;                                              // Increment Slider
+                UpdatePointsGUI();                                                     // Update the Number of Points on the UI
+
+                // Call CheckSolution before preparing next move:
+                CheckSolution();
+                if (_isGRTTerminated) return;
+
+                // Prepare Next Move:
+                _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
+                _currentSlider.gameObject.SetActive(true);                
+                _isNextSliderReady = false;
+            }
         }
     }
 
     private void CheckSolution()
     {
-        // If slider has been grabbed and released
+        if (_currentSliderIndex == _keyPositions.Length)
+        {
+            _isGRTTerminated = true;
+            finishedCover.gameObject.SetActive(true);
+            finishedCover.GetComponent<Renderer>().material = _coverFinished;
+        }
     }
 
-    public void GrabbedReleased()
+    /// <summary>
+    /// Actions performed when the user releases the slider
+    /// - method delegated to the event OnInteractionEnded of this PinchSlider.
+    /// </summary>
+    public void SliderReleased()
     {
-        Debug.Log("[GRTPinchSliderPipes:GrabbedReleased] OnInteractionEnded:GrabbedReleased");
+        Debug.Log("[GRTPinchSliderPipes:SliderReleased] OnInteractionEnded:SliderReleased: slider value: " + _currentSlider.SliderValue + " index=" + _currentSliderIndex);
         if (_currentSlider.SliderValue == 1)
         {
-            MoveKeyToNextPosition();
-            UpdateSliderIndex();
-            UpdatePointsGUI();
-            StartCoroutine(ButtonDelay());
+            _isNextSliderReady = true;
         }
         else
         {
-            Debug.Log("[GRTPinchSliderPipes:GrabbedReleased] else slidervalue: " + _currentSlider.SliderValue);
+            Debug.Log("[GRTPinchSliderPipes:SliderReleased] else slidervalue: " + _currentSlider.SliderValue);
         }
         
     }
 
-    IEnumerator ButtonDelay()
-    {
-    Debug.Log(Time.time);
-    yield return new WaitForSeconds(1f);
-    Debug.Log(Time.time);
-    }
-
-/// <summary>
-/// Debug to know if interaction has started
-/// </summary>
-public void InteractionHasStarted()
-    {
-        Debug.Log("----------- InteractionHasStarted--------------: slider value : " + _currentSlider.SliderValue + "; slider index: "+ _currentSliderIndex);
-    }
-
     /// <summary>
-    /// - Set the position of the key to the next position in the list _keyPositions
-    /// - Hide the last slider pressed
-    /// - Increase points counter and text.
+    /// Set the position of the key to the next position in the list _keyPositions
     /// </summary>
     private void MoveKeyToNextPosition()
     {
-        Debug.Log("[GRTPinchSliderPipes:MoveKeyToThisPositionAndHideSlider] move it! slider index: " + _currentSliderIndex);
-
         var _keyNextPos = _keyPositions[_currentSliderIndex].transform.position;
-
-        // Key
         _key.transform.position = new Vector3(_keyNextPos.x, _keyNextPos.y, _key.transform.position.z);
     }
 
-    private void UpdateSliderIndex()
-    {
-        Debug.Log("[GRTPinchSliderPipes:UpdateSliderIndex] Update slider index: " + _currentSliderIndex);
-        // Slider
-        _currentSlider.gameObject.SetActive(false);
-        _currentSliderIndex += 1;
-        _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
-        _currentSlider.gameObject.SetActive(true);
-        Debug.Log("[GRTPinchSliderPipes:UpdateSliderIndex] Update slider new index: " + _currentSliderIndex);
-    }
-
     /// <summary>
-    /// Increment by one the points and update the text value
+    /// Update the text value, based on the slider index value.
     /// </summary>
     private void UpdatePointsGUI()
     {
-        Debug.Log("[GRTPinchSliderPipes:UpdatePointsGUI] current points : " + _currentSliderIndex + " will be increased by one");
         _textPoints.text = $"Points: {Mathf.Round(_currentSliderIndex)}";
     }
 }

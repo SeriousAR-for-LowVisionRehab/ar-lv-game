@@ -19,7 +19,7 @@ using UnityEngine.Video;
 public class GameManager : MonoBehaviour
 {
     [Tooltip("Debug elements")]
-    [SerializeField] private bool _isDebugMode = true;            // allow to go directly to Escape Room
+    [SerializeField] private bool _isDebugMode = false;            // allow to go directly to Escape Room
     [SerializeField] private TextMesh _dataGRTPressClock;
     public TextMesh DataGRTPressClock
     {
