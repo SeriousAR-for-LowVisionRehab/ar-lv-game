@@ -779,7 +779,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1574278915975875189}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.1408, y: 0.0363, z: 0}
+  m_LocalPosition: {x: 0.1295, y: 0.0857, z: 0}
   m_LocalScale: {x: 0.8, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2523,7 +2523,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1806475648453544515}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.0743, y: -0.0433, z: 0}
+  m_LocalPosition: {x: 0.0858, y: -0.0569, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4154,7 +4154,9 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3079104941580797873}
-  m_Text: Home
+  m_Text: 'HOME
+
+    Choose Your Room'
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -4601,7 +4603,7 @@ Transform:
   m_GameObject: {fileID: 4790980973220557701}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.6, y: 2.5, z: 0.5}
+  m_LocalScale: {x: 1.8, y: 3, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8352488618917913980}

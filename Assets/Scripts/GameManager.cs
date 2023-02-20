@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
     private PressableButtonHoloLens2[] _tutorialButtons;           // the UI (filled it using GetComponentsInChildren)
     private PressableButtonHoloLens2[] _creationButtons;           // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _escapeRoomButtons;         // filled it using GetComponentsInChildren
+    private PressableButtonHoloLens2[] _welcomeMessageDialogButtons; 
     private PressableButtonHoloLens2 _tutorialGesturePressButton;  // the button to learn the gesture (used GetComponent)
 
     [Tooltip("Include a menu for each GameStates")]
@@ -106,7 +107,8 @@ public class GameManager : MonoBehaviour
     public enum EscapeRoomState
     {
         READY,
-        WELCOME,
+        WELCOME_PRESS,
+        WELCOME_PINCHSLIDE,
         PLAYING,
         PAUSE,
         SOLVED,
@@ -228,6 +230,15 @@ public class GameManager : MonoBehaviour
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
         _escapeRoomButtons[1].ButtonPressed.AddListener(ESCAPEROOMSetStateHome);
 
+        // Add Listeners to DialogEscapeRoomWelcome buttons: 0=pin, 1=Ok
+        _welcomeMessageDialogButtons = WelcomeMessageDialog.gameObject.GetComponentsInChildren<PressableButtonHoloLens2>();
+        _welcomeMessageDialogButtons[0].ButtonPressed.AddListener(SetEscapeRoomToPlayingState);
+
+        foreach(var btn in _welcomeMessageDialogButtons)
+        {
+            Debug.Log(" WELCOME DIALOG NAMES : " + btn.name);
+        }
+
         // Debug mode: access possible directly to the escape room
         if (_isDebugMode)
         {
@@ -257,13 +268,18 @@ public class GameManager : MonoBehaviour
     /// <param name="escapeRoomGesture"></param>
     private void SetStateEscapeRoomPress() 
     {
+        Debug.Log("[GameManager:SetStateEscapeRoomPress] CurrentTypeOfGesture avant: " + CurrentTypeOfGesture);
         _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
         CurrentTypeOfGesture = TypesOfGesture.PRESS;
+        Debug.Log("[GameManager:SetStateEscapeRoomPress] CurrentTypeOfGesture après: " + CurrentTypeOfGesture);
     }
     private void SetStateEscapeRoomPinchSlide()
     {
-        _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
+        Debug.Log("[GameManager:SetStateEscapeRoomPinchSlide] CurrentTypeOfGesture avant: " + CurrentTypeOfGesture);
         CurrentTypeOfGesture = TypesOfGesture.PINCHSLIDE;
+        Debug.Log("[GameManager:SetStateEscapeRoomPinchSlide] CurrentTypeOfGesture après: " + CurrentTypeOfGesture);
+        
+        _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
     }
 
     private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
@@ -396,7 +412,18 @@ public class GameManager : MonoBehaviour
     void OnEnterEscapeRoom()
     {
         Debug.Log("[GameManager:OnEnterEscapeRoom] Game Entered EscapeRoom state. " + CurrentTypeOfGesture);
-        EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME);
+        
+        if(CurrentTypeOfGesture == TypesOfGesture.PRESS)
+        {
+            EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME_PRESS);
+        } else if (CurrentTypeOfGesture == TypesOfGesture.PINCHSLIDE)
+        {
+            EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME_PINCHSLIDE);
+        } else
+        {
+            Debug.LogError("[GameManager:OnEnterEscapeRoom] CurrentTypeOfGesture NOT recognized. EscapeRoom's FSM state not changed.");
+        }
+        
 
         // display escape room menu
         _currentMenu = _menusUI[_menusUIIndexEscapeRoom];
@@ -405,7 +432,7 @@ public class GameManager : MonoBehaviour
 
     void OnExitEscapeRoom()
     {
-        Debug.Log("[GameManager:OnExitEscapeRoom] Exited Escape Room");
+        Debug.Log("[GameManager:OnExitEscapeRoom] Exited Escape Room (EscapeRoomState to PAUSE)");
         EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PAUSE);
 
         // hide Escape Room menu

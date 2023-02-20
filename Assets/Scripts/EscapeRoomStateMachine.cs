@@ -41,13 +41,25 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
                 )
             );
 
-        // Add WELCOME state
+        // Add WELCOME_PRESS state
         this.Add(
             new State<GameManager.EscapeRoomState>(
-                "WELCOME",
-                GameManager.EscapeRoomState.WELCOME,
-                OnEnterWelcome,
-                OnExitWelcome,
+                "WELCOME_PRESS",
+                GameManager.EscapeRoomState.WELCOME_PRESS,
+                OnEnterWelcomePress,
+                OnExitWelcomePress,
+                null,
+                null
+                )
+            );
+
+        // Add WELCOME_PINCHSLIDE state
+        this.Add(
+            new State<GameManager.EscapeRoomState>(
+                "WELCOME_PINCHSLIDE",
+                GameManager.EscapeRoomState.WELCOME_PINCHSLIDE,
+                OnEnterWelcomePinchSlide,
+                OnExitWelcomePinchSlide,
                 null,
                 null
                 )
@@ -101,7 +113,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Exited Ready mode");
     }
 
-    void OnEnterWelcome()
+    void OnEnterWelcomePinchSlide()
     {
         var gameManagerInstance = GameManager.Instance;
 
@@ -110,20 +122,10 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         // Create Player Data File, and start counters
         gameManagerInstance.ThePlayerData = new PlayerData(gameManagerInstance.NumberOfTasksToSolve);
         gameManagerInstance.ThePlayerData.EscapeRoomGlobalDuration = Time.time;
-        if (gameManagerInstance.CurrentTypeOfGesture == GameManager.TypesOfGesture.PRESS)
-        {
-            NextTaskToSolveIndex = 0;
-            Debug.Log(" -------  next task to solve index: " + _nextTaskToSolveIndex);
-        }
-        else if(gameManagerInstance.CurrentTypeOfGesture == GameManager.TypesOfGesture.PINCHSLIDE)
-        {
-            NextTaskToSolveIndex = 3;
-            Debug.Log(" -------  next task to solve index: " + _nextTaskToSolveIndex);
-        }
-        else
-        {
-            Debug.LogError("[EscapeRoomStateMachine:OnEnterWelcome] gameManager's CurrentTypeOfGesture unknown. Default to nextTaskToSolveIndex = 0");
-        }
+        
+        NextTaskToSolveIndex = 3;
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] next task to solve index: " + _nextTaskToSolveIndex);
+
         Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] ThePlayerData created");
 
         // Display welcome message with initial clue
@@ -139,15 +141,49 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         */
     }
 
-    void OnExitWelcome()
+    void OnExitWelcomePinchSlide()
+    {
+        Debug.Log("[EscapeRoomStateMachine:OnExitWelcome] Exited Welcome mode");
+    }
+
+
+    void OnEnterWelcomePress()
+    {
+        var gameManagerInstance = GameManager.Instance;
+
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] Entered Welcome mode: " + gameManagerInstance.CurrentTypeOfGesture);
+
+        // Create Player Data File, and start counters
+        gameManagerInstance.ThePlayerData = new PlayerData(gameManagerInstance.NumberOfTasksToSolve);
+        gameManagerInstance.ThePlayerData.EscapeRoomGlobalDuration = Time.time;
+        
+        NextTaskToSolveIndex = 0;
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome]  next task to solve index: " + _nextTaskToSolveIndex);
+
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] ThePlayerData created");
+
+        // Display welcome message with initial clue
+        gameManagerInstance.WelcomeMessageDialog.SetActive(true);
+        //Dialog.Open(gameManagerInstance.WelcomeMessageDialog, DialogButtonType.OK, gameManagerInstance.WelcomeMessageTitle, GameManager.Instance.WelcomeMessageDescription, false);
+
+        // once the player click "OK", the EscapeRoom goes from "WELCOME" to "PLAYING" state.
+        /*
+        Transform buttonOk = gameManagerInstance.WelcomeMessageDialog.transform.Find("ButtonParent").Find("ButtonOk");
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] WelcomeMessageDialog's buttonOk: name = " + buttonOk.name);
+        PressableButtonHoloLens2 buttonOkPressableScript = buttonOk.GetComponent<PressableButtonHoloLens2>();
+        buttonOkPressableScript.ButtonReleased.AddListener(SetUpdateState);
+        */
+    }
+
+    void OnExitWelcomePress()
     {
         Debug.Log("[EscapeRoomStateMachine:OnExitWelcome] Exited Welcome mode");
     }
 
     void OnEnterPlaying()
     {
-        Debug.Log("[EscapeRoomStateMachine:OnEnterPlaying] Entered Playing mode");
-        // Prepare initial task (index == 0)
+        Debug.Log("[EscapeRoomStateMachine:OnEnterPlaying] Entered Playing mode: _nextTaskToSolveIndex = " + _nextTaskToSolveIndex);
+        // Prepare initial task
         GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex];
         currentGrt.GetComponent<GRTPress>().GRTStateMachine.SetCurrentState(GRTPress.GRTState.PLACING);
         currentGrt.SetActive(true);

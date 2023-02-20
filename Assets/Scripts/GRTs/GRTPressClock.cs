@@ -125,7 +125,6 @@ public class GRTPressClock : GRTPress
     protected override void OnUpdateSolving()
     {
         _arrowInitPosition = _arrow.transform.position;
-        Debug.Log("GRTPressClock:Start] arrow (World Space): position = " + _arrowInitPosition + ", rotation = " + _arrowInitRotation);
 
         if (!_isGRTTerminated)
         {
