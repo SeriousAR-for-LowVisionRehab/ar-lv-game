@@ -28,10 +28,10 @@ public class GameManager : MonoBehaviour
     }
 
     private PressableButtonHoloLens2[] _homeButtons;               // filled it using GetComponentsInChildren
+    private PinchSlider[] _homeSliders;                            // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _tutorialButtons;           // the UI (filled it using GetComponentsInChildren)
     private PressableButtonHoloLens2[] _creationButtons;           // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _escapeRoomButtons;         // filled it using GetComponentsInChildren
-    private PressableButtonHoloLens2[] _welcomeMessageDialogButtons; 
     private PressableButtonHoloLens2 _tutorialGesturePressButton;  // the button to learn the gesture (used GetComponent)
 
     [Tooltip("Include a menu for each GameStates")]
@@ -46,12 +46,6 @@ public class GameManager : MonoBehaviour
     private PlayerData _thePlayerData;
     private int _numberOfTasksToSolve;
     private TypesOfGesture _currentTypeOfGesture;
-
-    // EscapeRoomStateMachine related: welcome message with what to do first
-    [Tooltip("The initial message displayed to the player, with initial clue toward the first task.")]
-    public GameObject WelcomeMessageDialog;
-    public string WelcomeMessageTitle = "Welcome to the Escape Room";
-    public string WelcomeMessageDescription = "Since you find an intriging letter left by your ancestors, heading toward a message left within other of their objects left to you. \r\n\r\nGo to the CRYPTEX they left you. The ARROW  leads the way!";
 
     private int _numberOfTasksSolved;
     public int NumberOfTasksSolved
@@ -207,15 +201,17 @@ public class GameManager : MonoBehaviour
 
         // Get buttons of UI HOME
         _homeButtons = _menusUI[_menusUIIndexHome].GetComponentsInChildren<PressableButtonHoloLens2>();
+        _homeSliders = _menusUI[_menusUIIndexHome].GetComponentsInChildren<PinchSlider>();
         _escapeRoomButtons = _menusUI[_menusUIIndexEscapeRoom].GetComponentsInChildren<PressableButtonHoloLens2>();
         _creationButtons = _menusUI[_menusUIIndexCreation].GetComponentsInChildren<PressableButtonHoloLens2>();
         _tutorialButtons = _menusUI[_menusUIIndexTutorial].GetComponentsInChildren<PressableButtonHoloLens2>();
         _tutorialGesturePressButton = _tutorialPrefabs[_tutorialPrefabsIndexPress].GetComponent<PressableButtonHoloLens2>();
 
-        // Add Listeners to HOME buttons: 0=pin, 1=Escape Room A (Press Gesture), 2=Escape Room B (Pinch & Slide Gesture), 3=creation
+        // Add Listeners to HOME buttons: 0=pin, 1=Escape Room Buttons (Press Gesture), 2=creation. Slider: 0=Escape Room Sliders (Pinch & Slide Gesture)
         _homeButtons[1].ButtonPressed.AddListener(SetStateEscapeRoomPress);
-        _homeButtons[2].ButtonPressed.AddListener(SetStateEscapeRoomPinchSlide);
-        _homeButtons[3].ButtonPressed.AddListener(SetStateCreation);
+        _homeButtons[2].ButtonPressed.AddListener(SetStateCreation);
+        _homeSliders[0].OnInteractionEnded.AddListener(delegate { SetStateEscapeRoomPinchSlide(); });
+        
 
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
         _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
@@ -229,15 +225,6 @@ public class GameManager : MonoBehaviour
 
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
         _escapeRoomButtons[1].ButtonPressed.AddListener(ESCAPEROOMSetStateHome);
-
-        // Add Listeners to DialogEscapeRoomWelcome buttons: 0=pin, 1=Ok
-        _welcomeMessageDialogButtons = WelcomeMessageDialog.gameObject.GetComponentsInChildren<PressableButtonHoloLens2>();
-        _welcomeMessageDialogButtons[0].ButtonPressed.AddListener(SetEscapeRoomToPlayingState);
-
-        foreach(var btn in _welcomeMessageDialogButtons)
-        {
-            Debug.Log(" WELCOME DIALOG NAMES : " + btn.name);
-        }
 
         // Debug mode: access possible directly to the escape room
         if (_isDebugMode)
@@ -273,13 +260,21 @@ public class GameManager : MonoBehaviour
         CurrentTypeOfGesture = TypesOfGesture.PRESS;
         Debug.Log("[GameManager:SetStateEscapeRoomPress] CurrentTypeOfGesture après: " + CurrentTypeOfGesture);
     }
+
+    /// <summary>
+    /// User needs to slide the cursor to one to activate the change of state.
+    /// </summary>
     private void SetStateEscapeRoomPinchSlide()
     {
-        Debug.Log("[GameManager:SetStateEscapeRoomPinchSlide] CurrentTypeOfGesture avant: " + CurrentTypeOfGesture);
-        CurrentTypeOfGesture = TypesOfGesture.PINCHSLIDE;
-        Debug.Log("[GameManager:SetStateEscapeRoomPinchSlide] CurrentTypeOfGesture après: " + CurrentTypeOfGesture);
-        
-        _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
+        if (_homeSliders[0].SliderValue == 1)
+        {
+            _homeSliders[0].SliderValue = 0;   // reset slider to zero/left position.
+            Debug.Log("[GameManager:SetStateEscapeRoomPinchSlide] CurrentTypeOfGesture avant: " + CurrentTypeOfGesture);
+            CurrentTypeOfGesture = TypesOfGesture.PINCHSLIDE;
+            Debug.Log("[GameManager:SetStateEscapeRoomPinchSlide] CurrentTypeOfGesture après: " + CurrentTypeOfGesture);
+
+            _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
+        }
     }
 
     private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
@@ -410,9 +405,7 @@ public class GameManager : MonoBehaviour
     }
 
     void OnEnterEscapeRoom()
-    {
-        Debug.Log("[GameManager:OnEnterEscapeRoom] Game Entered EscapeRoom state. " + CurrentTypeOfGesture);
-        
+    {        
         if(CurrentTypeOfGesture == TypesOfGesture.PRESS)
         {
             EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME_PRESS);
@@ -580,13 +573,6 @@ public class GameManager : MonoBehaviour
         int indexTasksStatus = 5;
         Transform taskStatus = _menusUI[_menusUIIndexCreation].transform.GetChild(indexTasksStatus);
         taskStatus.GetComponent<TextMesh>().text = newText;
-    }
-
-    public void SetEscapeRoomToPlayingState()
-    {
-        Debug.Log("[GameManager:SetEscapeRoomToPlayingState] Changing EscapeRoom's state to PLAYING...");
-        EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PLAYING);
-        WelcomeMessageDialog.SetActive(false);
     }
 
 }

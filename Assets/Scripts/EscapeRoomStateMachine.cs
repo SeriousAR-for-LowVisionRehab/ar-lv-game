@@ -1,4 +1,5 @@
 using UnityEngine;
+using static GameManager;
 
 /// <summary>
 /// State machine of the game itself.
@@ -113,6 +114,10 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Exited Ready mode");
     }
 
+    /// <summary>
+    /// - Set the Player Data and Task Index for "PinchSlide"/Sliders
+    /// - Then move to PLAYING state automatically
+    /// </summary>
     void OnEnterWelcomePinchSlide()
     {
         var gameManagerInstance = GameManager.Instance;
@@ -128,17 +133,8 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
 
         Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] ThePlayerData created");
 
-        // Display welcome message with initial clue
-        gameManagerInstance.WelcomeMessageDialog.SetActive(true);
-        //Dialog.Open(gameManagerInstance.WelcomeMessageDialog, DialogButtonType.OK, gameManagerInstance.WelcomeMessageTitle, GameManager.Instance.WelcomeMessageDescription, false);
-
-        // once the player click "OK", the EscapeRoom goes from "WELCOME" to "PLAYING" state.
-        /*
-        Transform buttonOk = gameManagerInstance.WelcomeMessageDialog.transform.Find("ButtonParent").Find("ButtonOk");
-        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] WelcomeMessageDialog's buttonOk: name = " + buttonOk.name);
-        PressableButtonHoloLens2 buttonOkPressableScript = buttonOk.GetComponent<PressableButtonHoloLens2>();
-        buttonOkPressableScript.ButtonReleased.AddListener(SetUpdateState);
-        */
+        // Move to PLAYING state
+        SetCurrentState(EscapeRoomState.PLAYING);
     }
 
     void OnExitWelcomePinchSlide()
@@ -146,33 +142,23 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         Debug.Log("[EscapeRoomStateMachine:OnExitWelcome] Exited Welcome mode");
     }
 
-
+    /// <summary>
+    /// - Set the Player Data and Task Index for "Press"/Buttons
+    /// - Then move to PLAYING state automatically
+    /// </summary>
     void OnEnterWelcomePress()
     {
         var gameManagerInstance = GameManager.Instance;
-
-        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] Entered Welcome mode: " + gameManagerInstance.CurrentTypeOfGesture);
 
         // Create Player Data File, and start counters
         gameManagerInstance.ThePlayerData = new PlayerData(gameManagerInstance.NumberOfTasksToSolve);
         gameManagerInstance.ThePlayerData.EscapeRoomGlobalDuration = Time.time;
         
         NextTaskToSolveIndex = 0;
-        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome]  next task to solve index: " + _nextTaskToSolveIndex);
+        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] Entered Welcome mode. ThePlayerData created.");
 
-        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] ThePlayerData created");
-
-        // Display welcome message with initial clue
-        gameManagerInstance.WelcomeMessageDialog.SetActive(true);
-        //Dialog.Open(gameManagerInstance.WelcomeMessageDialog, DialogButtonType.OK, gameManagerInstance.WelcomeMessageTitle, GameManager.Instance.WelcomeMessageDescription, false);
-
-        // once the player click "OK", the EscapeRoom goes from "WELCOME" to "PLAYING" state.
-        /*
-        Transform buttonOk = gameManagerInstance.WelcomeMessageDialog.transform.Find("ButtonParent").Find("ButtonOk");
-        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] WelcomeMessageDialog's buttonOk: name = " + buttonOk.name);
-        PressableButtonHoloLens2 buttonOkPressableScript = buttonOk.GetComponent<PressableButtonHoloLens2>();
-        buttonOkPressableScript.ButtonReleased.AddListener(SetUpdateState);
-        */
+        // Move to PLAYING state
+        SetCurrentState(EscapeRoomState.PLAYING);
     }
 
     void OnExitWelcomePress()
@@ -258,8 +244,8 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         Debug.Log("[EscapeRoomStateMachine:PrepareNextGRT] NexttaskToSolveIndex = " + NextTaskToSolveIndex);
         // Hide current solved task
         if (NextTaskToSolveIndex == 0) NextTaskToSolveIndex += 1;   // when player exits and is still on initial task
-        GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex - 1];
-        currentGrt.SetActive(false);
+        //GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex - 1];
+        //currentGrt.SetActive(false);
 
         // Show next task
         GameObject nextGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex];
