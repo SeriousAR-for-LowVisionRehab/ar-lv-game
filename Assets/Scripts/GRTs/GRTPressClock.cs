@@ -19,7 +19,7 @@ using UnityEngine;
 /// </summary>
 public class GRTPressClock : GRTPress
 {
-    private bool _isDebugMode = true;
+    private bool _isDebugMode = false;
 
     // Turns per GRT play
     [SerializeField] private int _turnsLeft = 5;
