@@ -124,6 +124,7 @@ public class GRTPressClock : GRTPress
     /// </summary>
     protected override void OnUpdateSolving()
     {
+        base.OnUpdateSolving();
         _arrowInitPosition = _arrow.transform.position;
 
         if (!_isGRTTerminated)

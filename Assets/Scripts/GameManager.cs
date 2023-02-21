@@ -20,12 +20,46 @@ public class GameManager : MonoBehaviour
 {
     [Tooltip("Debug elements")]
     [SerializeField] private bool _isDebugMode = false;            // allow to go directly to Escape Room
-    [SerializeField] private TextMesh _dataGRTPressClock;
-    public TextMesh DataGRTPressClock
+
+    public static GameManager Instance;
+    private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
+    public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
+
+    [Tooltip("Markers to place prefabs. These are NOT WLT anchors!")]
+    [SerializeField] private List<GameObject> _markers;                 // added by hand in Inspector
+
+    public enum TypesOfGesture
     {
-        get { return _dataGRTPressClock; }
-        set { _dataGRTPressClock = value; }
+        PRESS,
+        PINCHSLIDE,
     }
+
+    #region FSMs
+    public enum GameStates
+    {
+        HOME,
+        CREATION,
+        ESCAPEROOM,
+    }
+
+    public enum EscapeRoomState
+    {
+        READY,
+        PLAYING_PRESS,
+        PLAYING_PINCHSLIDE,
+        PAUSE,
+        SOLVED,
+    }
+
+    private FiniteStateMachine<GameStates> _gameStateMachine; // = new FiniteStateMachine<GameStates>();
+    public EscapeRoomStateMachine EscapeRoomStateMachine; // = new EscapeRoomStateMachine();
+    #endregion
+
+    #region Menus And Their Buttons
+    [Tooltip("Include a menu for each GameStates")]
+    [SerializeField] private List<GameObject> _menusUI;
+    private int _menusUIIndexHome, _menusUIIndexTutorial, _menusUIIndexCreation, _menusUIIndexEscapeRoom;
+    private GameObject _currentMenu;
 
     private PressableButtonHoloLens2[] _homeButtons;               // filled it using GetComponentsInChildren
     private PinchSlider[] _homeSliders;                            // filled it using GetComponentsInChildren
@@ -33,28 +67,43 @@ public class GameManager : MonoBehaviour
     private PressableButtonHoloLens2[] _creationButtons;           // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _escapeRoomButtons;         // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2 _tutorialGesturePressButton;  // the button to learn the gesture (used GetComponent)
+    #endregion
 
-    [Tooltip("Include a menu for each GameStates")]
-    [SerializeField] private List<GameObject> _menusUI;
-    private int _menusUIIndexHome, _menusUIIndexTutorial, _menusUIIndexCreation, _menusUIIndexEscapeRoom;
-    private GameObject _currentMenu;
-
-    private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
-    [Tooltip("Markers to place prefabs. These are NOT WLT anchors!")]
-    [SerializeField] private List<GameObject> _markers;                 // added by hand in Inspector
-    
+    #region Data To Record and Export
     private PlayerData _thePlayerData;
+    public PlayerData ThePlayerData
+    {
+        get { return _thePlayerData; }
+        set { _thePlayerData = value; }
+    }
     private int _numberOfTasksToSolve;
+    public int NumberOfTasksToSolve { 
+        get { return _numberOfTasksToSolve; } 
+    }
+
     private TypesOfGesture _currentTypeOfGesture;
+    public TypesOfGesture CurrentTypeOfGesture
+    {
+        get { return _currentTypeOfGesture; }
+        set { _currentTypeOfGesture = value; }
+    }
 
     private int _numberOfTasksSolved;
     public int NumberOfTasksSolved
     {
         get { return _numberOfTasksSolved; }
-        set { _numberOfTasksSolved = value; }
+        set { 
+            _numberOfTasksSolved = value;
+            if (NumberOfTasksSolved == NumberOfTasksToSolve)
+            {
+                EscapeRoomStateMachine.SetCurrentState(GameManager.EscapeRoomState.SOLVED);
+            }
+        }
     }
     public TextMesh TextNumberOfTasksSolved;
+    #endregion
 
+    #region Prefabs
     [Tooltip("Prefabs used in the Tutorial state to learn gestures")]  
     [SerializeField] private List<GameObject> _tutorialPrefabs;         // added by hand in Inspector
     private int _tutorialPrefabsIndexPress, _tutorialPrefabsIndexBall;  // _tutorialPrefabsIndexPinchSlide
@@ -63,54 +112,11 @@ public class GameManager : MonoBehaviour
     [Tooltip("Tasks' Prefabs to be solved by the player in the Escape Room")]
     [SerializeField] private List<GameObject> _tasksPrefabs;          // added by hand in Inspector
 
-    public static GameManager Instance;
-    public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
-    public PlayerData ThePlayerData
-    {
-        get
-        {
-            return _thePlayerData;
-        }
-        set
-        {
-            _thePlayerData = value;
-        }
-    }
-    public int NumberOfTasksToSolve { get { return _numberOfTasksToSolve; } }
-    public TypesOfGesture CurrentTypeOfGesture { 
-        get { return _currentTypeOfGesture; } 
-        set { _currentTypeOfGesture = value; }
-    }
     public List<GameObject> AvailableTutorialPrefabs { get { return _tutorialPrefabs; } }
     public List<GameObject> AvailableTasksPrefabs { get { return _tasksPrefabs; } }
+    #endregion
 
-    public enum TypesOfGesture
-    {
-        PRESS,
-        PINCHSLIDE,
-    }
-
-    public enum GameStates
-    {
-        HOME,
-        TUTORIAL,
-        CREATION,
-        ESCAPEROOM,
-    }
-
-    public enum EscapeRoomState
-    {
-        READY,
-        WELCOME_PRESS,
-        WELCOME_PINCHSLIDE,
-        PLAYING,
-        PAUSE,
-        SOLVED,
-    }
-
-    private FiniteStateMachine<GameStates> _gameStateMachine; // = new FiniteStateMachine<GameStates>();
-    public EscapeRoomStateMachine EscapeRoomStateMachine; // = new EscapeRoomStateMachine();
-
+    #region Unity methods
     /// <summary>
     /// Awake() is called at the object's creation. Ensure that GameManager is a Singleton.
     /// </summary>
@@ -155,18 +161,6 @@ public class GameManager : MonoBehaviour
                 GameStates.HOME,
                 OnEnterHome,
                 OnExitHome,
-                null,
-                null
-                )
-            );
-
-        // Add TUTORIAL state
-        _gameStateMachine.Add(
-            new State<GameStates>(
-                "TUTORIAL",
-                GameStates.TUTORIAL,
-                OnEnterTutorial,
-                OnExitTutorial,
                 null,
                 null
                 )
@@ -247,7 +241,36 @@ public class GameManager : MonoBehaviour
         _gameStateMachine.FixedUpdate();
         EscapeRoomStateMachine.FixedUpdate();
     }
+    #endregion
 
+    /// <summary>
+    /// HOME: setter function to activate the EscapeRoom button on the Home UI.
+    /// remark: refer to GameManager.Start() for index reference (hardcoded).
+    /// </summary>
+    public void SetHomeButtonEscapeRoom()
+    {
+        _homeButtons[2].gameObject.SetActive(true);
+    }
+
+    #region FSM Methods - Not Setting State
+    void OnEnterHome()
+    {
+        Debug.Log("[GameManager:OnEnterHome] Entered HOME state");
+        // Activate Home Menu
+        _currentMenu = _menusUI[_menusUIIndexHome];
+        _currentMenu.SetActive(true);
+    }
+
+    void OnExitHome()
+    {
+        Debug.Log("[GameManager:OnExitHome] Exit Home state");
+        // Deactivate Home Menu
+        _currentMenu.SetActive(false);
+    }
+
+    #endregion
+
+    #region Setter FSM states
     /// <summary>
     /// Set the State of GameManger's State Machine as ESCAPEROOM, 
     /// with a given TypesOfGesture.
@@ -256,8 +279,8 @@ public class GameManager : MonoBehaviour
     private void SetStateEscapeRoomPress() 
     {
         Debug.Log("[GameManager:SetStateEscapeRoomPress] CurrentTypeOfGesture avant: " + CurrentTypeOfGesture);
-        _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
         CurrentTypeOfGesture = TypesOfGesture.PRESS;
+        _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);        
         Debug.Log("[GameManager:SetStateEscapeRoomPress] CurrentTypeOfGesture après: " + CurrentTypeOfGesture);
     }
 
@@ -279,10 +302,14 @@ public class GameManager : MonoBehaviour
 
     private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
 
+    /// <summary>
+    /// In Escape Room's menu:
+    /// Returning HOME, will PAUSE the Escape Room if it was in PLAYING_* mode.
+    /// </summary>
     private void ESCAPEROOMSetStateHome()
     {
         
-        if (EscapeRoomStateMachine.GetCurrentState().Equals(EscapeRoomState.PLAYING))
+        if (EscapeRoomStateMachine.GetCurrentState().Equals(EscapeRoomState.PLAYING_PRESS) || EscapeRoomStateMachine.GetCurrentState().Equals(EscapeRoomState.PLAYING_PINCHSLIDE))
         {
             Debug.Log("[GameManager:ESCAPEROOMSetStateHome] EscapeRoom current state EQUAL to PLAYING. Changing it to PAUSE...");
             EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PAUSE);
@@ -291,6 +318,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("[GameManager:ESCAPEROOMSetStateHome] EscapeRoom current state NOT equal to PLAYING.");
         }
+
         _gameStateMachine.SetCurrentState(GameStates.HOME);
     }
 
@@ -304,119 +332,22 @@ public class GameManager : MonoBehaviour
         _gameStateMachine.SetCurrentState(GameStates.HOME);
     }
 
-    /// <summary>
-    /// HOME: setter function to activate the EscapeRoom button on the Home UI.
-    /// remark: refer to GameManager.Start() for index reference (hardcoded).
-    /// </summary>
-    public void SetHomeButtonEscapeRoom()
-    {
-        _homeButtons[2].gameObject.SetActive(true);
-    }
-
-    void OnEnterHome()
-    {
-        Debug.Log("[GameManager:OnEnterHome] Entered HOME state");
-        // Activate Home Menu
-        _currentMenu = _menusUI[_menusUIIndexHome];
-        _currentMenu.SetActive(true);
-    }
-
-    void OnExitHome()
-    {
-        Debug.Log("[GameManager:OnExitHome] Exit Home state");
-        // Deactivate Home Menu
-        _currentMenu.SetActive(false);
-    }
-
-    void OnEnterTutorial()
-    {
-        Debug.Log("[GameManager:OnEnterTutorial] Entered Tutorial state");
-        // Display Tutorial menu
-        _currentMenu = _menusUI[_menusUIIndexTutorial];
-        _currentMenu.SetActive(true);
-
-        // Show the tutorial gestures
-        foreach(var tuto in _tutorialPrefabs)
-        {
-            tuto.SetActive(true);
-        }
-        foreach(var vid in _gestureVideos)
-        {
-            vid.gameObject.SetActive(true);
-            vid.Play();
-        }
-    }
-
-
-    void OnExitTutorial()
-    {
-        Debug.Log("GameManager:OnExitTutorial] Exited Tutorial state");
-        _currentMenu.SetActive(false);
-        // Remove any objects
-        foreach( var tuto in _tutorialPrefabs)
-        {
-            tuto.SetActive(false);
-        }
-
-        foreach(var vid in _gestureVideos)
-        {
-            vid.Stop();
-            vid.gameObject.SetActive(false);
-        }
-    }
-
-    /// <summary>
-    /// CREATION: entering the CREATION state makes its UI active, the tasks movable and set between markers.
-    /// </summary>
-    void OnEnterCreation()
-    {
-        Debug.Log("[GameManager:OnEnterCreationMode] Entered Creation Mode state");
-        // display Creation Mode menu, and markers
-        _currentMenu = _menusUI[_menusUIIndexCreation];
-        _currentMenu.SetActive(true);
-
-        // Unfreeze tasks by default
-        // UnfreezeTasksInPlace();
-
-        // Display the tasks
-        // ResetTasks();
-        foreach (var task in _tasksPrefabs)
-        {
-            task.SetActive(true);
-        }
-    }
-
-    /// <summary>
-    /// CREATION: when exit CREATION state, hide objects
-    /// </summary>
-    void OnExitCreation()
-    {
-        Debug.Log("[GameManager:OnExitCreationMode] Exited Creation Mode state");
-        // hide UI and markers, and freeze and hide tasks
-        _currentMenu.SetActive(false);
-        // HideMarkers();
-        // FreezeTasksInPlace();        
-
-        // Hide the Tasks
-        foreach (var task in Instance.AvailableTasksPrefabs)
-        {
-            task.SetActive(false);
-        }
-    }
 
     void OnEnterEscapeRoom()
-    {        
-        if(CurrentTypeOfGesture == TypesOfGesture.PRESS)
+    {
+        if (CurrentTypeOfGesture == TypesOfGesture.PRESS)
         {
-            EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME_PRESS);
-        } else if (CurrentTypeOfGesture == TypesOfGesture.PINCHSLIDE)
+            EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PLAYING_PRESS);
+        }
+        else if (CurrentTypeOfGesture == TypesOfGesture.PINCHSLIDE)
         {
-            EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.WELCOME_PINCHSLIDE);
-        } else
+            EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PLAYING_PINCHSLIDE);
+        }
+        else
         {
             Debug.LogError("[GameManager:OnEnterEscapeRoom] CurrentTypeOfGesture NOT recognized. EscapeRoom's FSM state not changed.");
         }
-        
+
 
         // display escape room menu
         _currentMenu = _menusUI[_menusUIIndexEscapeRoom];
@@ -432,6 +363,52 @@ public class GameManager : MonoBehaviour
         _currentMenu.SetActive(false);
     }
 
+
+    #endregion  // Setter FSM states
+
+
+    #region Tutorial
+    /// <summary>
+    /// Start the tutorial video
+    /// </summary>
+    void StartTutorial(int tutorialIndex)
+    {
+        Debug.Log("[GameManager:StartTutorial] Entered Tutorial");
+        // Display Tutorial menu
+        _currentMenu = _menusUI[_menusUIIndexTutorial];
+        _currentMenu.SetActive(true);
+
+        // Show the tutorial gestures
+        _tutorialPrefabs[tutorialIndex].SetActive(true);
+        _gestureVideos[tutorialIndex].gameObject.SetActive(true);
+        _gestureVideos[tutorialIndex].Play();
+    }
+
+    /// <summary>
+    /// Exit the tutorial video
+    /// </summary>
+    void ExitTutorial(int tutorialIndex)
+    {
+        Debug.Log("GameManager:ExitTutorial] Exited Tutorial");
+        _currentMenu.SetActive(false);
+        // Remove any objects
+        _tutorialPrefabs[tutorialIndex].SetActive(false);
+        _gestureVideos[tutorialIndex].Stop();
+        _gestureVideos[tutorialIndex].gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// TUTORIAL: when the player press the "press" button in the tutorial, a ball pops up and disappears after 2 seconds
+    /// </summary>
+    public void TutorialPressButtonTriggersBall()
+    {
+        GameObject bouncyBall = Instantiate(_tutorialPrefabs[_tutorialPrefabsIndexBall], transform);
+        Destroy(bouncyBall, 2.0f);
+    }
+    #endregion
+
+
+    #region Reset Tasks' Positions
     /// <summary>
     /// CREATION: Set the GameObject's position to a new position referencePosition "AnchorAB", instantly.
     /// Possible to pass a Vector3 for additional offset.
@@ -544,15 +521,48 @@ public class GameManager : MonoBehaviour
             //nearInteractionGrabbable.enabled = true;
         }
     }
+    #endregion
+
+    #region Creation Mode
+    /// <summary>
+    /// CREATION: entering the CREATION state makes its UI active, the tasks movable and set between markers.
+    /// </summary>
+    void OnEnterCreation()
+    {
+        Debug.Log("[GameManager:OnEnterCreationMode] Entered Creation Mode state");
+        // display Creation Mode menu, and markers
+        _currentMenu = _menusUI[_menusUIIndexCreation];
+        _currentMenu.SetActive(true);
+
+        // Unfreeze tasks by default
+        // UnfreezeTasksInPlace();
+
+        // Display the tasks
+        // ResetTasks();
+        foreach (var task in _tasksPrefabs)
+        {
+            task.SetActive(true);
+        }
+    }
 
     /// <summary>
-    /// TUTORIAL: when the player press the "press" button in the tutorial, a ball pops up and disappears after 2 seconds
+    /// CREATION: when exit CREATION state, hide objects
     /// </summary>
-    public void TutorialPressButtonTriggersBall()
+    void OnExitCreation()
     {
-        GameObject bouncyBall = Instantiate(_tutorialPrefabs[_tutorialPrefabsIndexBall], transform);
-        Destroy(bouncyBall, 2.0f);
+        Debug.Log("[GameManager:OnExitCreationMode] Exited Creation Mode state");
+        // hide UI and markers, and freeze and hide tasks
+        _currentMenu.SetActive(false);
+        // HideMarkers();
+        // FreezeTasksInPlace();        
+
+        // Hide the Tasks
+        foreach (var task in Instance.AvailableTasksPrefabs)
+        {
+            task.SetActive(false);
+        }
     }
+
 
     /// <summary>
     /// CREATION: Tasks are frozen, markers hidden
@@ -575,4 +585,5 @@ public class GameManager : MonoBehaviour
         taskStatus.GetComponent<TextMesh>().text = newText;
     }
 
+    #endregion
 }

@@ -22,15 +22,28 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     public FiniteStateMachine<GRTState> GRTStateMachine;
 
     [Header("GRT Components")]
+    [Tooltip("These GameObjects are find automatically in Awake() function.")]
     [SerializeField] protected Transform _support;                // on what the GRT itself sits on.
     [SerializeField] protected Transform _grtCore;                // the central element, what must be solved
     [SerializeField] protected GRTController<T> _controller;      // what the player interacts with to change GRT's status
     [SerializeField] protected Transform _buttonStart;            // Effectively start the GRT (any count down, counting, etc.)
 
-    // Data
+
+    #region Data To Record and Export
     private float _timeInGRT;
 
+    public float TimeInGRT
+    {
+        get { return _timeInGRT; }
+        set { _timeInGRT = value; }
+    }
 
+    #endregion
+
+    #region Unity methods
+    /// <summary>
+    /// Find the main components of this GRT: support, core, controller, and start button.
+    /// </summary>
     private void Awake()
     {
         // Get the elements of the GRT
@@ -42,6 +55,11 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         _buttonStart = transform.Find("ButtonStart");
     }
 
+    /// <summary>
+    /// - Create FSM of this GRT and add states to it
+    /// - Set state of this GRT to PLACING
+    /// - Add listener to start button: SetGRTStateToSolving()
+    /// </summary>
     protected virtual void Start()
     {
         GRTStateMachine = new FiniteStateMachine<GRTState>();
@@ -100,25 +118,30 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     {
         GRTStateMachine.Update();
     }
+    #endregion
 
+    #region FSM Methods
+    /// <summary>
+    /// Set state of this GRT to PLACING
+    /// </summary>
     private void OnEnterPlacing()
     {
         GRTStateMachine.SetCurrentState(GRTState.PLACING);
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterPlacing] Entered Placing mode");
-        //TODO: check if need to UnfreezeGRTBox();    implement again if needed.
     }
 
     private void OnExitPlacing()
     {
         Debug.Log("[GRTGeneric(" + this.name + "):OnExitPlacing] Exiting Placing mode");
-        //TODO: check if need to FreezeGRTBox();    implement again if needed.
     }
 
+    /// <summary>
+    /// Set state of this GRT to READY
+    /// </summary>
     private void OnEnterReady()
     {
         GRTStateMachine.SetCurrentState(GRTState.READY);
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterReady] Entered Ready mode");
-        //TODO: check if need to UnfreezeGRTBox();    implement again if needed.
     }
 
     private void OnExitReady()
@@ -126,6 +149,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnExitReady] Exiting Ready mode");
     }
 
+    /// <summary>
+    /// - Set the state of this GRT to SOLVING
+    /// - Deactivate START button, Activate Controllers.
+    /// </summary>
     virtual protected void OnEnterSolving()
     {
         // Mechanism
@@ -133,9 +160,6 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         GRTStateMachine.SetCurrentState(GRTState.SOLVING);
         _buttonStart.gameObject.SetActive(false);
         _controller.Parent.gameObject.SetActive(true);
-
-        // Data
-        _timeInGRT += Time.deltaTime;
     }
 
     private void OnExitSolving()
@@ -143,8 +167,20 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnExitSolving] Exiting Solving mode");
     }
 
-    protected abstract void OnUpdateSolving();
+    /// <summary>
+    /// Increment Time in GRT
+    /// </summary>
+    virtual protected void OnUpdateSolving()
+    {
+        // Data
+        _timeInGRT += Time.deltaTime;
+    }
 
+    /// <summary>
+    /// - Increase the number of tasks solved in the GameManger (NumberOfTasksSolved)
+    /// - Increase the index of next task to solve in the EscapeRoom (NextTaskToSolveIndex)
+    /// - Set state of this GRT to SOLVED
+    /// </summary>
     private void OnEnterSolved()
     {
         // Increase counters
@@ -155,22 +191,18 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfTasksSolved + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
         GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         _controller.Parent.gameObject.SetActive(false);
-
-        // Data
-        var gameObjectWithTextText = new GameObject("Temp Text");
-        var tempTextMesh = gameObjectWithTextText.AddComponent<TextMesh>();
-        tempTextMesh.text = "; one more solved";
-        GameManager.Instance.DataGRTPressClock.text += tempTextMesh.text;
     }
 
     private void OnExitSolved()
     {
         Debug.Log("[GRTGeneric(" + this.name + "):OnExitSolved] Exiting Solved mode");
     }
+    #endregion
 
-
+    #region Setter FSM states
     public void SetGRTStateToSolving()
     {
         GRTStateMachine.SetCurrentState(GRTState.SOLVING);
     }
+    #endregion
 }
