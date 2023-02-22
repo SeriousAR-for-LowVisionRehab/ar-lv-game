@@ -9,7 +9,8 @@ using UnityEngine;
 [Serializable]
 public class PlayerData
 {
-    public DateTime PlayerID;
+    public DateTime PlayerID;                        // Generated automatically by DateTime.Now
+    public string PlayerAlias;                       // Chosen by the player at login/start.
     public string FileName;
     public int NumberOfTasksToSolve;
     public int NumberOfTasksStarted;
@@ -22,7 +23,6 @@ public class PlayerData
     /// <summary>
     /// For each new PlayerData instance, a new file with current time (Time.time) is created
     /// </summary>
-    /// <param name="difficulty"></param>
     /// <param name="numberOfTasksToSolve"></param>
     public PlayerData(int numberOfTasksToSolve)
     {

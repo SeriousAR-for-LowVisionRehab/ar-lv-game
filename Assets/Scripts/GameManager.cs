@@ -1,6 +1,7 @@
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.WorldLocking.Core;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -77,8 +78,8 @@ public class GameManager : MonoBehaviour
         set { _thePlayerData = value; }
     }
     private int _numberOfTasksToSolve;
-    public int NumberOfTasksToSolve { 
-        get { return _numberOfTasksToSolve; } 
+    public int NumberOfTasksToSolve {
+        get { return _numberOfTasksToSolve; }
     }
 
     private TypesOfGesture _currentTypeOfGesture;
@@ -92,7 +93,7 @@ public class GameManager : MonoBehaviour
     public int NumberOfTasksSolved
     {
         get { return _numberOfTasksSolved; }
-        set { 
+        set {
             _numberOfTasksSolved = value;
             if (NumberOfTasksSolved == NumberOfTasksToSolve)
             {
@@ -101,6 +102,22 @@ public class GameManager : MonoBehaviour
         }
     }
     public TextMesh TextNumberOfTasksSolved;
+
+    private bool _isEscapeRoomButtonsSolved = false;
+    public bool IsEscapeRoomButtonsSolved
+    {
+        get { return _isEscapeRoomButtonsSolved; }
+        set { _isEscapeRoomButtonsSolved = value; }
+    }
+    private bool _isEscapeRoomSlidersSolved = false;
+    public bool IsEscapeRoomSlidersSolved
+    {
+        get { return _isEscapeRoomSlidersSolved; }
+        set { _isEscapeRoomSlidersSolved = value; }
+    }
+
+
+
     #endregion
 
     #region Prefabs
@@ -190,9 +207,6 @@ public class GameManager : MonoBehaviour
                 )
             );
 
-        // Set current state of the GameManager's state machine
-        _gameStateMachine.SetCurrentState(GameStates.HOME);
-
         // Get buttons of UI HOME
         _homeButtons = _menusUI[_menusUIIndexHome].GetComponentsInChildren<PressableButtonHoloLens2>();
         _homeSliders = _menusUI[_menusUIIndexHome].GetComponentsInChildren<PinchSlider>();
@@ -202,23 +216,26 @@ public class GameManager : MonoBehaviour
         _tutorialGesturePressButton = _tutorialPrefabs[_tutorialPrefabsIndexPress].GetComponent<PressableButtonHoloLens2>();
 
         // Add Listeners to HOME buttons: 0=pin, 1=Escape Room Buttons (Press Gesture), 2=creation. Slider: 0=Escape Room Sliders (Pinch & Slide Gesture)
-        _homeButtons[1].ButtonPressed.AddListener(SetStateEscapeRoomPress);
+        _homeButtons[1].ButtonPressed.AddListener(SetStateEscapeRoomAndGesturePress);
+        _homeButtons[1].gameObject.SetActive(false);  // need to create escape room first
+        _homeSliders[0].OnInteractionEnded.AddListener(delegate { SetStateEscapeRoomAndGesturePinchSlide(); });
+        _homeSliders[0].gameObject.SetActive(false);  // need to create escape room first
         _homeButtons[2].ButtonPressed.AddListener(SetStateCreation);
-        _homeSliders[0].OnInteractionEnded.AddListener(delegate { SetStateEscapeRoomPinchSlide(); });
-        
 
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
         _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
-        _tutorialButtons[1].ButtonPressed.AddListener(TUTORIALSetStateHome);
 
         // Add Listeners to CREATION buttons: 0=pin, 1=Save, 2=Reset, 3=Unfreeze, 4=Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
         _creationButtons[2].ButtonPressed.AddListener(ResetTasks);
         _creationButtons[3].ButtonPressed.AddListener(UnfreezeTasksInPlace);        
-        _creationButtons[4].ButtonPressed.AddListener(CREATIONSetStateHome);
+        _creationButtons[4].ButtonPressed.AddListener(SetStateHome);
 
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
-        _escapeRoomButtons[1].ButtonPressed.AddListener(ESCAPEROOMSetStateHome);
+        _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHomeAndPauseEscapeRoom);
+
+        // Set current state of the GameManager's state machine
+        _gameStateMachine.SetCurrentState(GameStates.HOME);
 
         // Debug mode: access possible directly to the escape room
         if (_isDebugMode)
@@ -244,12 +261,15 @@ public class GameManager : MonoBehaviour
     #endregion
 
     /// <summary>
-    /// HOME: setter function to activate the EscapeRoom button on the Home UI.
+    /// HOME: activate the EscapeRoom button and slider on the Home UI.
     /// remark: refer to GameManager.Start() for index reference (hardcoded).
     /// </summary>
-    public void SetHomeButtonEscapeRoom()
+    public void UpdateHomeButtonSliderForEscapeRoom()
     {
-        _homeButtons[2].gameObject.SetActive(true);
+        // Slider/Button is active only if the EscapeRoom is NOT solved yet.
+
+        _homeSliders[0].gameObject.SetActive(!IsEscapeRoomSlidersSolved);
+        _homeButtons[1].gameObject.SetActive(!IsEscapeRoomButtonsSolved);
     }
 
     #region FSM Methods - Not Setting State
@@ -276,58 +296,45 @@ public class GameManager : MonoBehaviour
     /// with a given TypesOfGesture.
     /// </summary>
     /// <param name="escapeRoomGesture"></param>
-    private void SetStateEscapeRoomPress() 
+    private void SetStateEscapeRoomAndGesturePress() 
     {
-        Debug.Log("[GameManager:SetStateEscapeRoomPress] CurrentTypeOfGesture avant: " + CurrentTypeOfGesture);
         CurrentTypeOfGesture = TypesOfGesture.PRESS;
         _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);        
-        Debug.Log("[GameManager:SetStateEscapeRoomPress] CurrentTypeOfGesture après: " + CurrentTypeOfGesture);
+        Debug.Log("[GameManager:SetStateEscapeRoomAndGesturePress] new CurrentTypeOfGesture: " + CurrentTypeOfGesture);
     }
 
     /// <summary>
     /// User needs to slide the cursor to one to activate the change of state.
     /// </summary>
-    private void SetStateEscapeRoomPinchSlide()
+    private void SetStateEscapeRoomAndGesturePinchSlide()
     {
         if (_homeSliders[0].SliderValue == 1)
         {
             _homeSliders[0].SliderValue = 0;   // reset slider to zero/left position.
-            Debug.Log("[GameManager:SetStateEscapeRoomPinchSlide] CurrentTypeOfGesture avant: " + CurrentTypeOfGesture);
             CurrentTypeOfGesture = TypesOfGesture.PINCHSLIDE;
-            Debug.Log("[GameManager:SetStateEscapeRoomPinchSlide] CurrentTypeOfGesture après: " + CurrentTypeOfGesture);
-
             _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
+            Debug.Log("[GameManager:SetStateEscapeRoomAndGesturePinchSlide] new CurrentTypeOfGesture: " + CurrentTypeOfGesture);
         }
     }
 
     private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
 
     /// <summary>
-    /// In Escape Room's menu:
-    /// Returning HOME, will PAUSE the Escape Room if it was in PLAYING_* mode.
+    /// - Pause the Escape Room's FSM if in (playing_press or playing_pinchslide)
+    /// - Set Game's FSM state to HOME
     /// </summary>
-    private void ESCAPEROOMSetStateHome()
+    private void SetStateHomeAndPauseEscapeRoom()
     {
-        
         if (EscapeRoomStateMachine.GetCurrentState().Equals(EscapeRoomState.PLAYING_PRESS) || EscapeRoomStateMachine.GetCurrentState().Equals(EscapeRoomState.PLAYING_PINCHSLIDE))
         {
-            Debug.Log("[GameManager:ESCAPEROOMSetStateHome] EscapeRoom current state EQUAL to PLAYING. Changing it to PAUSE...");
+            Debug.Log("[GameManager:SetStateHomeAndPauseEscapeRoom] EscapeRoom FSM is paused.");
             EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PAUSE);
         }
-        else
-        {
-            Debug.Log("[GameManager:ESCAPEROOMSetStateHome] EscapeRoom current state NOT equal to PLAYING.");
-        }
 
         _gameStateMachine.SetCurrentState(GameStates.HOME);
     }
 
-    private void CREATIONSetStateHome()
-    {
-        _gameStateMachine.SetCurrentState(GameStates.HOME);
-    }
-
-    private void TUTORIALSetStateHome()
+    public void SetStateHome()
     {
         _gameStateMachine.SetCurrentState(GameStates.HOME);
     }
@@ -356,15 +363,14 @@ public class GameManager : MonoBehaviour
 
     void OnExitEscapeRoom()
     {
-        Debug.Log("[GameManager:OnExitEscapeRoom] Exited Escape Room (EscapeRoomState to PAUSE)");
-        EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PAUSE);
+        Debug.Log("[GameManager:OnExitEscapeRoom] Exited Escape Room.");
 
         // hide Escape Room menu
         _currentMenu.SetActive(false);
     }
 
 
-    #endregion  // Setter FSM states
+    #endregion
 
 
     #region Tutorial
@@ -400,7 +406,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// TUTORIAL: when the player press the "press" button in the tutorial, a ball pops up and disappears after 2 seconds
     /// </summary>
-    public void TutorialPressButtonTriggersBall()
+    private void TutorialPressButtonTriggersBall()
     {
         GameObject bouncyBall = Instantiate(_tutorialPrefabs[_tutorialPrefabsIndexBall], transform);
         Destroy(bouncyBall, 2.0f);
@@ -415,13 +421,13 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="referencePosition"></param>
     /// <param name="objectPosition"></param>
-    public void ResetTaskToMidpointAnchorAB(GameObject taskToReset)
+    private void ResetTaskToMidpointAnchorAB(GameObject taskToReset)
     {
         Vector3 midpoint = Vector3.Lerp(_markers[0].transform.position, _markers[1].transform.position, 0.5f);
         taskToReset.transform.position = midpoint;
     }
 
-    public void ResetTaskToMidpointAnchorAB(GameObject taskToReset, Vector3 offset)
+    private void ResetTaskToMidpointAnchorAB(GameObject taskToReset, Vector3 offset)
     {
         Vector3 midpoint = Vector3.Lerp(_markers[0].transform.position, _markers[1].transform.position, 0.5f);
         taskToReset.transform.position = midpoint + offset;
@@ -449,7 +455,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Freeze the tasks into their place by deactivating possible manipulation.
     /// </summary>
-    public void FreezeTasksInPlace()
+    private void FreezeTasksInPlace()
     {
         foreach(var task in _tasksPrefabs)
         {
@@ -466,7 +472,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Unfreeze the tasks into their place by activating possible manipulation.
     /// </summary>
-    public void UnfreezeTasksInPlace()
+    private void UnfreezeTasksInPlace()
     {
         Debug.Log("[GameManager:UnfreezeTasksInPlace] Unfreezing tasks...");
         
@@ -487,7 +493,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// CREATION: Disable possible interactions with the marker (simple helper, NOT the Spatial pin from WTL)
     /// </summary>
-    public void HideMarkers()
+    private void HideMarkers()
     {
         foreach (var marker in Instance._markers)
         {
@@ -506,7 +512,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// CREATION: Enable possible interactions with the marker (simple helper, NOT the Spatial pin from WTL)
     /// </summary>
-    public void ShowMarkers()
+    private void ShowMarkers()
     {
         foreach (var marker in Instance._markers)
         {
@@ -586,4 +592,18 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
+
+    /// <summary>
+    /// ESCAPE ROOM: Save anchors and data of the player
+    /// </summary>
+    public void SaveGame()
+    {
+        GameManager.Instance.WorldLockingManager.Save();
+
+        // Save Global Duration
+        GameManager.Instance.ThePlayerData.EscapeRoomGlobalDuration = Time.time - GameManager.Instance.ThePlayerData.EscapeRoomGlobalDuration;
+        GameManager.Instance.ThePlayerData.SavePlayerDataToJson();
+    }
+
+
 }

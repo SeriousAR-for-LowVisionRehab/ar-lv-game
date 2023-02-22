@@ -177,9 +177,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     }
 
     /// <summary>
-    /// - Increase the number of tasks solved in the GameManger (NumberOfTasksSolved)
+    /// - Increase the number of tasks solved in the GameManager (NumberOfTasksSolved)
     /// - Increase the index of next task to solve in the EscapeRoom (NextTaskToSolveIndex)
     /// - Set state of this GRT to SOLVED
+    /// - Deactivate the controller of this GRT
     /// </summary>
     private void OnEnterSolved()
     {

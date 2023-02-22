@@ -91,8 +91,6 @@ public class GRTPressTower : GRTPress
     {
         _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
 
-        Debug.Log("[GRTPressTower:CheckSolution] _currentSelectionRotationY = " + _currentSelectionRotationY);
-
         if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
         {
             if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
@@ -149,13 +147,6 @@ public class GRTPressTower : GRTPress
         // Y position of the dialogue
         var dialogPosition = _helpDialog.transform.position;
         var levelPositionY = _towerComponents[_currentTowerLevelIndex].transform.position.y;
-
-        Debug.Log(
-            "[GRTPinchSlideTower:UpdateHelpInformation] dialogPosition = "
-            + dialogPosition
-            + "; levelPositionY="
-            + levelPositionY
-        );
 
         _helpDialog.transform.position = new Vector3(dialogPosition.x, levelPositionY, dialogPosition.z);
 

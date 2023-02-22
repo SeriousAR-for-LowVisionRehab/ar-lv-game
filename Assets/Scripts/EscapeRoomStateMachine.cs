@@ -94,7 +94,8 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     void OnEnterReady()
     {
         Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Entered Ready mode");
-        //GameManager.Instance.SetHomeButtonEscapeRoom();
+        // Show only the rooms that are (ready and) not solved yet
+        GameManager.Instance.UpdateHomeButtonSliderForEscapeRoom();
     }
 
     void OnExitReady()
@@ -180,7 +181,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
     {
         Debug.Log("[EscapeRoomStateMachine:OnEnterPause] Entered Pause mode");
         // Save WLT, and write to PlayerData's JSON the data.
-        SaveGame();
+        GameManager.Instance.SaveGame();
     }
 
     void OnExitPause()
@@ -188,10 +189,30 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         Debug.Log("[EscapeRoomStateMachine:OnExitPause] Exited Pause mode");
     }
 
+    /// <summary>
+    /// - Save Game Data
+    /// - Set State back to READY
+    /// - Set Game FSM's state to HOME
+    /// </summary>
     void OnEnterSolved()
     {
         Debug.Log("[EscapeRoomStateMachine:OnEnterSolved] Entered Solved mode");
-        SaveGame();
+        switch (GameManager.Instance.CurrentTypeOfGesture){
+            case TypesOfGesture.PRESS:
+                GameManager.Instance.IsEscapeRoomButtonsSolved = true;
+                break;
+            case TypesOfGesture.PINCHSLIDE:
+                GameManager.Instance.IsEscapeRoomSlidersSolved = true;
+                break;
+            default:
+                Debug.Log("[EscapeRoomStateMachine:OnEnterSolved] CurrentTypeOfGesture not recognized.");
+                break;
+        }            
+
+
+        GameManager.Instance.SaveGame();
+        SetCurrentState(EscapeRoomState.READY);
+        GameManager.Instance.SetStateHome();
     }
 
     void OnExitSolved()
@@ -199,17 +220,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<GameManager.EscapeRoomS
         Debug.Log("[EscapeRoomStateMachine:OnExitSolved] Exited Solved mode");
     }
 
-    /// <summary>
-    /// ESCAPE ROOM: Save anchors and data of the player
-    /// </summary>
-    public void SaveGame()
-    {
-        GameManager.Instance.WorldLockingManager.Save();
 
-        // Save Global Duration
-        GameManager.Instance.ThePlayerData.EscapeRoomGlobalDuration = Time.time - GameManager.Instance.ThePlayerData.EscapeRoomGlobalDuration;
-        GameManager.Instance.ThePlayerData.SavePlayerDataToJson();
-    }
 
     /// <summary>
     /// Set Current GRT active and set its state to READY

@@ -170,13 +170,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
         var dialogPosition = _helpDialog.transform.position;
         var levelPositionY = _towerComponents[_currentTowerLevelIndex].transform.position.y;
 
-        Debug.Log(
-            "[GRTPinchSlideTower:UpdateHelpInformation] dialogPosition = " 
-            + dialogPosition 
-            + "; levelPositionY=" 
-            + levelPositionY
-        );
-
         _helpDialog.transform.position = new Vector3(dialogPosition.x, levelPositionY, dialogPosition.z);
 
         // Icone
