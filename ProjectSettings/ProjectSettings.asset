@@ -187,6 +187,8 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -688,7 +690,18 @@ PlayerSettings:
   metroCertificateIssuer: DefaultCompany
   metroCertificateNotAfter: 0032c542e8d9d901
   metroApplicationDescription: pretest v0.3.0
-  wsaImages: {}
+  wsaImages:
+    65636: Assets/Resources/Logo/fovea_logo_50x50.png
+    65661: Assets/Resources/Logo/fovea_logo_63x63.png
+    65686: Assets/Resources/Logo/fovea_logo_75x75.png
+    65736: Assets/Resources/Logo/fovea_logo_100x100.png
+    65936: Assets/Resources/Logo/fovea_logo_200x200.png
+    2031716: Assets/Resources/Logo/fovea_logo_44x44.png
+    2031816: Assets/Resources/Logo/fovea_logo_88x88.png
+    2097252: Assets/Resources/Logo/fovea_logo_71x71.png
+    2162788: Assets/Resources/Logo/fovea_logo_150x150.png
+    2228324: Assets/Resources/Logo/fovea_logo_310x310.png
+    2228424: Assets/Resources/Logo/fovea_logo_620x620.png
   metroTileShortName: ar-lv-game
   metroTileShowName: 0
   metroMediumTileShowName: 0
