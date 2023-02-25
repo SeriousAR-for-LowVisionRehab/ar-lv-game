@@ -15,10 +15,12 @@ public class PlayerData
     public int NumberOfTasksToSolve;
     public int NumberOfTasksStarted;
     public int NumberOfTasksSolved;
-    public float EscapeRoomGlobalDuration;
+    public float EscapeRoomPressDuration;
+    public float EscapeRoomPinchSlideDuration;
     public List<TaskData> DataOfTasks;
 
-    public string _savePathDir;
+    private string _savePathDir;
+    private string _fullPath;
 
     /// <summary>
     /// For each new PlayerData instance, a new file with current time (Time.time) is created
@@ -26,6 +28,7 @@ public class PlayerData
     /// <param name="numberOfTasksToSolve"></param>
     public PlayerData(int numberOfTasksToSolve)
     {
+        // Initialize Data
         PlayerID = DateTime.Now;  // Time.time;
         FileName = String.Concat(
             "PlayerData_", 
@@ -35,7 +38,11 @@ public class PlayerData
         NumberOfTasksToSolve = numberOfTasksToSolve;
         NumberOfTasksStarted = 0;
         NumberOfTasksSolved = 0;
-        EscapeRoomGlobalDuration = 0;
+        EscapeRoomPressDuration = 0;
+
+        // Full Path
+        _savePathDir = Application.persistentDataPath;
+        _fullPath = Path.Combine(_savePathDir, this.FileName);
     }
 
 
@@ -45,15 +52,11 @@ public class PlayerData
     /// <param name="playerData"></param>
     public void SavePlayerDataToJson()
     {
-        // Full Path
-        _savePathDir = Application.persistentDataPath;
-        string fullPath = Path.Combine(_savePathDir, this.FileName);
-
         // Serialize
         string jsonString = JsonUtility.ToJson(this);
-        File.WriteAllText(fullPath, jsonString);
+        File.WriteAllText(_fullPath, jsonString);
 
-        Debug.Log("Player data is saved under: " + fullPath);
+        Debug.Log("Player data is saved under: " + _fullPath);
     }
 
 
@@ -63,10 +66,7 @@ public class PlayerData
     /// <returns></returns>
     public PlayerData LoadPlayerDataFromJson()
     {
-        _savePathDir = Application.persistentDataPath;
-        string fullPath = Path.Combine(_savePathDir, this.FileName);
-
-        string json = File.ReadAllText(fullPath);
+        string json = File.ReadAllText(_fullPath);
         PlayerData newPlayerData = JsonUtility.FromJson<PlayerData>(json);
         return newPlayerData;
     }

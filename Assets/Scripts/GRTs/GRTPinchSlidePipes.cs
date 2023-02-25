@@ -8,9 +8,6 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     private bool _isGRTTerminated = false;
     private bool _isNextSliderReady = false;
 
-    // Points gained by the user
-    [SerializeField] private TextMesh _textPoints;
-
     //
     // GRT Mechanic
     //
@@ -117,6 +114,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     /// </summary>
     private void UpdatePointsGUI()
     {
-        _textPoints.text = $"Points: {Mathf.Round(_currentSliderIndex)}";
+        Points = _currentSliderIndex;
+        TextPoints.text =  $"Points: {Mathf.Round(Points)}";
     }
 }

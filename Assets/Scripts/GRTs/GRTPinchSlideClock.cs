@@ -22,7 +22,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
                 _finishedCover.GetComponent<Renderer>().material = _coverFinished;
                 _textTurnsLeft.gameObject.SetActive(false);
                 _textTimeLeft.gameObject.SetActive(false);
-                _textPoints.gameObject.SetActive(false);
+                TextPoints.gameObject.SetActive(false);
             }
         }
     }
@@ -43,10 +43,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
     }
     [SerializeField] private TextMesh _textTimeLeft;
     private bool _moveToNextTurn = true;                      // true at start, and then only if _remainingTime <= 0
-
-    // Points gained by the user
-    private int _points;
-    [SerializeField] private TextMesh _textPoints;
 
     // Mechanics of the clock
     private int _rotationIndex;        // an index chosen at random: for rotation, and piece on clock
@@ -137,7 +133,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         }
         else
         {
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _points + " points! Well done!");
+            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
     }
@@ -261,8 +257,8 @@ public class GRTPinchSlideClock : GRTPinchSlide
         if (_piecesOnClock[_rotationIndex].name == _piecesToSelect[SelectionIndex].name)
         {
             // UI
-            _points += 1;
-            _textPoints.text = $"Points: {Mathf.Round(_points)}";
+            Points += 1;
+            TextPoints.text = $"Points: {Mathf.Round(Points)}";
 
             // Game Mechanic
             _moveToNextTurn = true;

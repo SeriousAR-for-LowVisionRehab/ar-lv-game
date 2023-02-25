@@ -6,10 +6,6 @@ public class GRTPressPipes : GRTPress
 
     [SerializeField]  private bool _isGRTTerminated = false;
 
-    // Points gained by the user
-    private int _points;
-    [SerializeField] private TextMesh _textPoints;
-
     //
     // GRT Mechanic
     //
@@ -48,7 +44,7 @@ public class GRTPressPipes : GRTPress
         }
         else
         {
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _points + " points! Well done!");
+            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
     }
@@ -92,8 +88,8 @@ public class GRTPressPipes : GRTPress
     /// </summary>
     private void UpdatePointsGUI()
     {
-        _points += 1;
-        _textPoints.text = $"Points: {Mathf.Round(_points)}";
+        Points += 1;
+        TextPoints.text = $"Points: {Mathf.Round(Points)}";
     }
 
 }

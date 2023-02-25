@@ -41,10 +41,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
     [SerializeField] private GameObject _helpDialog;
     [SerializeField] private GameObject[] _shapeSolutionPerLevel;
 
-    // Points gained by the user
-    private int _points;
-    [SerializeField] private TextMesh _textPoints;
-
     protected override void Start()
     {
         base.Start();
@@ -77,7 +73,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         if (_isGRTTerminated)
         {
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _points + " points! Well done!");
+            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
     }

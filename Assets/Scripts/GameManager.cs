@@ -1,9 +1,21 @@
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.WorldLocking.Core;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.Video;
+
+public enum TypeOfGesture
+{
+    PRESS,                       // will be using, e.g., buttons
+    PINCHSLIDE,                  // will be using, e.g., sliders
+}
+
+public enum GameState
+{
+    HOME,                        // starting point of the app with UI and accesses to Escape Room and Creation
+    CREATION,                    // where the escape room can be setup, i.e. the tasks placed
+    ESCAPEROOM,                  // where the escape room takes place
+}
 
 /// <summary>
 /// GameManager is a Singleton. It holds the Home UI.
@@ -20,7 +32,7 @@ using UnityEngine.Video;
 public class GameManager : MonoBehaviour
 {
     [Tooltip("Debug elements")]
-    [SerializeField] private bool _isDebugMode = false;            // allow to go directly to Escape Room
+    private bool _isDebugMode = false;            // allow to go directly to Escape Room
 
     public static GameManager Instance;
     private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
@@ -29,34 +41,12 @@ public class GameManager : MonoBehaviour
     [Tooltip("Markers to place prefabs. These are NOT WLT anchors!")]
     [SerializeField] private List<GameObject> _markers;                 // added by hand in Inspector
 
-    public enum TypesOfGesture
-    {
-        PRESS,
-        PINCHSLIDE,
-    }
-
     #region FSMs
-    public enum GameStates
-    {
-        HOME,
-        CREATION,
-        ESCAPEROOM,
-    }
-
-    public enum EscapeRoomState
-    {
-        READY,
-        PLAYING_PRESS,
-        PLAYING_PINCHSLIDE,
-        PAUSE,
-        SOLVED,
-    }
-
-    private FiniteStateMachine<GameStates> _gameStateMachine; // = new FiniteStateMachine<GameStates>();
+    private FiniteStateMachine<GameState> _gameStateMachine; // = new FiniteStateMachine<GameStates>();
     public EscapeRoomStateMachine EscapeRoomStateMachine; // = new EscapeRoomStateMachine();
     #endregion
 
-    #region Menus And Their Buttons
+    #region Menus
     [Tooltip("Include a menu for each GameStates")]
     [SerializeField] private List<GameObject> _menusUI;
     private int _menusUIIndexHome, _menusUIIndexTutorial, _menusUIIndexCreation, _menusUIIndexEscapeRoom;
@@ -70,23 +60,31 @@ public class GameManager : MonoBehaviour
     private PressableButtonHoloLens2 _tutorialGesturePressButton;  // the button to learn the gesture (used GetComponent)
     #endregion
 
-    #region Data To Record and Export
-    private PlayerData _thePlayerData;
-    public PlayerData ThePlayerData
+    #region Data
+    private GameSettings _gameSettings;   //  contains settings for the game setup: tasks' positions, nb of tasks to solve
+    public GameSettings GameSettings
     {
-        get { return _thePlayerData; }
-        set { _thePlayerData = value; }
+        get { return _gameSettings; }
+        set { _gameSettings = value; }
+    }
+
+    private PlayerData _playerData;      // contains data that will be exported for analysis
+    public PlayerData PlayerData
+    {
+        get { return _playerData; }
+        set { _playerData = value; }
     }
     private int _numberOfTasksToSolve;
     public int NumberOfTasksToSolve {
         get { return _numberOfTasksToSolve; }
+        private set { _numberOfTasksToSolve = value; }
     }
 
-    private TypesOfGesture _currentTypeOfGesture;
-    public TypesOfGesture CurrentTypeOfGesture
+    private TypeOfGesture _currentGesture;
+    public TypeOfGesture CurrentGesture
     {
-        get { return _currentTypeOfGesture; }
-        set { _currentTypeOfGesture = value; }
+        get { return _currentGesture; }
+        set { _currentGesture = value; }
     }
 
     private int _numberOfTasksSolved;
@@ -95,9 +93,10 @@ public class GameManager : MonoBehaviour
         get { return _numberOfTasksSolved; }
         set {
             _numberOfTasksSolved = value;
+            TextNumberOfTasksSolved.text = $"tasks solved: {NumberOfTasksSolved} / 3";
             if (NumberOfTasksSolved == NumberOfTasksToSolve)
             {
-                EscapeRoomStateMachine.SetCurrentState(GameManager.EscapeRoomState.SOLVED);
+                EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.SOLVED);
             }
         }
     }
@@ -148,7 +147,7 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        _gameStateMachine = new FiniteStateMachine<GameStates>();
+        _gameStateMachine = new FiniteStateMachine<GameState>();
         EscapeRoomStateMachine = new EscapeRoomStateMachine();
 
         // WLT name file
@@ -157,7 +156,15 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        _numberOfTasksToSolve = 3;
+        // Load Settings from GameSettings.json file
+        // TODO: do refactor that (1) LoadGame inside constructor? and (2) ... position = GameSettings.MarkersPostions[...]ssssssss
+        GameSettings = new GameSettings();
+        GameSettings = GameSettings.LoadGameSettingsFromFile();
+        _markers[0].transform.position = GameSettings.MarkersPositions[0];
+        _markers[1].transform.position = GameSettings.MarkersPositions[1];
+        _markers[2].transform.position = GameSettings.MarkersPositions[2];
+
+        NumberOfTasksToSolve = 3;
         NumberOfTasksSolved = 0;
 
         // Indices w.r.t. _menusUI list
@@ -173,9 +180,9 @@ public class GameManager : MonoBehaviour
 
         // Add the HOME state to the GameManager's state machine
         _gameStateMachine.Add(
-            new State<GameStates>(
+            new State<GameState>(
                 "HOME",
-                GameStates.HOME,
+                GameState.HOME,
                 OnEnterHome,
                 OnExitHome,
                 null,
@@ -185,9 +192,9 @@ public class GameManager : MonoBehaviour
 
         // Add CREATION state
         _gameStateMachine.Add(
-            new State<GameStates>(
+            new State<GameState>(
                 "CREATION",
-                GameStates.CREATION,
+                GameState.CREATION,
                 OnEnterCreation,
                 OnExitCreation,
                 null,
@@ -197,9 +204,9 @@ public class GameManager : MonoBehaviour
 
         // Add the ESCAPEROOM state
         _gameStateMachine.Add(
-            new State<GameStates>(
+            new State<GameState>(
                 "ESCAPEROOM",
-                GameStates.ESCAPEROOM,
+                GameState.ESCAPEROOM,
                 OnEnterEscapeRoom,
                 OnExitEscapeRoom,
                 null,
@@ -228,14 +235,15 @@ public class GameManager : MonoBehaviour
         // Add Listeners to CREATION buttons: 0=pin, 1=Save, 2=Reset, 3=Unfreeze, 4=Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
         _creationButtons[2].ButtonPressed.AddListener(ResetTasks);
-        _creationButtons[3].ButtonPressed.AddListener(UnfreezeTasksInPlace);        
+        _creationButtons[3].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
         _creationButtons[4].ButtonPressed.AddListener(SetStateHome);
+        _creationButtons[5].ButtonPressed.AddListener(ResetGame);
 
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
         _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHomeAndPauseEscapeRoom);
 
         // Set current state of the GameManager's state machine
-        _gameStateMachine.SetCurrentState(GameStates.HOME);
+        _gameStateMachine.SetCurrentState(GameState.HOME);
 
         // Debug mode: access possible directly to the escape room
         if (_isDebugMode)
@@ -266,10 +274,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void UpdateHomeButtonSliderForEscapeRoom()
     {
+        
         // Slider/Button is active only if the EscapeRoom is NOT solved yet.
 
         _homeSliders[0].gameObject.SetActive(!IsEscapeRoomSlidersSolved);
         _homeButtons[1].gameObject.SetActive(!IsEscapeRoomButtonsSolved);
+        Debug.Log("[GameManager:UpdateHomeButtonSliderForEscapeRoom] Done.");
     }
 
     #region FSM Methods - Not Setting State
@@ -298,9 +308,9 @@ public class GameManager : MonoBehaviour
     /// <param name="escapeRoomGesture"></param>
     private void SetStateEscapeRoomAndGesturePress() 
     {
-        CurrentTypeOfGesture = TypesOfGesture.PRESS;
-        _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);        
-        Debug.Log("[GameManager:SetStateEscapeRoomAndGesturePress] new CurrentTypeOfGesture: " + CurrentTypeOfGesture);
+        CurrentGesture = TypeOfGesture.PRESS;
+        _gameStateMachine.SetCurrentState(GameState.ESCAPEROOM);        
+        Debug.Log("[GameManager:SetStateEscapeRoomAndGesturePress] new CurrentTypeOfGesture: " + CurrentGesture);
     }
 
     /// <summary>
@@ -311,13 +321,13 @@ public class GameManager : MonoBehaviour
         if (_homeSliders[0].SliderValue == 1)
         {
             _homeSliders[0].SliderValue = 0;   // reset slider to zero/left position.
-            CurrentTypeOfGesture = TypesOfGesture.PINCHSLIDE;
-            _gameStateMachine.SetCurrentState(GameStates.ESCAPEROOM);
-            Debug.Log("[GameManager:SetStateEscapeRoomAndGesturePinchSlide] new CurrentTypeOfGesture: " + CurrentTypeOfGesture);
+            CurrentGesture = TypeOfGesture.PINCHSLIDE;
+            _gameStateMachine.SetCurrentState(GameState.ESCAPEROOM);
+            Debug.Log("[GameManager:SetStateEscapeRoomAndGesturePinchSlide] new CurrentTypeOfGesture: " + CurrentGesture);
         }
     }
 
-    private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameStates.CREATION); }
+    private void SetStateCreation() { _gameStateMachine.SetCurrentState(GameState.CREATION); }
 
     /// <summary>
     /// - Pause the Escape Room's FSM if in (playing_press or playing_pinchslide)
@@ -331,22 +341,22 @@ public class GameManager : MonoBehaviour
             EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PAUSE);
         }
 
-        _gameStateMachine.SetCurrentState(GameStates.HOME);
+        _gameStateMachine.SetCurrentState(GameState.HOME);
     }
 
     public void SetStateHome()
     {
-        _gameStateMachine.SetCurrentState(GameStates.HOME);
+        _gameStateMachine.SetCurrentState(GameState.HOME);
     }
 
 
     void OnEnterEscapeRoom()
     {
-        if (CurrentTypeOfGesture == TypesOfGesture.PRESS)
+        if (CurrentGesture == TypeOfGesture.PRESS)
         {
             EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PLAYING_PRESS);
         }
-        else if (CurrentTypeOfGesture == TypesOfGesture.PINCHSLIDE)
+        else if (CurrentGesture == TypeOfGesture.PINCHSLIDE)
         {
             EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PLAYING_PINCHSLIDE);
         }
@@ -414,122 +424,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
 
-    #region Reset Tasks' Positions
-    /// <summary>
-    /// CREATION: Set the GameObject's position to a new position referencePosition "AnchorAB", instantly.
-    /// Possible to pass a Vector3 for additional offset.
-    /// </summary>
-    /// <param name="referencePosition"></param>
-    /// <param name="objectPosition"></param>
-    private void ResetTaskToMidpointAnchorAB(GameObject taskToReset)
-    {
-        Vector3 midpoint = Vector3.Lerp(_markers[0].transform.position, _markers[1].transform.position, 0.5f);
-        taskToReset.transform.position = midpoint;
-    }
-
-    private void ResetTaskToMidpointAnchorAB(GameObject taskToReset, Vector3 offset)
-    {
-        Vector3 midpoint = Vector3.Lerp(_markers[0].transform.position, _markers[1].transform.position, 0.5f);
-        taskToReset.transform.position = midpoint + offset;
-    }
-
-    /// <summary>
-    /// CREATION: show visual markers and reset the tasks between those two markers.
-    /// </summary>
-    private void ResetTasks()
-    {
-        Debug.Log("[GameManager:ResetTasks] Resetting tasks' position...");
-
-        ShowMarkers();
-
-        Vector3 offset = new Vector3(0.3f, 0, 0);
-
-        foreach (var task in _tasksPrefabs)
-        {
-            task.SetActive(true);
-            ResetTaskToMidpointAnchorAB(task, offset);
-            offset += offset;
-        }
-    }
-
-    /// <summary>
-    /// Freeze the tasks into their place by deactivating possible manipulation.
-    /// </summary>
-    private void FreezeTasksInPlace()
-    {
-        foreach(var task in _tasksPrefabs)
-        {
-            ObjectManipulator objectManipulatorScript = task.GetComponent<ObjectManipulator>();
-            if(objectManipulatorScript != null)
-            {
-                objectManipulatorScript.enabled = false;
-            }
-        }
-
-        CreationUpdateTasksStatus("Tasks: Frozen");
-    }
-
-    /// <summary>
-    /// Unfreeze the tasks into their place by activating possible manipulation.
-    /// </summary>
-    private void UnfreezeTasksInPlace()
-    {
-        Debug.Log("[GameManager:UnfreezeTasksInPlace] Unfreezing tasks...");
-        
-        ShowMarkers();
-
-        foreach (var task in _tasksPrefabs)
-        {
-            ObjectManipulator objectManipulatorScript = task.GetComponent<ObjectManipulator>();
-            if (objectManipulatorScript != null)
-            {
-                objectManipulatorScript.enabled = true;
-            }
-        }
-
-        CreationUpdateTasksStatus("Tasks: Free");
-    }
-
-    /// <summary>
-    /// CREATION: Disable possible interactions with the marker (simple helper, NOT the Spatial pin from WTL)
-    /// </summary>
-    private void HideMarkers()
-    {
-        foreach (var marker in Instance._markers)
-        {
-            marker.SetActive(false);
-            //var markerMesh = marker.GetComponent<MeshRenderer>();
-            //var boxCollider = marker.GetComponent<BoxCollider>();
-            //var objectManipulator = marker.GetComponent<ObjectManipulator>();
-            //var nearInteractionGrabbable = marker.GetComponent<NearInteractionGrabbable>();
-            //markerMesh.enabled = false;
-            //boxCollider.enabled = false;
-            //objectManipulator.enabled = false;
-            //nearInteractionGrabbable.enabled = false;
-        }
-    }
-
-    /// <summary>
-    /// CREATION: Enable possible interactions with the marker (simple helper, NOT the Spatial pin from WTL)
-    /// </summary>
-    private void ShowMarkers()
-    {
-        foreach (var marker in Instance._markers)
-        {
-            marker.SetActive(true);
-            //var markerMesh = marker.GetComponent<MeshRenderer>();
-            //var boxCollider = marker.GetComponent<BoxCollider>();
-            //var objectManipulator = marker.GetComponent<ObjectManipulator>();
-            //var nearInteractionGrabbable = marker.GetComponent<NearInteractionGrabbable>();
-            //markerMesh.enabled = true;
-            //boxCollider.enabled = true;
-            //objectManipulator.enabled = true;
-            //nearInteractionGrabbable.enabled = true;
-        }
-    }
-    #endregion
-
-    #region Creation Mode
+    #region Creation Mode    
     /// <summary>
     /// CREATION: entering the CREATION state makes its UI active, the tasks movable and set between markers.
     /// </summary>
@@ -541,14 +436,17 @@ public class GameManager : MonoBehaviour
         _currentMenu.SetActive(true);
 
         // Unfreeze tasks by default
-        // UnfreezeTasksInPlace();
+        FreezeTasksInPlace(false);
 
         // Display the tasks
-        // ResetTasks();
+        ShowMarkers(true);
+
         foreach (var task in _tasksPrefabs)
         {
             task.SetActive(true);
         }
+
+        ResetTasks();
     }
 
     /// <summary>
@@ -571,12 +469,70 @@ public class GameManager : MonoBehaviour
 
 
     /// <summary>
+    /// CREATION: show visual markers and reset the tasks between those two markers.
+    /// </summary>
+    private void ResetTasks()
+    {
+        Debug.Log("[GameManager:ResetTasks] Resetting tasks' position...");
+
+        for (int markerIndex = 0; markerIndex < _markers.Count; markerIndex++)
+        {
+            _tasksPrefabs[markerIndex].SetActive(true);
+            _tasksPrefabs[markerIndex + 3].SetActive(true);
+            _tasksPrefabs[markerIndex].transform.position = _markers[markerIndex].transform.position;
+            _tasksPrefabs[markerIndex + 3].transform.position = _markers[markerIndex].transform.position;
+        }
+    }
+
+    /// <summary>
+    /// Freeze (freezedTask=true) or unfreeze the tasks into their place by deactivating possible manipulation.
+    /// </summary>
+    private void FreezeTasksInPlace(bool freezedTask)
+    {
+        foreach (var task in _tasksPrefabs)
+        {
+            ObjectManipulator objectManipulatorScript = task.GetComponent<ObjectManipulator>();
+            if (objectManipulatorScript != null)
+            {
+                objectManipulatorScript.enabled = freezedTask;
+            }
+        }
+
+        CreationUpdateTasksStatus("Tasks: Frozen");
+    }
+
+    /// <summary>
+    /// Show (markerShown=true) or hide the markers: Enable possible interactions with the marker (simple helper, NOT the Spatial pin from WTL)
+    /// </summary>
+    private void ShowMarkers(bool markerShown)
+    {
+        foreach (var marker in Instance._markers)
+        {
+            marker.SetActive(markerShown);
+        }
+    }
+
+
+    /// <summary>
     /// CREATION: Tasks are frozen, markers hidden
     /// </summary>
     public void SaveCreation()
     {
-        FreezeTasksInPlace();
-        HideMarkers();
+        FreezeTasksInPlace(true);
+        ShowMarkers(false);
+
+        // TODO: do clean that code...!
+        List<Vector3> tempPositions = new List<Vector3>();
+        foreach(var marker in _markers)
+        {
+            tempPositions.Add(marker.transform.position);
+            Debug.Log("[GameManager:SaveCreation] tempPosition: " + tempPositions.Count);
+        }
+
+        GameSettings.MarkersPositions = tempPositions;
+
+        GameSettings.SaveGameSettingsToFile();
+
         EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
         Debug.Log("[GameManager:SaveCreation] Creation saved");
     }
@@ -591,6 +547,18 @@ public class GameManager : MonoBehaviour
         taskStatus.GetComponent<TextMesh>().text = newText;
     }
 
+    /// <summary>
+    /// Reset EscapeRooms and GRTs counters and status to initial values.
+    /// Keep position of GRTs emplacements.
+    /// </summary>
+    private void ResetGame()
+    {
+        IsEscapeRoomButtonsSolved = false;
+        IsEscapeRoomSlidersSolved = false;
+        UpdateHomeButtonSliderForEscapeRoom();
+        Debug.Log("[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
+
+    }
     #endregion
 
     /// <summary>
@@ -598,11 +566,22 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SaveGame()
     {
-        GameManager.Instance.WorldLockingManager.Save();
+        WorldLockingManager.Save();
 
         // Save Global Duration
-        GameManager.Instance.ThePlayerData.EscapeRoomGlobalDuration = Time.time - GameManager.Instance.ThePlayerData.EscapeRoomGlobalDuration;
-        GameManager.Instance.ThePlayerData.SavePlayerDataToJson();
+        switch (CurrentGesture)
+        {
+            case TypeOfGesture.PRESS:
+                PlayerData.EscapeRoomPressDuration = Time.time - PlayerData.EscapeRoomPressDuration;
+                break;
+            case TypeOfGesture.PINCHSLIDE:
+                PlayerData.EscapeRoomPinchSlideDuration = Time.time - PlayerData.EscapeRoomPinchSlideDuration;
+                break;
+            default:
+                Debug.Log("[GameManager:SaveGame] CurrentTypeOfGesture not recognized - EscapeRoom Duration not calculated correctly.");
+                break;
+        }
+        PlayerData.SavePlayerDataToJson();
     }
 
 

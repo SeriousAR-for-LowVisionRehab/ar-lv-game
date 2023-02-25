@@ -1,5 +1,14 @@
 using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
+
+public enum GRTState
+{
+    PLACING,                       // You can move the GRTBox. But cannot solve the GRT itself, nor interact with controller.
+    READY,                         // GRT is placed and waiting (to be placed again, or start 'solving' state)
+    SOLVING,                       // You can solve the GRT itself using the controller. The GRTBox is fixed in place.
+    SOLVED,                        // The final solution has been reached, end of the GRT.
+}
+
 /// <summary>
 /// Generic class defining a Gamified Rehabilitation Task (GRT), whether it uses "press" or "pinch & slide" gesture. A GRTGeneric contains:
 ///  - a support where the GRT stays on, and how the GRTBox can be moved around.
@@ -11,14 +20,6 @@ using UnityEngine;
 /// </summary>
 public abstract class GRTGeneric<T> : MonoBehaviour
 {
-    public enum GRTState
-    {
-        PLACING,                       // You can move the GRTBox. But cannot solve the GRT itself, nor interact with controller.
-        READY,                         // GRT is placed and waiting (to be placed again, or start 'solving' state)
-        SOLVING,                       // You can solve the GRT itself using the controller. The GRTBox is fixed in place.
-        SOLVED,                        // The final solution has been reached, end of the GRT.
-    }
-
     public FiniteStateMachine<GRTState> GRTStateMachine;
 
     [Header("GRT Components")]
@@ -29,7 +30,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     [SerializeField] protected Transform _buttonStart;            // Effectively start the GRT (any count down, counting, etc.)
 
 
-    #region Data To Record and Export
+    #region Data
     private float _timeInGRT;
 
     public float TimeInGRT
@@ -37,7 +38,18 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         get { return _timeInGRT; }
         set { _timeInGRT = value; }
     }
-
+    private int _points;
+    public int Points
+    {
+        get { return _points; }
+        set { _points = value; }
+    }
+    [SerializeField] private TextMesh _textPoints;
+    public TextMesh TextPoints
+    {
+        get { return _textPoints; }
+        set { _textPoints = value; }
+    }
     #endregion
 
     #region Unity methods
@@ -186,7 +198,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     {
         // Increase counters
         GameManager.Instance.NumberOfTasksSolved += 1;
-        GameManager.Instance.EscapeRoomStateMachine.NextTaskToSolveIndex += 1;
+        if(!GameManager.Instance.IsEscapeRoomButtonsSolved || !GameManager.Instance.IsEscapeRoomSlidersSolved)
+        {
+            GameManager.Instance.EscapeRoomStateMachine.NextTaskToSolveIndex += 1;
+        }
         
         // Mechanism
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfTasksSolved + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");

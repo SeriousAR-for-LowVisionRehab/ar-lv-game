@@ -29,10 +29,6 @@ public class GRTPressTower : GRTPress
     [SerializeField] private GameObject _helpDialog;
     [SerializeField] private GameObject[] _shapeSolutionPerLevel;
 
-    // Points gained by the user
-    private int _points;
-    [SerializeField] private TextMesh _textPoints;
-
     // Start is called before the first frame update
     protected override void Start()
     {
@@ -65,19 +61,17 @@ public class GRTPressTower : GRTPress
     {
         if (_isGRTTerminated)
         {
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _points + " points! Well done!");
+            Debug.Log("[GRTPressTower:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
     }
 
-
+    /// <summary>
+    /// - Update current level w.r.t. given direction.
+    /// - Then, Check solution
+    /// </summary>
+    /// <param name="direction"></param>
     public void UpdateMechanismAndCheckSolution(int direction)
-    {
-        UpdateMechanism(direction);
-        CheckSolution();
-    }
-
-    private void UpdateMechanism(int direction)
     {
         RotateThisLevelToNewPosition(_currentTowerLevelIndex, direction);
         CheckSolution();
