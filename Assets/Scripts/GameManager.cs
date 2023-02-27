@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
 {
     [Tooltip("Debug elements")]
     private bool _isDebugMode = false;            // allow to go directly to Escape Room
+    public TextMesh _homeMenuText; 
 
     public static GameManager Instance;
     private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
@@ -115,8 +116,6 @@ public class GameManager : MonoBehaviour
         set { _isEscapeRoomSlidersSolved = value; }
     }
 
-
-
     #endregion
 
     #region Prefabs
@@ -156,14 +155,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // Load Settings from GameSettings.json file
-        // TODO: do refactor that (1) LoadGame inside constructor? and (2) ... position = GameSettings.MarkersPostions[...]ssssssss
         GameSettings = new GameSettings();
-        GameSettings = GameSettings.LoadGameSettingsFromFile();
-        _markers[0].transform.position = GameSettings.MarkersPositions[0];
-        _markers[1].transform.position = GameSettings.MarkersPositions[1];
-        _markers[2].transform.position = GameSettings.MarkersPositions[2];
-
+        GameSettings.LoadMarkersPositionsFromFile();
         NumberOfTasksToSolve = 3;
         NumberOfTasksSolved = 0;
 
@@ -234,7 +227,7 @@ public class GameManager : MonoBehaviour
 
         // Add Listeners to CREATION buttons: 0=pin, 1=Save, 2=Reset, 3=Unfreeze, 4=Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
-        _creationButtons[2].ButtonPressed.AddListener(ResetTasks);
+        _creationButtons[2].ButtonPressed.AddListener(SetTasksPositionFromMarkers);
         _creationButtons[3].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
         _creationButtons[4].ButtonPressed.AddListener(SetStateHome);
         _creationButtons[5].ButtonPressed.AddListener(ResetGame);
@@ -426,31 +419,38 @@ public class GameManager : MonoBehaviour
 
     #region Creation Mode    
     /// <summary>
-    /// CREATION: entering the CREATION state makes its UI active, the tasks movable and set between markers.
+    /// Display UI and position tasks whe entering the CREATION state
     /// </summary>
     void OnEnterCreation()
     {
         Debug.Log("[GameManager:OnEnterCreationMode] Entered Creation Mode state");
-        // display Creation Mode menu, and markers
+
+        // UI
         _currentMenu = _menusUI[_menusUIIndexCreation];
         _currentMenu.SetActive(true);
 
-        // Unfreeze tasks by default
+        // Set _markers position from GameSettings
+        if (GameSettings.MarkersPositions.Count > 0)
+        {
+            Debug.Log("[GameManager:OnEnterCreation] Placing _markers w.r.t. settings...");
+            for (int i = 0; i < GameSettings.MarkersPositions.Count; i++)
+            {
+                _markers[i].transform.position = GameSettings.MarkersPositions[i];
+            }
+        }
+
+        // Tasks
         FreezeTasksInPlace(false);
-
-        // Display the tasks
         ShowMarkers(true);
-
         foreach (var task in _tasksPrefabs)
         {
             task.SetActive(true);
         }
-
-        ResetTasks();
+        SetTasksPositionFromMarkers();                 // Position the GRTs on their respective marker
     }
 
     /// <summary>
-    /// CREATION: when exit CREATION state, hide objects
+    /// Deactivate the UI and the tasks when exit CREATION state
     /// </summary>
     void OnExitCreation()
     {
@@ -469,12 +469,11 @@ public class GameManager : MonoBehaviour
 
 
     /// <summary>
-    /// CREATION: show visual markers and reset the tasks between those two markers.
+    /// Position the tasks w.r.t. the positions of the markers' GameObjects
     /// </summary>
-    private void ResetTasks()
+    private void SetTasksPositionFromMarkers()
     {
         Debug.Log("[GameManager:ResetTasks] Resetting tasks' position...");
-
         for (int markerIndex = 0; markerIndex < _markers.Count; markerIndex++)
         {
             _tasksPrefabs[markerIndex].SetActive(true);
@@ -485,24 +484,37 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Freeze (freezedTask=true) or unfreeze the tasks into their place by deactivating possible manipulation.
+    /// Deactivate script manipulator (freezedTask=true) to freeze tasks in place.
     /// </summary>
     private void FreezeTasksInPlace(bool freezedTask)
     {
+        // Unfreeze/Enable script manipulator
         foreach (var task in _tasksPrefabs)
         {
             ObjectManipulator objectManipulatorScript = task.GetComponent<ObjectManipulator>();
             if (objectManipulatorScript != null)
             {
-                objectManipulatorScript.enabled = freezedTask;
+                objectManipulatorScript.enabled = !freezedTask;   // not freezed => enabled manipulator script
             }
         }
 
-        CreationUpdateTasksStatus("Tasks: Frozen");
+
+        // Update UI
+        string tempText;
+        if (freezedTask)
+        {
+            tempText = "Tasks: Frozen";
+        }
+        else
+        {
+            tempText = "Tasks: Unfrozen";
+        }
+        CreationUpdateTasksStatus(tempText);
     }
 
     /// <summary>
-    /// Show (markerShown=true) or hide the markers: Enable possible interactions with the marker (simple helper, NOT the Spatial pin from WTL)
+    /// Display a marker (cube) per type of task.
+    /// These markers define (throught ResetTasksPosition) as the GRTs' position.
     /// </summary>
     private void ShowMarkers(bool markerShown)
     {
@@ -514,23 +526,23 @@ public class GameManager : MonoBehaviour
 
 
     /// <summary>
-    /// CREATION: Tasks are frozen, markers hidden
+    /// Save tasks' position to file, set escape room state to READY.
     /// </summary>
     public void SaveCreation()
     {
         FreezeTasksInPlace(true);
         ShowMarkers(false);
 
-        // TODO: do clean that code...!
-        List<Vector3> tempPositions = new List<Vector3>();
-        foreach(var marker in _markers)
-        {
-            tempPositions.Add(marker.transform.position);
-            Debug.Log("[GameManager:SaveCreation] tempPosition: " + tempPositions.Count);
-        }
-
-        GameSettings.MarkersPositions = tempPositions;
-
+        // TODO: clean
+        // Read positions from Scene's GameObjects and save them to GameSettings' file
+        //List<Vector3> tempPositions = new List<Vector3>();
+        //foreach(var marker in _markers)
+        //{
+        //    tempPositions.Add(marker.transform.position);
+        //    Debug.Log("[GameManager:SaveCreation] tempPosition: " + tempPositions.Count);
+        //}
+        //GameSettings.MarkersPositions = tempPositions;
+        GameSettings.SetMarkersPositionsFromList(_markers);
         GameSettings.SaveGameSettingsToFile();
 
         EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
@@ -538,7 +550,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// CREATION: in the UI, update the TextMesh element to indicate if tasks are free (unfrozen) or frozen.
+    /// Update text on the Creation UI
     /// </summary>
     private void CreationUpdateTasksStatus(string newText)
     {
@@ -556,6 +568,9 @@ public class GameManager : MonoBehaviour
         IsEscapeRoomButtonsSolved = false;
         IsEscapeRoomSlidersSolved = false;
         UpdateHomeButtonSliderForEscapeRoom();
+
+        //TODO: reset all counters
+
         Debug.Log("[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
 
     }

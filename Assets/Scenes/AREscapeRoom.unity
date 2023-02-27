@@ -459,6 +459,14 @@ PrefabInstance:
       propertyPath: ButtonPressed.m_PersistentCalls.m_Calls.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 7234170700183447317, guid: 596b6b00b4249514b98e3755ec9d41a4, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7247335084574251918, guid: 596b6b00b4249514b98e3755ec9d41a4, type: 3}
+      propertyPath: autoFollowAtDistance
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 596b6b00b4249514b98e3755ec9d41a4, type: 3}
 --- !u!1 &259211923 stripped
@@ -2948,7 +2956,7 @@ MonoBehaviour:
   handType: 3
   proximityType: 3
   executionOrder: 0
-  constraintOnRotation: -1
+  constraintOnRotation: 5
   useLocalSpaceForConstraint: 0
 --- !u!1 &1723714683
 GameObject:
@@ -3262,7 +3270,7 @@ MonoBehaviour:
   handType: 3
   proximityType: 3
   executionOrder: 0
-  constraintOnRotation: -1
+  constraintOnRotation: 5
   useLocalSpaceForConstraint: 0
 --- !u!1 &1790585509 stripped
 GameObject:
@@ -3353,6 +3361,11 @@ Transform:
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4252771961657242507, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
   m_PrefabInstance: {fileID: 1764211763}
+  m_PrefabAsset: {fileID: 0}
+--- !u!102 &1847710743 stripped
+TextMesh:
+  m_CorrespondingSourceObject: {fileID: 3157797776999215411, guid: 417332cd6536c404e92c486761ab6420, type: 3}
+  m_PrefabInstance: {fileID: 871275510}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1864302033 stripped
 GameObject:
@@ -4233,7 +4246,7 @@ MonoBehaviour:
   handType: 3
   proximityType: 3
   executionOrder: 0
-  constraintOnRotation: -1
+  constraintOnRotation: 5
   useLocalSpaceForConstraint: 0
 --- !u!1 &2119825422 stripped
 GameObject:
@@ -4352,6 +4365,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
+      propertyPath: _homeMenuText
+      value: 
+      objectReference: {fileID: 1847710743}
     - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
       propertyPath: _dataGRTPressClock
       value: 

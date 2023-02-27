@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -25,14 +24,44 @@ public class GameSettings
         set { _markersPositions = value; }
     }
 
+    /// <summary>
+    /// Constructor: set path and initialize empty MarkersPositions' list.
+    /// </summary>
     public GameSettings()
     {
         _fileName = "GameSettings.json";
         _fullPath = Path.Combine(Application.persistentDataPath, _fileName);
 
-        //Debug.Log("GameSettings created: full path = " + _fullPath + ", nb of tasks to solve=" + NumberOfTasksToSolve);
+        MarkersPositions = new List<Vector3>();
+
+        Debug.Log("[GameSettings] Created instance");
     }
 
+    /// <summary>
+    /// Set this instance's MarkersPositions from an existing GameSettings file.
+    /// </summary>
+    public void LoadMarkersPositionsFromFile()
+    {
+        if (!File.Exists(_fullPath)) return;
+
+        string json;
+        GameSettings temporaryGameSettings;
+
+        // Read file
+        json = File.ReadAllText(_fullPath);
+        temporaryGameSettings = JsonUtility.FromJson<GameSettings>(json);
+        
+        // Import/Load data to this instance
+        MarkersPositions = temporaryGameSettings.MarkersPositions;
+
+        Debug.Log("[GameSettings:LoadMarkersPositionsFromFile] new positions loaded.");
+    }
+
+    #region public methods
+
+    /// <summary>
+    /// Save this instance's public/SerializeField to a JSON on the Application.persistentDataPath
+    /// </summary>
     public void SaveGameSettingsToFile()
     {
         // Serialize
@@ -42,10 +71,18 @@ public class GameSettings
         Debug.Log("[GameSettings:SaveGameSettingsToFile] saved under " + _fullPath);
     }
 
-    public GameSettings LoadGameSettingsFromFile()
+    /// <summary>
+    /// Clear current list of markers' position, and 
+    /// Add new position from a list of GameObject.
+    /// </summary>
+    public void SetMarkersPositionsFromList(List<GameObject> markersGameObjects)
     {
-        string json = File.ReadAllText(_fullPath);
-        GameSettings newGameSettings = JsonUtility.FromJson<GameSettings>(json);
-        return newGameSettings;
+        MarkersPositions.Clear();
+        foreach(GameObject marker in markersGameObjects)
+        {
+            MarkersPositions.Add(marker.transform.position);
+        }
+        Debug.Log("[GameSettings:SetMarkersPositions] new positions set.");
     }
+    #endregion
 }
