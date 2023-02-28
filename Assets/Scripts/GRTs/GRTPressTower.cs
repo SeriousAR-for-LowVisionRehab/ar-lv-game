@@ -3,14 +3,11 @@ using UnityEngine;
 
 public class GRTPressTower : GRTPress
 {
-
+    #region Status
     private bool _isDebugMode = false;
+    #endregion
 
-    private bool _isGRTTerminated = false;
-
-    //
-    // GRT Mechanic
-    //
+    #region Mechanic
     private PressableButtonHoloLens2 buttonRight;
     private PressableButtonHoloLens2 buttonLeft;
 
@@ -18,22 +15,21 @@ public class GRTPressTower : GRTPress
     private float[] _solutionsDegrees = { 90.0f, 270.0f, 0.0f, 180.0f };
     private float _currentSelectionRotationY;
 
-    private Transform finishedCover;
+
     [Header("Tower's Components")]
     [SerializeField] private GameObject[] _towerComponents;
     [SerializeField] private Material _colorLevelOn;
     [SerializeField] private Material _colorLevelOff;
-    [SerializeField] private Material _coverFinished;
 
     [Header("Help Window")]
     [SerializeField] private GameObject _helpDialog;
     [SerializeField] private GameObject[] _shapeSolutionPerLevel;
+    #endregion
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
-        finishedCover = _support.Find("FinishedCover");
 
         // Set initial parameters and helper
         _currentTowerLevelIndex = 0;   // start at the bottom
@@ -59,11 +55,40 @@ public class GRTPressTower : GRTPress
 
     protected override void OnUpdateSolving()
     {
-        if (_isGRTTerminated)
+        if (IsGRTTerminated)
         {
             Debug.Log("[GRTPressTower:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
+    }
+
+    /// <summary>
+    /// Compare current selection's rotation against solution.
+    /// If correction solution, call function to prepare next level.
+    /// </summary>
+    protected override void CheckSolution()
+    {
+        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
+
+        if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
+        {
+            if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
+            {
+                IsGRTTerminated = true;
+                _helpDialog.transform.parent.gameObject.SetActive(false);
+                FinishedCover.gameObject.SetActive(true);
+                FinishedCover.GetComponent<Renderer>().material = CoverFinished;
+                return;
+            }
+
+            UpdateUI();
+            PrepareNextLevel();
+        }
+    }
+
+    public override void ResetGRT()
+    {
+        base.ResetGRT();
     }
 
     /// <summary>
@@ -77,28 +102,7 @@ public class GRTPressTower : GRTPress
         CheckSolution();
     }
 
-    /// <summary>
-    /// Compare current selection's rotation against solution.
-    /// If correction solution, call function to prepare next level.
-    /// </summary>
-    private void CheckSolution()
-    {
-        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
 
-        if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
-        {
-            if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
-            {
-                _isGRTTerminated = true;
-                _helpDialog.transform.parent.gameObject.SetActive(false);
-                finishedCover.gameObject.SetActive(true);
-                finishedCover.GetComponent<Renderer>().material = _coverFinished;
-                return;
-            }
-
-            PrepareNextLevel();
-        }
-    }
 
     /// <summary>
     /// Take an int to rotate the _towerComponents[towerLevelIndex] by 90°C
@@ -162,7 +166,10 @@ public class GRTPressTower : GRTPress
     /// </summary>
     private void UpdateComponentsHighlight(int towerLevelIndexToActivate)
     {
-        if (towerLevelIndexToActivate != 0) _towerComponents[towerLevelIndexToActivate - 1].GetComponent<Renderer>().material = _colorLevelOff;
+        if (towerLevelIndexToActivate != 0)
+        {
+            _towerComponents[towerLevelIndexToActivate - 1].GetComponent<Renderer>().material = _colorLevelOff;
+        }        
         _towerComponents[towerLevelIndexToActivate].GetComponent<Renderer>().material = _colorLevelOn;
     }
 

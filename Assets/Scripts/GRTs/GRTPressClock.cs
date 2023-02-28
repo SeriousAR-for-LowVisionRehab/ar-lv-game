@@ -19,22 +19,32 @@ using UnityEngine;
 /// </summary>
 public class GRTPressClock : GRTPress
 {
+    #region Status
     private bool _isDebugMode = false;
+    #endregion
 
+    #region Mechanic
     // Turns per GRT play
-    [SerializeField] private int _turnsLeft = 5;
-    private int TurnsLeft
+    private int _turnsLeft;
+    public override int TurnsLeft
     {
         get { return _turnsLeft; }
         set
         {
             _turnsLeft = value;
-            if (_turnsLeft == 0) _isGRTTerminated = true;
+            if (_turnsLeft == 0)
+            {
+                IsGRTTerminated = true;
+                FinishedCover.gameObject.SetActive(true);
+                FinishedCover.GetComponent<Renderer>().material = CoverFinished;
+                TextTurnsLeft.gameObject.SetActive(false);
+                TextTimeLeft.gameObject.SetActive(false);
+                TextPoints.gameObject.SetActive(false);
+            }
         }
     }
 
-    [SerializeField] private TextMesh _textTurnsLeft;
-    private bool _isGRTTerminated = false;                    // true if _turnsLeft <= 0
+    
 
     // Time per turn
     [SerializeField] private float _allowedTime = 20f;
@@ -48,19 +58,18 @@ public class GRTPressClock : GRTPress
             if (_remainingTime <= 0) _moveToNextTurn = true;
         }
     }
-    [SerializeField] private TextMesh _textTimeLeft;
-    private bool _moveToNextTurn = true;                      // true at start, and then only if _remainingTime <= 0
+    private bool _moveToNextTurn = true;                                     // true at start, and then only if _remainingTime <= 0
 
-    // Mechanics of the clock
-    private int _rotationIndex;        // an index chosen at random: for rotation, and piece on clock
-    [SerializeField] private int[] _rotationAngles = { 0, -90, -180, -270 };   // assume four pieces displayed    
+    // Clock
+    private int _rotationIndex;                                              // an index chosen at random: for rotation, and piece on clock
+    [SerializeField] private int[] _rotationAngles = { 0, -90, -180, -270 }; // assume four pieces displayed    
     [SerializeField] private GameObject _arrow;
     private Vector3 _arrowInitPosition;
     private Quaternion _arrowInitRotation;
     [SerializeField] private GameObject[] _piecesOnClock;
 
-    // Mechanics for the user
-    [SerializeField] private GameObject[] _piecesToSelect;   // what the user should select
+    // User
+    [SerializeField] private GameObject[] _piecesToSelect;                   // what the user should select
     private PressableButtonHoloLens2 buttonRight;
     private PressableButtonHoloLens2 buttonLeft;
     private PressableButtonHoloLens2 buttonValidate;
@@ -78,11 +87,13 @@ public class GRTPressClock : GRTPress
     private Transform _currentSelectionHighlight;
     private Transform _currentClockPieceHighlight;
     private bool _isSelectionValidated = false;
+    #endregion
 
-    // Data to be collected
+    #region Data
     private int _NbClickButtonLeft, _NbClickButtonRight, _NbClickButtonValidate;
+    #endregion
 
-    
+
     protected override void Start()
     {
         base.Start();
@@ -100,6 +111,9 @@ public class GRTPressClock : GRTPress
         _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
         _rotationIndex = 0;
         _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
+
+        // Counters
+        TurnsLeft = 5;
 
         // Debug Mode
         if (_isDebugMode)
@@ -123,12 +137,12 @@ public class GRTPressClock : GRTPress
         base.OnUpdateSolving();
         _arrowInitPosition = _arrow.transform.position;
 
-        if (!_isGRTTerminated)
+        if (!IsGRTTerminated)
         {
             if (!_moveToNextTurn)
             {
                 RemainingTime -= Time.deltaTime;
-                _textTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
+                TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
 
                 if (_isSelectionValidated)
                 {
@@ -146,10 +160,42 @@ public class GRTPressClock : GRTPress
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
-        
-
     }
 
+    /// <summary>
+    /// Set _moveToNextTurn to true when validated selection is correct.
+    /// </summary>
+    protected override void CheckSolution()
+    {
+        if (_piecesOnClock[_rotationIndex].name == _piecesToSelect[SelectionIndex].name)
+        {
+            // Sound FX
+            // TODO: add win sound
+
+            // UI
+            Points += 1;
+            TextPoints.text = $"Points: {Mathf.Round(Points)}";
+
+            // Game Mechanic
+            _moveToNextTurn = true;
+            _currentSelectionHighlight.gameObject.SetActive(false);
+        }
+        else
+        {
+            //TODO: add lose sound
+        }
+
+        // Player's selection
+        _isSelectionValidated = false;
+    }
+
+    public override void ResetGRT()
+    {
+        base.ResetGRT();
+
+        _selectionIndex = 0;
+        _rotationIndex = 0;
+    }
 
     /// <summary>
     /// Reset the clock (arrow and piece), selected piece, and time,
@@ -159,7 +205,7 @@ public class GRTPressClock : GRTPress
     {
         // UI
         TurnsLeft -= 1;
-        _textTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
+        TextTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
         RemainingTime = _allowedTime;
 
         // Arrow
@@ -240,23 +286,4 @@ public class GRTPressClock : GRTPress
         _NbClickButtonRight += 1;
     }
 
-    /// <summary>
-    /// Set _moveToNextTurn to true when validated selection is correct.
-    /// </summary>
-    private void CheckSolution()
-    {
-        if(_piecesOnClock[_rotationIndex].name == _piecesToSelect[SelectionIndex].name)
-        {
-            // UI
-            Points += 1;
-            TextPoints.text = $"Points: {Mathf.Round(Points)}";
-            
-            // Game Mechanic
-            _moveToNextTurn = true;
-            _currentSelectionHighlight.gameObject.SetActive(false);
-        }
-
-        // Player's selection
-        _isSelectionValidated = false;
-    }
 }

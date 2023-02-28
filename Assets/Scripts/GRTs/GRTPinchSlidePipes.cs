@@ -3,28 +3,32 @@ using UnityEngine;
 
 public class GRTPinchSlidePipes : GRTPinchSlide
 {
+    #region Status
     private bool _isDebugMode = false;
-
-    private bool _isGRTTerminated = false;
     private bool _isNextSliderReady = false;
+    #endregion
 
-    //
-    // GRT Mechanic
-    //
+    #region Mechanic
     [Header("Main Objects")]
     [SerializeField] private GameObject _key;
     [SerializeField] private GameObject _endGoal;
     [SerializeField] private GameObject[] _keyPositions;  // where the key will move
-    private Transform finishedCover;
-    [SerializeField] private Material _coverFinished;
+    private Vector3 _keyOriginalPosition;
+
+    // private Transform finishedCover;
+    // [SerializeField] private Material _coverFinished;
 
     private int _currentSliderIndex;
     private PinchSlider _currentSlider;
+    #endregion
 
     protected override void Start()
     {
         base.Start();
-        finishedCover = _support.Find("FinishedCover");
+
+        _keyOriginalPosition = _key.transform.position;
+
+//        finishedCover = _support.Find("FinishedCover");
 
         // Slider
         foreach (var button in _controller.ControllerButtons)
@@ -46,7 +50,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
 
     protected override void OnUpdateSolving()
     {
-        if(_isGRTTerminated)
+        if(IsGRTTerminated)
         {
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _currentSliderIndex + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
@@ -59,11 +63,12 @@ public class GRTPinchSlidePipes : GRTPinchSlide
                 MoveKeyToNextPosition();    
                 _currentSlider.gameObject.SetActive(false);                            // Deactivate Used Slider
                 _currentSliderIndex += 1;                                              // Increment Slider
-                UpdatePointsGUI();                                                     // Update the Number of Points on the UI
+                Points = _currentSliderIndex;
+                UpdateUI();
 
                 // Call CheckSolution before preparing next move:
                 CheckSolution();
-                if (_isGRTTerminated) return;
+                if (IsGRTTerminated) return;
 
                 // Prepare Next Move:
                 _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
@@ -73,14 +78,24 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         }
     }
 
-    private void CheckSolution()
+    protected override void CheckSolution()
     {
         if (_currentSliderIndex == _keyPositions.Length)
         {
-            _isGRTTerminated = true;
-            finishedCover.gameObject.SetActive(true);
-            finishedCover.GetComponent<Renderer>().material = _coverFinished;
+            IsGRTTerminated = true;
+            FinishedCover.gameObject.SetActive(true);
+            FinishedCover.GetComponent<Renderer>().material = CoverFinished;
         }
+    }
+
+    public override void ResetGRT()
+    {
+        base.ResetGRT();
+        _key.transform.position = _keyOriginalPosition;
+        _currentSliderIndex = 0;
+        _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
+        _currentSlider.gameObject.SetActive(true);
+
     }
 
     /// <summary>
@@ -92,6 +107,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         if (_currentSlider.SliderValue == 1)
         {
             _isNextSliderReady = true;
+            _currentSlider.SliderValue = 0;
         }
         else
         {
@@ -109,12 +125,4 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         _key.transform.position = new Vector3(_keyNextPos.x, _keyNextPos.y, _key.transform.position.z);
     }
 
-    /// <summary>
-    /// Update the text value, based on the slider index value.
-    /// </summary>
-    private void UpdatePointsGUI()
-    {
-        Points = _currentSliderIndex;
-        TextPoints.text =  $"Points: {Mathf.Round(Points)}";
-    }
 }

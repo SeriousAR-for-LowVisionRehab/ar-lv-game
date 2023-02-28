@@ -2,24 +2,26 @@ using UnityEngine;
 
 public class GRTPressPipes : GRTPress
 {
+    #region Status
     private bool _isDebugMode = false;
+    #endregion
 
-    [SerializeField]  private bool _isGRTTerminated = false;
-
-    //
-    // GRT Mechanic
-    //
+    #region Mechanic
     [Header("Main Objects")]
     [SerializeField] private GameObject _key;
     [SerializeField] private GameObject _endGoal;
+    private Vector3 _keyOriginalPosition;
 
     private int _currentButtonIndex;
     private Transform _currentButtonTransform;
+    #endregion
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
+
+        _keyOriginalPosition = _key.transform.position;
 
         // Add listeners to controller's buttons
         foreach(var btn in _controller.ControllerButtons)
@@ -38,7 +40,7 @@ public class GRTPressPipes : GRTPress
 
     protected override void OnUpdateSolving()
     {
-        if (!_isGRTTerminated)
+        if (!IsGRTTerminated)
         {
             CheckSolution();
         }
@@ -52,14 +54,29 @@ public class GRTPressPipes : GRTPress
     /// <summary>
     /// Set the variable _isGRTTerminated to true once all buttons have been clicked
     /// </summary>
-    private void CheckSolution()
+    protected override void CheckSolution()
     {
         // index from 0 to 6 + final extra increment = 7 = nb of buttons
         if (_currentButtonIndex == _controller.ControllerButtons.Length)
         {
-            _isGRTTerminated = true;
+            IsGRTTerminated = true;
+            FinishedCover.gameObject.SetActive(true);
+            FinishedCover.GetComponent<Renderer>().material = CoverFinished;
             Debug.Log("[GRTPerssPipes:CheckSolution] Check solution result = GRT is terminated!");
         }
+    }
+
+    public override void ResetGRT()
+    {
+        base.ResetGRT();
+
+        foreach(var btn in _controller.ControllerButtons)
+        {
+            btn.gameObject.SetActive(true);
+        }
+
+        _key.transform.position = _keyOriginalPosition;
+        _currentButtonIndex = 0;
     }
 
     /// <summary>
@@ -80,16 +97,8 @@ public class GRTPressPipes : GRTPress
         _currentButtonIndex += 1;
 
         // Points
-        UpdatePointsGUI();
-    }
-
-    /// <summary>
-    /// Increment by one the points and update the text value
-    /// </summary>
-    private void UpdatePointsGUI()
-    {
         Points += 1;
-        TextPoints.text = $"Points: {Mathf.Round(Points)}";
+        UpdateUI();
     }
 
 }

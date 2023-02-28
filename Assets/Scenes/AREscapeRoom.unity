@@ -148,7 +148,7 @@ MonoBehaviour:
   _support: {fileID: 0}
   _grtCore: {fileID: 0}
   _buttonStart: {fileID: 0}
-  _textPoints: {fileID: 0}
+  _textPoints: {fileID: 1764211764}
   _towerComponents:
   - {fileID: 1036905073}
   - {fileID: 1790585509}
@@ -1019,6 +1019,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+--- !u!102 &640958631 stripped
+TextMesh:
+  m_CorrespondingSourceObject: {fileID: 3795053824162023390, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+  m_PrefabInstance: {fileID: 640958630}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &640958632 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6828736552320424976, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
@@ -3083,6 +3088,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+--- !u!102 &1764211764 stripped
+TextMesh:
+  m_CorrespondingSourceObject: {fileID: 3795053824162023390, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+  m_PrefabInstance: {fileID: 1764211763}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1781924008
 GameObject:
   m_ObjectHideFlags: 0
@@ -3387,8 +3397,7 @@ MonoBehaviour:
   _support: {fileID: 0}
   _grtCore: {fileID: 0}
   _buttonStart: {fileID: 0}
-  _textPoints: {fileID: 0}
-  _isGRTTerminated: 0
+  _textPoints: {fileID: 640958631}
   _towerComponents:
   - {fileID: 1945390276}
   - {fileID: 513161900}
@@ -3655,9 +3664,7 @@ MonoBehaviour:
   _grtCore: {fileID: 0}
   _buttonStart: {fileID: 0}
   _textPoints: {fileID: 283294133}
-  _turnsLeft: 5
   _textTurnsLeft: {fileID: 469027107}
-  _allowedTime: 20
   _textTimeLeft: {fileID: 1344096945}
   _rotationAngles: 00000000a6ffffff4cfffffff2feffff
   _arrow: {fileID: 986398896}

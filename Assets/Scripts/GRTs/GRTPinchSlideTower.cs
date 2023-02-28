@@ -17,13 +17,11 @@ using UnityEngine;
 /// </summary>
 public class GRTPinchSlideTower : GRTPinchSlide
 {
+    #region Status
     private bool _isDebugMode = false;
+    #endregion Status
 
-    [SerializeField] private bool _isGRTTerminated = false;
-
-    //
-    // GRT Mechanic
-    //
+    #region Mechanic
     private PinchSlider _sliderController;
     private float _currentSliderValue;
     private int _currentTowerLevelIndex;
@@ -40,6 +38,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     [Header("Help Window")]
     [SerializeField] private GameObject _helpDialog;
     [SerializeField] private GameObject[] _shapeSolutionPerLevel;
+    #endregion
 
     protected override void Start()
     {
@@ -71,11 +70,41 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
     protected override void OnUpdateSolving()
     {
-        if (_isGRTTerminated)
+        if (IsGRTTerminated)
         {
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
+    }
+
+    /// <summary>
+    /// Compare current selection's rotation against solution.
+    /// If correction solution, call function to prepare next level.
+    /// </summary>
+    protected override void CheckSolution()
+    {
+        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
+
+        if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
+        {
+            if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
+            {
+                IsGRTTerminated = true;
+                _helpDialog.transform.parent.gameObject.SetActive(false);
+                finishedCover.gameObject.SetActive(true);
+                finishedCover.GetComponent<Renderer>().material = _coverFinished;
+                return;
+            }
+
+            UpdateUI();
+            PrepareNextLevel();
+        }
+    }
+
+    public override void ResetGRT()
+    {
+        base.ResetGRT();
+        _currentSliderValue = 0.5f;
     }
 
     public void UpdateMechanismAndCheckSolution()
@@ -98,29 +127,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
             RotateThisLevelToNewPosition(_currentTowerLevelIndex, sliderChange);
         }
 
-    }
-
-    /// <summary>
-    /// Compare current selection's rotation against solution.
-    /// If correction solution, call function to prepare next level.
-    /// </summary>
-    private void CheckSolution()
-    {
-        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
-
-        if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
-        {
-            if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
-            {
-                _isGRTTerminated = true;
-                _helpDialog.transform.parent.gameObject.SetActive(false);
-                finishedCover.gameObject.SetActive(true);
-                finishedCover.GetComponent<Renderer>().material = _coverFinished;
-                return;
-            }
-
-            PrepareNextLevel();
-        }
     }
 
     /// <summary>

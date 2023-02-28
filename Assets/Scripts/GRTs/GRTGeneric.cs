@@ -22,6 +22,13 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 {
     public FiniteStateMachine<GRTState> GRTStateMachine;
 
+    private bool _isGRTTerminated;
+    public bool IsGRTTerminated
+    {
+        get { return _isGRTTerminated; }
+        set { _isGRTTerminated = value; }
+    }
+
     [Header("GRT Components")]
     [Tooltip("These GameObjects are find automatically in Awake() function.")]
     [SerializeField] protected Transform _support;                // on what the GRT itself sits on.
@@ -29,15 +36,34 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     [SerializeField] protected GRTController<T> _controller;      // what the player interacts with to change GRT's status
     [SerializeField] protected Transform _buttonStart;            // Effectively start the GRT (any count down, counting, etc.)
 
+    private Transform _finishedCover;
+    public Transform FinishedCover
+    {
+        get { return _finishedCover; }
+        private set { _finishedCover = value; }
+    }
+    [SerializeField] private Material _coverFinished;
+    public Material CoverFinished
+    {
+        get { return _coverFinished; }
+    }
 
     #region Data
+    // Time
     private float _timeInGRT;
-
     public float TimeInGRT
     {
         get { return _timeInGRT; }
         set { _timeInGRT = value; }
     }
+
+    [SerializeField] private TextMesh _textTimeLeft;
+    public TextMesh TextTimeLeft
+    {
+        get { return _textTimeLeft; }
+    }
+
+    // Points
     private int _points;
     public int Points
     {
@@ -50,6 +76,16 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         get { return _textPoints; }
         set { _textPoints = value; }
     }
+
+    // Turns Left
+    public virtual int TurnsLeft { get; set;}
+
+    [SerializeField] private TextMesh _textTurnsLeft;
+    public TextMesh TextTurnsLeft
+    {
+        get { return _textTurnsLeft; }
+    }
+
     #endregion
 
     #region Unity methods
@@ -122,8 +158,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         _buttonStart.gameObject.GetComponent<PressableButton>().ButtonPressed.AddListener(SetGRTStateToSolving);
         _controller.Parent.gameObject.SetActive(false);
 
+        FinishedCover = _support.Find("FinishedCover");
+
         // Data
-        _timeInGRT = 0f;
+        TimeInGRT = 0f;
     }
 
     private void Update()
@@ -219,6 +257,35 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     public void SetGRTStateToSolving()
     {
         GRTStateMachine.SetCurrentState(GRTState.SOLVING);
+    }
+    #endregion
+
+    #region GRT Methods
+    protected abstract void CheckSolution();
+    public virtual void ResetGRT()
+    {
+        // Status
+        IsGRTTerminated = false;
+
+        // UI
+        Points = 0;
+        TextPoints.text = $"Points: {Mathf.Round(Points)}";
+        TimeInGRT = 0.0f;
+
+        // GameObjects
+        _buttonStart.gameObject.SetActive(true);
+        FinishedCover.gameObject.SetActive(false);
+
+        // FSM State
+        GRTStateMachine.SetCurrentState(GRTState.READY);
+    }
+
+    /// <summary>
+    /// Update the text components of the UI
+    /// </summary>
+    public virtual void UpdateUI()
+    {
+        TextPoints.text = $"Points: {Mathf.Round(Points)}";
     }
     #endregion
 }

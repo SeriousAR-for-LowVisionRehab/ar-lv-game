@@ -423,8 +423,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void OnEnterCreation()
     {
-        Debug.Log("[GameManager:OnEnterCreationMode] Entered Creation Mode state");
-
         // UI
         _currentMenu = _menusUI[_menusUIIndexCreation];
         _currentMenu.SetActive(true);
@@ -447,6 +445,8 @@ public class GameManager : MonoBehaviour
             task.SetActive(true);
         }
         SetTasksPositionFromMarkers();                 // Position the GRTs on their respective marker
+
+        Debug.Log("[GameManager:OnEnterCreationMode] UI activated. _markers position set from settings. Tasks placed on markers.");
     }
 
     /// <summary>
@@ -473,7 +473,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void SetTasksPositionFromMarkers()
     {
-        Debug.Log("[GameManager:ResetTasks] Resetting tasks' position...");
+        // one marker per type of task (pipes, clock, and tower)
+        // e.g. marker[0] is for pipes with buttons (prefab 0) and with sliders (prefab 3)
         for (int markerIndex = 0; markerIndex < _markers.Count; markerIndex++)
         {
             _tasksPrefabs[markerIndex].SetActive(true);
@@ -481,6 +482,7 @@ public class GameManager : MonoBehaviour
             _tasksPrefabs[markerIndex].transform.position = _markers[markerIndex].transform.position;
             _tasksPrefabs[markerIndex + 3].transform.position = _markers[markerIndex].transform.position;
         }
+        Debug.Log("[GameManager:SetTasksPositionFromMarkers] Tasks set on markers");
     }
 
     /// <summary>
@@ -570,6 +572,11 @@ public class GameManager : MonoBehaviour
         UpdateHomeButtonSliderForEscapeRoom();
 
         //TODO: reset all counters
+        foreach(var grt in _tasksPrefabs)
+        {
+            if(grt.GetComponent<GRTPress>() != null) grt.GetComponent<GRTPress>().ResetGRT();
+            if(grt.GetComponent<GRTPinchSlide>() != null) grt.GetComponent<GRTPinchSlide>().ResetGRT();
+        }
 
         Debug.Log("[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
 

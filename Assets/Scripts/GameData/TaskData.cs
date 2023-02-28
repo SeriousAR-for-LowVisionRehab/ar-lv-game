@@ -21,15 +21,6 @@ public class TaskData
         TaskID = taskID;
     }
 
-
-    /// <summary>
-    /// For debug purpose, create fake and fixed data to the current instance of TaskData.
-    /// </summary>
-    public void DebugCreateFakeData()
-    {
-
-    }
-
     /// <summary>
     /// Data of a Click
     /// </summary>
