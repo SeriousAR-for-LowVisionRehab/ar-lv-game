@@ -28,12 +28,10 @@ public class GRTPinchSlideTower : GRTPinchSlide
     private float[] _solutionsDegrees = { 90.0f, 270.0f, 0.0f, 180.0f };
     private float _currentSelectionRotationY;
 
-    private Transform finishedCover;
     [Header("Tower's Components")]
     [SerializeField] private GameObject[] _towerComponents;
     [SerializeField] private Material _colorLevelOn;
     [SerializeField] private Material _colorLevelOff;
-    [SerializeField] private Material _coverFinished;
 
     [Header("Help Window")]
     [SerializeField] private GameObject _helpDialog;
@@ -43,8 +41,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
     protected override void Start()
     {
         base.Start();
-
-        finishedCover = _support.Find("FinishedCover");
 
         // Set initial parameters and helper
         _currentTowerLevelIndex = 0;   // start at the bottom
@@ -91,8 +87,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
             {
                 IsGRTTerminated = true;
                 _helpDialog.transform.parent.gameObject.SetActive(false);
-                finishedCover.gameObject.SetActive(true);
-                finishedCover.GetComponent<Renderer>().material = _coverFinished;
+                FinishedCover.gameObject.SetActive(true);
+                FinishedCover.GetComponent<Renderer>().material = CoverFinished;
                 return;
             }
 

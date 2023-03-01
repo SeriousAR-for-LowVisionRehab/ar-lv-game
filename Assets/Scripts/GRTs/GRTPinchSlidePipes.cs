@@ -15,9 +15,6 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     [SerializeField] private GameObject[] _keyPositions;  // where the key will move
     private Vector3 _keyOriginalPosition;
 
-    // private Transform finishedCover;
-    // [SerializeField] private Material _coverFinished;
-
     private int _currentSliderIndex;
     private PinchSlider _currentSlider;
     #endregion
@@ -94,6 +91,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         _key.transform.position = _keyOriginalPosition;
         _currentSliderIndex = 0;
         _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
+        _currentSlider.SliderValue = 0;
         _currentSlider.gameObject.SetActive(true);
 
     }

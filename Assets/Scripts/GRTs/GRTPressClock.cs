@@ -42,14 +42,11 @@ public class GRTPressClock : GRTPress
                 TextPoints.gameObject.SetActive(false);
             }
         }
-    }
-
-    
+    }    
 
     // Time per turn
-    [SerializeField] private float _allowedTime = 20f;
     private float _remainingTime;
-    private float RemainingTime
+    public override float RemainingTime
     {
         get { return _remainingTime; }
         set
@@ -114,6 +111,7 @@ public class GRTPressClock : GRTPress
 
         // Counters
         TurnsLeft = 5;
+        AllowedTime = 30.0f;
 
         // Debug Mode
         if (_isDebugMode)
@@ -195,6 +193,7 @@ public class GRTPressClock : GRTPress
 
         _selectionIndex = 0;
         _rotationIndex = 0;
+        _isSelectionValidated = false;
     }
 
     /// <summary>
@@ -206,11 +205,11 @@ public class GRTPressClock : GRTPress
         // UI
         TurnsLeft -= 1;
         TextTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
-        RemainingTime = _allowedTime;
+        RemainingTime = AllowedTime;
 
         // Arrow
         ResetArrow();
-        _rotationIndex = GenerateRotationIndex();
+        _rotationIndex += 1;  // GenerateRotationIndex();
         PlaceArrow();
         
         // Player's selection
@@ -262,6 +261,8 @@ public class GRTPressClock : GRTPress
 
         // Data
         _NbClickButtonValidate += 1;
+        
+        NbSuccessClicks += 1;
     }
 
     private void MoveCursorLeft()
@@ -271,8 +272,11 @@ public class GRTPressClock : GRTPress
         SelectionIndex -= 1;
         _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
         _currentSelectionHighlight.gameObject.SetActive(true);
+
         // Data
         _NbClickButtonLeft += 1;
+
+        NbSuccessClicks += 1;
     }
 
     private void MoveCursorRight()
@@ -282,8 +286,11 @@ public class GRTPressClock : GRTPress
         SelectionIndex += 1;
         _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
         _currentSelectionHighlight.gameObject.SetActive(true);
+
         // Data
         _NbClickButtonRight += 1;
+
+        NbSuccessClicks += 1;
     }
 
 }

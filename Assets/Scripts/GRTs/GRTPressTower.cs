@@ -98,6 +98,10 @@ public class GRTPressTower : GRTPress
     /// <param name="direction"></param>
     public void UpdateMechanismAndCheckSolution(int direction)
     {
+        // Clicks
+        NbSuccessClicks += 1;
+
+        // Update
         RotateThisLevelToNewPosition(_currentTowerLevelIndex, direction);
         CheckSolution();
     }

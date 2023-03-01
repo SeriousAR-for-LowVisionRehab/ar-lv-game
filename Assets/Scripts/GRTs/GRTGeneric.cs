@@ -57,6 +57,14 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         set { _timeInGRT = value; }
     }
 
+    private float _allowedTime;
+    public float AllowedTime
+    {
+        get { return _allowedTime; }
+        set { _allowedTime = value; }
+    }
+    public virtual float RemainingTime { get; set; }
+
     [SerializeField] private TextMesh _textTimeLeft;
     public TextMesh TextTimeLeft
     {
@@ -85,6 +93,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     {
         get { return _textTurnsLeft; }
     }
+
 
     #endregion
 
@@ -267,10 +276,15 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         // Status
         IsGRTTerminated = false;
 
-        // UI
-        Points = 0;
-        TextPoints.text = $"Points: {Mathf.Round(Points)}";
+        // UI        
         TimeInGRT = 0.0f;
+        TextTurnsLeft.gameObject.SetActive(true);
+        TextTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
+        TextTimeLeft.gameObject.SetActive(true);
+        TextTimeLeft.text = $"Time Left: {Mathf.Round(AllowedTime)}";
+        Points = 0;
+        TextPoints.gameObject.SetActive(true);
+        TextPoints.text = $"Points: {Mathf.Round(Points)}";
 
         // GameObjects
         _buttonStart.gameObject.SetActive(true);

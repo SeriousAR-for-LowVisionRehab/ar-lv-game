@@ -1,3 +1,4 @@
+using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 
 public class GRTPressPipes : GRTPress
@@ -7,12 +8,47 @@ public class GRTPressPipes : GRTPress
     #endregion
 
     #region Mechanic
+    // Time
+    private int _turnsLeft;
+    public override int TurnsLeft
+    {
+        get { return _turnsLeft; }
+        set
+        {
+            _turnsLeft = value;
+            if (_turnsLeft == 0)
+            {
+                IsGRTTerminated = true;
+                FinishedCover.gameObject.SetActive(true);
+                FinishedCover.GetComponent<Renderer>().material = CoverFinished;
+                TextTurnsLeft.gameObject.SetActive(false);
+                TextTimeLeft.gameObject.SetActive(false);
+                TextPoints.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    // Time per turn
+    private float _remainingTime;
+    public override float RemainingTime
+    {
+        get { return _remainingTime; }
+        set
+        {
+            _remainingTime = value;
+            if (_remainingTime <= 0) _moveToNextTurn = true;
+        }
+    }
+    private bool _moveToNextTurn = true;                                     // true at start, and then only if _remainingTime <= 0
+
+    // Pipes
     [Header("Main Objects")]
     [SerializeField] private GameObject _key;
     [SerializeField] private GameObject _endGoal;
     private Vector3 _keyOriginalPosition;
 
     private int _currentButtonIndex;
+    private PressableButtonHoloLens2 _currentButton;
     private Transform _currentButtonTransform;
     #endregion
 
@@ -21,13 +57,20 @@ public class GRTPressPipes : GRTPress
     {
         base.Start();
 
+        AllowedTime = 45.0f;
+        RemainingTime = AllowedTime;
         _keyOriginalPosition = _key.transform.position;
 
         // Add listeners to controller's buttons
         foreach(var btn in _controller.ControllerButtons)
         {
             btn.ButtonPressed.AddListener(MoveKeyToThisButtonAndHideIt);
+            btn.gameObject.SetActive(false);
         }
+
+        _currentButtonIndex = 0;
+        _currentButton = _controller.ControllerButtons[_currentButtonIndex];
+        _currentButton.gameObject.SetActive(true);
 
         // Debug Mode
         if (_isDebugMode)
@@ -42,6 +85,9 @@ public class GRTPressPipes : GRTPress
     {
         if (!IsGRTTerminated)
         {
+            RemainingTime -= Time.deltaTime;
+            TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
+
             CheckSolution();
         }
         else
@@ -69,14 +115,10 @@ public class GRTPressPipes : GRTPress
     public override void ResetGRT()
     {
         base.ResetGRT();
-
-        foreach(var btn in _controller.ControllerButtons)
-        {
-            btn.gameObject.SetActive(true);
-        }
-
         _key.transform.position = _keyOriginalPosition;
         _currentButtonIndex = 0;
+        _currentButton = _controller.ControllerButtons[_currentButtonIndex];
+        _currentButton.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -86,19 +128,24 @@ public class GRTPressPipes : GRTPress
     /// </summary>
     private void MoveKeyToThisButtonAndHideIt()
     {
-        _currentButtonTransform = _controller.ControllerButtons[_currentButtonIndex].transform;
+        _currentButtonTransform = _currentButton.transform;
         var _btnPos = _currentButtonTransform.position;
 
         // Key
         _key.transform.position = new Vector3(_btnPos.x, _btnPos.y, _key.transform.position.z);
         
         // Button
-        _currentButtonTransform.gameObject.SetActive(false);
+        _currentButton.gameObject.SetActive(false);
         _currentButtonIndex += 1;
+        _currentButton = _controller.ControllerButtons[_currentButtonIndex];
+        _currentButton.gameObject.SetActive(true);
 
         // Points
         Points += 1;
         UpdateUI();
+
+        // Clicks
+        NbSuccessClicks += 1;
     }
 
 }

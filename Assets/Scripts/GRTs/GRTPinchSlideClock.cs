@@ -30,9 +30,8 @@ public class GRTPinchSlideClock : GRTPinchSlide
     }
 
     // Time per turn
-    private float _allowedTime = 30f;
     private float _remainingTime;
-    private float RemainingTime
+    public override float RemainingTime
     {
         get { return _remainingTime; }
         set
@@ -98,6 +97,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
 
         // Counters
         TurnsLeft = 5;
+        AllowedTime = 30.0f;
 
         // Debug Mode
         if (_isDebugMode)
@@ -174,7 +174,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         // UI
         TurnsLeft -= 1;
         TextTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
-        RemainingTime = _allowedTime;
+        RemainingTime = AllowedTime;
 
         // Arrow
         ResetArrow();
