@@ -5,5 +5,12 @@ using Microsoft.MixedReality.Toolkit.UI;
 /// </summary>
 public abstract class GRTPinchSlide : GRTGeneric<PinchSlider>
 {
-    public enum SliderOrientation { Horizontal, Vertical }
+    #region Data
+    private int _nbSuccessPinches;
+    public virtual int NbSuccessPinches
+    {
+        get { return _nbSuccessPinches; }
+        set { _nbSuccessPinches = value; }
+    }
+    #endregion
 }

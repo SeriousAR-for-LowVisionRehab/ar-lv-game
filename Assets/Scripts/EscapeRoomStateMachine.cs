@@ -112,10 +112,6 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Entered Ready mode");
         // Show only the rooms that are (ready and) not solved yet
         GameManager.Instance.UpdateHomeButtonSliderForEscapeRoom();
-
-        // Create Player Data File, and start Global Duration counter
-        var gameManagerInstance = GameManager.Instance;
-        gameManagerInstance.PlayerData = new PlayerData(gameManagerInstance.NumberOfTasksToSolve);
     }
 
     void OnExitReady()

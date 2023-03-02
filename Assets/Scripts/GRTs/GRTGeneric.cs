@@ -22,6 +22,14 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 {
     public FiniteStateMachine<GRTState> GRTStateMachine;
 
+    private bool _isDebugMode = false;
+
+    public bool IsDebugMode
+    {
+        get { return _isDebugMode; }
+        set { _isDebugMode = value; }
+    }
+
     private bool _isGRTTerminated;
     public bool IsGRTTerminated
     {
@@ -52,8 +60,8 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     private TaskData _taskData;
     public TaskData TaskData
     {
-        get;
-        set;
+        get { return _taskData; }
+        set { _taskData = value; }
     }
 
     // Time
@@ -178,6 +186,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
         // Data
         TaskData = new TaskData(this.name);
+        Debug.LogAssertion("[GRTGeneric:" + this.name + "] TaskData created with ID=" + this.name);
 
         TimeInGRT = 0f;
     }
@@ -241,7 +250,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     virtual protected void OnUpdateSolving()
     {
         // Data
-        _timeInGRT += Time.deltaTime;
+        TimeInGRT += Time.deltaTime;
     }
 
     /// <summary>
@@ -252,22 +261,25 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     /// </summary>
     private void OnEnterSolved()
     {
-        // Increase counters
+        // Data
+        TaskData.TaskDuration = TimeInGRT;
+        TaskData.IsSolved = true;
+
+        GameManager.Instance.PlayerData.DataOfTasks.Add(TaskData);
+        Debug.LogAssertion("[GRTGeneric:OnEnterSolved] PlayerData.DataOfTasks count = " + GameManager.Instance.PlayerData.DataOfTasks.Count);
+
+        // Counters
         GameManager.Instance.NumberOfTasksSolved += 1;
         if(!GameManager.Instance.IsEscapeRoomButtonsSolved || !GameManager.Instance.IsEscapeRoomSlidersSolved)
         {
+            // Move to next task if escape room is still not solved
             GameManager.Instance.EscapeRoomStateMachine.NextTaskToSolveIndex += 1;
         }
         
         // Mechanism
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfTasksSolved + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
-        GRTStateMachine.SetCurrentState(GRTState.SOLVED);
+        // GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         _controller.Parent.gameObject.SetActive(false);
-
-        // Data
-        TaskData.TimeOnTask = TimeInGRT;
-
-        GameManager.Instance.PlayerData.DataOfTasks.Add(TaskData);
     }
 
     private void OnExitSolved()

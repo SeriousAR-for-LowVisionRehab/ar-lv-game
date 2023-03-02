@@ -34,7 +34,6 @@ public class GameManager : MonoBehaviour
     [Tooltip("Debug elements")]
     private bool _isDebugMode = false;            // allow to go directly to Escape Room
     public TextMesh _homeMenuText; 
-
     public static GameManager Instance;
     private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
     public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
@@ -116,6 +115,19 @@ public class GameManager : MonoBehaviour
         set { _isEscapeRoomSlidersSolved = value; }
     }
 
+    private bool _isExperimentDone = false;
+    public bool IsExperimentDone
+    {
+        get { return _isExperimentDone; }
+        private set
+        {
+            if(IsEscapeRoomButtonsSolved & IsEscapeRoomSlidersSolved)
+            {
+                _isExperimentDone = true;
+            }
+        }
+    }
+
     #endregion
 
     #region Prefabs
@@ -159,6 +171,7 @@ public class GameManager : MonoBehaviour
         GameSettings.LoadMarkersPositionsFromFile();
         NumberOfTasksToSolve = 3;
         NumberOfTasksSolved = 0;
+        PlayerData = new PlayerData(NumberOfTasksToSolve);
 
         // Indices w.r.t. _menusUI list
         _menusUIIndexHome = 0;
@@ -357,7 +370,6 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("[GameManager:OnEnterEscapeRoom] CurrentTypeOfGesture NOT recognized. EscapeRoom's FSM state not changed.");
         }
-
 
         // display escape room menu
         _currentMenu = _menusUI[_menusUIIndexEscapeRoom];
@@ -577,6 +589,9 @@ public class GameManager : MonoBehaviour
             if(grt.GetComponent<GRTPress>() != null) grt.GetComponent<GRTPress>().ResetGRT();
             if(grt.GetComponent<GRTPinchSlide>() != null) grt.GetComponent<GRTPinchSlide>().ResetGRT();
         }
+
+        // Create New Player Data File
+        PlayerData = new PlayerData(NumberOfTasksToSolve);
 
         Debug.Log("[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
 

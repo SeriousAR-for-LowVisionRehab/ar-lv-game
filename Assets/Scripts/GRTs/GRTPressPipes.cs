@@ -3,10 +3,6 @@ using UnityEngine;
 
 public class GRTPressPipes : GRTPress
 {
-    #region Status
-    private bool _isDebugMode = false;
-    #endregion
-
     #region Mechanic
     // Time
     private int _turnsLeft;
@@ -73,7 +69,7 @@ public class GRTPressPipes : GRTPress
         _currentButton.gameObject.SetActive(true);
 
         // Debug Mode
-        if (_isDebugMode)
+        if (IsDebugMode)
         {
             Debug.Log("[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);
@@ -124,7 +120,7 @@ public class GRTPressPipes : GRTPress
     /// <summary>
     /// - Set the position of the key to the last button pressed
     /// - Hide the last button pressed
-    /// - Increase points counter and text.
+    /// - Update counters
     /// </summary>
     private void MoveKeyToThisButtonAndHideIt()
     {

@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class GRTPinchSlideClock : GRTPinchSlide
 {
-    #region Status
-    private bool _isDebugMode = false;
-    #endregion
-
     #region Mechanic
     // Turns per GRT play
     private int _turnsLeft;
@@ -100,7 +96,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         AllowedTime = 30.0f;
 
         // Debug Mode
-        if (_isDebugMode)
+        if (IsDebugMode)
         {
             Debug.Log("[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);

@@ -17,10 +17,6 @@ using UnityEngine;
 /// </summary>
 public class GRTPinchSlideTower : GRTPinchSlide
 {
-    #region Status
-    private bool _isDebugMode = false;
-    #endregion Status
-
     #region Mechanic
     private PinchSlider _sliderController;
     private float _currentSliderValue;
@@ -50,7 +46,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
         _currentSliderValue = _sliderController.SliderValue;
 
         // Debug Mode
-        if (_isDebugMode)
+        if (IsDebugMode)
         {
             Debug.Log("[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);

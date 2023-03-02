@@ -3,10 +3,6 @@ using UnityEngine;
 
 public class GRTPressTower : GRTPress
 {
-    #region Status
-    private bool _isDebugMode = false;
-    #endregion
-
     #region Mechanic
     private PressableButtonHoloLens2 buttonRight;
     private PressableButtonHoloLens2 buttonLeft;
@@ -39,7 +35,7 @@ public class GRTPressTower : GRTPress
         buttonLeft.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
 
         // Debug Mode
-        if (_isDebugMode)
+        if (IsDebugMode)
         {
             Debug.Log("[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);

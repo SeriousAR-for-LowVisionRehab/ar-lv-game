@@ -4,7 +4,6 @@ using UnityEngine;
 public class GRTPinchSlidePipes : GRTPinchSlide
 {
     #region Status
-    private bool _isDebugMode = false;
     private bool _isNextSliderReady = false;
     #endregion
 
@@ -38,7 +37,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         _currentSlider.gameObject.SetActive(true);
 
         // Debug Mode
-        if (_isDebugMode)
+        if (IsDebugMode)
         {
             Debug.Log("[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);

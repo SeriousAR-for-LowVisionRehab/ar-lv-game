@@ -30,7 +30,7 @@ public class PlayerData
         // Initialize Data
         PlayerID = DateTime.Now;  // Time.time;
         FileName = String.Concat(
-            "PlayerData_", 
+            "Participant_", 
             PlayerID.ToString("ddMMyyyy_HHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo), 
             ".json"
         );
@@ -43,6 +43,8 @@ public class PlayerData
         // Full Path
         _savePathDir = Application.persistentDataPath;
         _fullPath = Path.Combine(_savePathDir, this.FileName);
+
+        Debug.Log("[PlayerData] Constructed PlayerData.");
     }
 
 
