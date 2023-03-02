@@ -13,7 +13,6 @@ public class PlayerData
     public string PlayerAlias;                       // Chosen by the player at login/start.
     public string FileName;
     public int NumberOfTasksToSolve;
-    public int NumberOfTasksStarted;
     public int NumberOfTasksSolved;
     public float EscapeRoomPressDuration;
     public float EscapeRoomPinchSlideDuration;
@@ -36,9 +35,10 @@ public class PlayerData
             ".json"
         );
         NumberOfTasksToSolve = numberOfTasksToSolve;
-        NumberOfTasksStarted = 0;
         NumberOfTasksSolved = 0;
-        EscapeRoomPressDuration = 0;
+        EscapeRoomPressDuration = 0.0f;
+        EscapeRoomPinchSlideDuration = 0.0f;
+        DataOfTasks = new List<TaskData>();
 
         // Full Path
         _savePathDir = Application.persistentDataPath;

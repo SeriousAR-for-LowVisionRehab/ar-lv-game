@@ -595,9 +595,11 @@ public class GameManager : MonoBehaviour
         {
             case TypeOfGesture.PRESS:
                 PlayerData.EscapeRoomPressDuration = Time.time - PlayerData.EscapeRoomPressDuration;
+                PlayerData.NumberOfTasksSolved += NumberOfTasksSolved;
                 break;
             case TypeOfGesture.PINCHSLIDE:
                 PlayerData.EscapeRoomPinchSlideDuration = Time.time - PlayerData.EscapeRoomPinchSlideDuration;
+                PlayerData.NumberOfTasksSolved += NumberOfTasksSolved;
                 break;
             default:
                 Debug.Log("[GameManager:SaveGame] CurrentTypeOfGesture not recognized - EscapeRoom Duration not calculated correctly.");

@@ -1883,6 +1883,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1613161257}
     m_Modifications:
+    - target: {fileID: 4404885519577781942, guid: 59639d5b8900b114b9da107cf744291a, type: 3}
+      propertyPath: iconQuadTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: b5066c514f7f02f4292cf842f3c8b75f, type: 3}
     - target: {fileID: 6379130598763811130, guid: 59639d5b8900b114b9da107cf744291a, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -2578,6 +2582,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5736448859974927950, guid: 48ecb89bdf601d741a5092b05ea7bf44, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6275196514509689517, guid: 48ecb89bdf601d741a5092b05ea7bf44, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.161
@@ -3102,6 +3110,10 @@ PrefabInstance:
     - target: {fileID: 7821347247020646715, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
       propertyPath: m_RootOrder
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8360103410690405848, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8680259867810305459, guid: e526ecab68cf9f74188ddd32afb7ce1b, type: 3}
       propertyPath: m_RootOrder

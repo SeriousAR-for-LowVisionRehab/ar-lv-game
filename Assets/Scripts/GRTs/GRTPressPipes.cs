@@ -137,8 +137,11 @@ public class GRTPressPipes : GRTPress
         // Button
         _currentButton.gameObject.SetActive(false);
         _currentButtonIndex += 1;
-        _currentButton = _controller.ControllerButtons[_currentButtonIndex];
-        _currentButton.gameObject.SetActive(true);
+        if (_currentButtonIndex < _controller.ControllerButtons.Length)
+        {
+            _currentButton = _controller.ControllerButtons[_currentButtonIndex];
+            _currentButton.gameObject.SetActive(true);
+        }
 
         // Points
         Points += 1;

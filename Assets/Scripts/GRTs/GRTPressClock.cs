@@ -58,8 +58,8 @@ public class GRTPressClock : GRTPress
     private bool _moveToNextTurn = true;                                     // true at start, and then only if _remainingTime <= 0
 
     // Clock
-    private int _rotationIndex;                                              // an index chosen at random: for rotation, and piece on clock
-    [SerializeField] private int[] _rotationAngles = { 0, -90, -180, -270 }; // assume four pieces displayed    
+    private int _rotationIndex;                                              // an index for rotation, and piece on clock
+    [SerializeField] private int[] _rotationAngles = { -90, -270, 0, -180 }; // { 0, -90, -180, -270 }; // assume four pieces displayed    
     [SerializeField] private GameObject _arrow;
     private Vector3 _arrowInitPosition;
     private Quaternion _arrowInitRotation;
@@ -175,11 +175,15 @@ public class GRTPressClock : GRTPress
             TextPoints.text = $"Points: {Mathf.Round(Points)}";
 
             // Game Mechanic
+            _rotationIndex += 1;
             _moveToNextTurn = true;
             _currentSelectionHighlight.gameObject.SetActive(false);
         }
         else
         {
+            Debug.Log("Pieces: clock(index " + _rotationIndex + ") = " + _piecesOnClock[_rotationIndex].name +
+                ", selection (index " +  SelectionIndex + ") = " + _piecesToSelect[SelectionIndex].name);
+
             //TODO: add lose sound
         }
 
@@ -209,20 +213,13 @@ public class GRTPressClock : GRTPress
 
         // Arrow
         ResetArrow();
-        _rotationIndex += 1;  // GenerateRotationIndex();
-        PlaceArrow();
-        
+        if (_rotationIndex < _rotationAngles.Length)
+        {
+            PlaceArrow();
+        }
+
         // Player's selection
         _isSelectionValidated = false;
-    }
-
-    /// <summary>
-    /// Return a random index for a rotation
-    /// </summary>
-    /// <returns></returns>
-    private int GenerateRotationIndex()
-    {
-        return Random.Range(0, _rotationAngles.Length - 1);
     }
 
     /// <summary>
@@ -230,7 +227,6 @@ public class GRTPressClock : GRTPress
     /// </summary>
     private void PlaceArrow()
     {
-        // Placement
         Vector3 newAngle = new Vector3(0, 0, _rotationAngles[_rotationIndex]);
         _arrow.transform.Rotate(newAngle);
         _arrow.transform.localScale = new Vector3(2, 2, 2);

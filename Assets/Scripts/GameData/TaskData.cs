@@ -10,13 +10,13 @@ public class TaskData
 
     public int BaselineNbClickForSolution;
 
-    public int TaskID;
-    public bool IsStarted, IsSolved;
+    public string TaskID;
+    public bool IsSolved;
     public int NbClicksTotal;
     public float TimeOnTask;
     public ClickData[] ClicksData;
 
-    public TaskData(int taskID)
+    public TaskData(string taskID)
     {
         TaskID = taskID;
     }

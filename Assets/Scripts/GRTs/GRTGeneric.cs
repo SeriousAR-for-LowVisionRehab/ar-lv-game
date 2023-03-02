@@ -49,6 +49,13 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     }
 
     #region Data
+    private TaskData _taskData;
+    public TaskData TaskData
+    {
+        get;
+        set;
+    }
+
     // Time
     private float _timeInGRT;
     public float TimeInGRT
@@ -170,6 +177,8 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         FinishedCover = _support.Find("FinishedCover");
 
         // Data
+        TaskData = new TaskData(this.name);
+
         TimeInGRT = 0f;
     }
 
@@ -254,6 +263,11 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfTasksSolved + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
         GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         _controller.Parent.gameObject.SetActive(false);
+
+        // Data
+        TaskData.TimeOnTask = TimeInGRT;
+
+        GameManager.Instance.PlayerData.DataOfTasks.Add(TaskData);
     }
 
     private void OnExitSolved()
