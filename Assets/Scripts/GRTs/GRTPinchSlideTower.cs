@@ -18,7 +18,6 @@ using UnityEngine;
 public class GRTPinchSlideTower : GRTPinchSlide
 {
     #region Mechanic
-    private PinchSlider _sliderController;
     private float _currentSliderValue;
     private int _currentTowerLevelIndex;
     private float[] _solutionsDegrees = { 90.0f, 270.0f, 0.0f, 180.0f };
@@ -40,10 +39,10 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
         // Set initial parameters and helper
         _currentTowerLevelIndex = 0;   // start at the bottom
-        _sliderController = _controller.ControllerButtons[0];
-        _sliderController.OnInteractionEnded.AddListener(delegate { UpdateMechanismAndCheckSolution(); });
+        SliderController = _controller.ControllerButtons[0];
+        SliderController.OnInteractionEnded.AddListener(delegate { UpdateMechanismAndCheckSolution(); });
 
-        _currentSliderValue = _sliderController.SliderValue;
+        _currentSliderValue = SliderController.SliderValue;
 
         // Debug Mode
         if (IsDebugMode)
@@ -101,6 +100,9 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
     public void UpdateMechanismAndCheckSolution()
     {
+        // Data
+        SliderTaskData.NbSuccessPinches += 1;
+
         UpdateMechanism();
         CheckSolution();
     }
@@ -110,12 +112,12 @@ public class GRTPinchSlideTower : GRTPinchSlide
     /// </summary>
     private void UpdateMechanism()
     {
-        float sliderChange = _sliderController.SliderValue - _currentSliderValue;
+        float sliderChange = SliderController.SliderValue - _currentSliderValue;
 
         // Rotate Level
         if(sliderChange != 0)
         {
-            _currentSliderValue = _sliderController.SliderValue;
+            _currentSliderValue = SliderController.SliderValue;
             RotateThisLevelToNewPosition(_currentTowerLevelIndex, sliderChange);
         }
 
@@ -149,7 +151,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         _currentTowerLevelIndex += 1;
 
-        ResetControllerPosition();
+        ResetControllerPosition(0.5f);
         UpdateComponentsHighlight(_currentTowerLevelIndex);
         UpdateHelpInformation(_currentTowerLevelIndex);
     }
@@ -177,14 +179,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
             currentShape.transform.position.z
         );
 
-    }
-
-    /// <summary>
-    /// Place the cursor to the original position on the slider's line
-    /// </summary>
-    private void ResetControllerPosition()
-    {
-        _sliderController.SliderValue = 0.5f;
     }
 
     /// <summary>

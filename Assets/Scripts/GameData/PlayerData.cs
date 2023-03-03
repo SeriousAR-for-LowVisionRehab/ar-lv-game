@@ -1,3 +1,4 @@
+using Microsoft.MixedReality.Toolkit.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +17,8 @@ public class PlayerData
     public int NumberOfTasksSolved;
     public float EscapeRoomPressDuration;
     public float EscapeRoomPinchSlideDuration;
-    public List<TaskData> DataOfTasks;
+    public List<ButtonData> DataOfButtonTasks;
+    public List<SliderData> DataOfSliderTasks;
 
     private string _savePathDir;
     private string _fullPath;
@@ -38,7 +40,8 @@ public class PlayerData
         NumberOfTasksSolved = 0;
         EscapeRoomPressDuration = 0.0f;
         EscapeRoomPinchSlideDuration = 0.0f;
-        DataOfTasks = new List<TaskData>();
+        DataOfButtonTasks = new List<ButtonData>();
+        DataOfSliderTasks = new List<SliderData>();
 
         // Full Path
         _savePathDir = Application.persistentDataPath;

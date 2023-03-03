@@ -253,8 +253,8 @@ public class GRTPressClock : GRTPress
 
         // Data
         _NbClickButtonValidate += 1;
-        
-        NbSuccessClicks += 1;
+
+        ButtonTaskData.NbSuccessClicks += 1;
     }
 
     private void MoveCursorLeft()
@@ -268,7 +268,7 @@ public class GRTPressClock : GRTPress
         // Data
         _NbClickButtonLeft += 1;
 
-        NbSuccessClicks += 1;
+        ButtonTaskData.NbSuccessClicks += 1;
     }
 
     private void MoveCursorRight()
@@ -282,7 +282,7 @@ public class GRTPressClock : GRTPress
         // Data
         _NbClickButtonRight += 1;
 
-        NbSuccessClicks += 1;
+        ButtonTaskData.NbSuccessClicks += 1;
     }
 
 }

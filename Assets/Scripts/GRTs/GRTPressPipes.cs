@@ -144,7 +144,7 @@ public class GRTPressPipes : GRTPress
         UpdateUI();
 
         // Clicks
-        NbSuccessClicks += 1;
+        ButtonTaskData.NbSuccessClicks += 1;
     }
 
 }

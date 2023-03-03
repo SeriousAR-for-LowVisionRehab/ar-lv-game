@@ -547,15 +547,6 @@ public class GameManager : MonoBehaviour
         FreezeTasksInPlace(true);
         ShowMarkers(false);
 
-        // TODO: clean
-        // Read positions from Scene's GameObjects and save them to GameSettings' file
-        //List<Vector3> tempPositions = new List<Vector3>();
-        //foreach(var marker in _markers)
-        //{
-        //    tempPositions.Add(marker.transform.position);
-        //    Debug.Log("[GameManager:SaveCreation] tempPosition: " + tempPositions.Count);
-        //}
-        //GameSettings.MarkersPositions = tempPositions;
         GameSettings.SetMarkersPositionsFromList(_markers);
         GameSettings.SaveGameSettingsToFile();
 

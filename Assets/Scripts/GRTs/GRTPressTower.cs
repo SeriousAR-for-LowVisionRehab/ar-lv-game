@@ -95,7 +95,7 @@ public class GRTPressTower : GRTPress
     public void UpdateMechanismAndCheckSolution(int direction)
     {
         // Clicks
-        NbSuccessClicks += 1;
+        ButtonTaskData.NbSuccessClicks += 1;
 
         // Update
         RotateThisLevelToNewPosition(_currentTowerLevelIndex, direction);

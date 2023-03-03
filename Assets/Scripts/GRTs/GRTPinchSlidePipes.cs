@@ -15,26 +15,34 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     private Vector3 _keyOriginalPosition;
 
     private int _currentSliderIndex;
-    private PinchSlider _currentSlider;
     #endregion
 
+    #region Override methods
     protected override void Start()
     {
         base.Start();
+        IsDebugMode = true;
 
         _keyOriginalPosition = _key.transform.position;
-
-//        finishedCover = _support.Find("FinishedCover");
 
         // Slider
         foreach (var button in _controller.ControllerButtons)
         {
+            // Data
+            button.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
+            button.OnHoverEntered.AddListener(delegate { IncrementHoverCount(); });
+            button.OnHoverExited.AddListener(delegate { IsOnHover(false); });
+            button.OnInteractionStarted.AddListener(delegate { IsOnInteraction(true); });
+            button.OnInteractionStarted.AddListener(delegate { IncrementOnInteractionCount(); });
+            button.OnInteractionEnded.AddListener(delegate { IsOnInteraction(false); });
+
+            // Mechanic
             button.OnInteractionEnded.AddListener(delegate { SliderReleased(); });
             button.gameObject.SetActive(false);
         }
         _currentSliderIndex = 0;
-        _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
-        _currentSlider.gameObject.SetActive(true);
+        SliderController = _controller.ControllerButtons[_currentSliderIndex];
+        SliderController.gameObject.SetActive(true);
 
         // Debug Mode
         if (IsDebugMode)
@@ -46,7 +54,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
 
     protected override void OnUpdateSolving()
     {
-        if(IsGRTTerminated)
+        if (IsGRTTerminated)
         {
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _currentSliderIndex + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
@@ -57,7 +65,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
             {
                 // Actions needed after slider was released:
                 MoveKeyToNextPosition();    
-                _currentSlider.gameObject.SetActive(false);                            // Deactivate Used Slider
+                SliderController.gameObject.SetActive(false);                            // Deactivate Used Slider
                 _currentSliderIndex += 1;                                              // Increment Slider
                 Points = _currentSliderIndex;
                 UpdateUI();
@@ -67,8 +75,8 @@ public class GRTPinchSlidePipes : GRTPinchSlide
                 if (IsGRTTerminated) return;
 
                 // Prepare Next Move:
-                _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
-                _currentSlider.gameObject.SetActive(true);                
+                SliderController = _controller.ControllerButtons[_currentSliderIndex];
+                SliderController.gameObject.SetActive(true);                
                 _isNextSliderReady = false;
             }
         }
@@ -89,11 +97,12 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         base.ResetGRT();
         _key.transform.position = _keyOriginalPosition;
         _currentSliderIndex = 0;
-        _currentSlider = _controller.ControllerButtons[_currentSliderIndex];
-        _currentSlider.SliderValue = 0;
-        _currentSlider.gameObject.SetActive(true);
+        SliderController = _controller.ControllerButtons[_currentSliderIndex];
+        ResetControllerPosition(0.0f);
+        SliderController.gameObject.SetActive(true);
 
     }
+    #endregion
 
     /// <summary>
     /// Actions performed when the user releases the slider
@@ -101,14 +110,15 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     /// </summary>
     public void SliderReleased()
     {
-        if (_currentSlider.SliderValue == 1)
+        if (SliderController.SliderValue == 1)
         {
+            SliderTaskData.NbSuccessPinches += 1;
             _isNextSliderReady = true;
-            _currentSlider.SliderValue = 0;
+            ResetControllerPosition(0.0f);
         }
         else
         {
-            Debug.Log("[GRTPinchSliderPipes:SliderReleased] else slidervalue: " + _currentSlider.SliderValue);
+            Debug.Log("[GRTPinchSliderPipes:SliderReleased] else slidervalue: " + SliderController.SliderValue);
         }
         
     }

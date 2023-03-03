@@ -57,11 +57,17 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     }
 
     #region Data
-    private TaskData _taskData;
-    public TaskData TaskData
+    private SliderData _sliderTaskData;
+    public SliderData SliderTaskData
     {
-        get { return _taskData; }
-        set { _taskData = value; }
+        get { return _sliderTaskData; }
+        set { _sliderTaskData = value; }
+    }
+    private ButtonData _buttonTaskData;
+    public ButtonData ButtonTaskData
+    {
+        get { return _buttonTaskData; }
+        set { _buttonTaskData = value; }
     }
 
     // Time
@@ -185,8 +191,19 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         FinishedCover = _support.Find("FinishedCover");
 
         // Data
-        TaskData = new TaskData(this.name);
-        Debug.LogAssertion("[GRTGeneric:" + this.name + "] TaskData created with ID=" + this.name);
+        if(typeof(T) == typeof(PressableButtonHoloLens2))
+        {
+            ButtonTaskData = new ButtonData();
+        }else if (typeof(T) == typeof(PinchSlider))
+        {
+            SliderTaskData = new SliderData();
+        }
+        
+
+
+
+        Debug.LogAssertion("type of GRTGeneric: " + typeof(T));
+        // Debug.LogAssertion("[GRTGeneric:" + this.name + "] TaskData created with ID=" + this.name);
 
         TimeInGRT = 0f;
     }
@@ -262,11 +279,25 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     private void OnEnterSolved()
     {
         // Data
-        TaskData.TaskDuration = TimeInGRT;
-        TaskData.IsSolved = true;
-
-        GameManager.Instance.PlayerData.DataOfTasks.Add(TaskData);
-        Debug.LogAssertion("[GRTGeneric:OnEnterSolved] PlayerData.DataOfTasks count = " + GameManager.Instance.PlayerData.DataOfTasks.Count);
+        if (typeof(T) == typeof(PressableButtonHoloLens2))
+        {
+            ButtonTaskData.TaskDuration = TimeInGRT;
+            ButtonTaskData.IsSolved = true;
+            GameManager.Instance.PlayerData.DataOfButtonTasks.Add(ButtonTaskData);
+        }
+        else if (typeof(T) == typeof(PinchSlider))
+        {
+            SliderTaskData.TaskDuration = TimeInGRT;
+            SliderTaskData.IsSolved = true;
+            GameManager.Instance.PlayerData.DataOfSliderTasks.Add(SliderTaskData);
+        }
+        
+        Debug.LogAssertion(
+            "[GRTGeneric:OnEnterSolved] PlayerData.DataOfButtonTasks count = " 
+            + GameManager.Instance.PlayerData.DataOfButtonTasks.Count 
+            + "PlayerData.DataOfSliderTasks count = " 
+            + GameManager.Instance.PlayerData.DataOfSliderTasks.Count
+        );
 
         // Counters
         GameManager.Instance.NumberOfTasksSolved += 1;
@@ -280,6 +311,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfTasksSolved + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
         // GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         _controller.Parent.gameObject.SetActive(false);
+
+
+        //TODO Remove <- was for debug
+        GameManager.Instance.SaveGame();
     }
 
     private void OnExitSolved()

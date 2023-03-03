@@ -1,5 +1,4 @@
 using Microsoft.MixedReality.Toolkit.UI;
-using UnityEditor;
 using UnityEngine;
 
 public class GRTPinchSlideClock : GRTPinchSlide
@@ -49,7 +48,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
     [SerializeField] private GameObject[] _piecesOnClock;
 
     // User
-    private PinchSlider _sliderController;
     private PinchSlider _sliderValidation;
     [SerializeField] private GameObject[] _piecesToSelect;                   // what the user should select
     private int _selectionIndex;
@@ -76,11 +74,11 @@ public class GRTPinchSlideClock : GRTPinchSlide
     protected override void Start()
     {
         base.Start();
-        _sliderController = _controller.ControllerButtons[0];
+        SliderController = _controller.ControllerButtons[0];
         _sliderValidation = _controller.ControllerButtons[1];
+        ResetControllerPosition(0.5f);
 
-        _sliderController.OnInteractionEnded.AddListener(delegate { UpdateSelectionIndex(); });
-        //_sliderController.OnValueUpdated.AddListener(delegate { MoveCursor(); });
+        SliderController.OnInteractionEnded.AddListener(delegate { UpdateSelectionIndex(); });
         _sliderValidation.OnInteractionEnded.AddListener(delegate { ValidateChoice(); });
 
         // Set default starting selection
@@ -167,6 +165,8 @@ public class GRTPinchSlideClock : GRTPinchSlide
     /// </summary>
     private void PrepareTurn()
     {
+        ResetControllerPosition(0.5f);
+
         // UI
         TurnsLeft -= 1;
         TextTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
@@ -224,10 +224,10 @@ public class GRTPinchSlideClock : GRTPinchSlide
         if (_sliderValidation.SliderValue != 1) return;
 
         _isSelectionValidated = true;
-        _sliderValidation.SliderValue = 0;
+        ResetControllerPosition(0.5f);
 
         // Data
-        _NbClickButtonValidate += 1;
+        SliderTaskData.NbSuccessPinches += 1;
     }
 
     
@@ -240,14 +240,15 @@ public class GRTPinchSlideClock : GRTPinchSlide
         _currentSelectionHighlight.gameObject.SetActive(false);
         _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
         _currentSelectionHighlight.gameObject.SetActive(true);
-        // Data
-        _NbClickButtonLeft += 1;
     }
 
     private void UpdateSelectionIndex()
     {
+        // Data
+        SliderTaskData.NbSuccessPinches += 1;
+
         // slider to selectionIndex:  0->0, 0.25 -> 1, 0.5 -> middle/none, 0.75 -> 2, 1 -> 3
-        switch (_sliderController.SliderValue)
+        switch (SliderController.SliderValue)
         {
             case 0.00f:
                 SelectionIndex = 0;
