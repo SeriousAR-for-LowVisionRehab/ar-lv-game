@@ -3086,7 +3086,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routingTarget: {fileID: 2811428404042408455}
-  InteractableOnClick: 1
+  InteractableOnClick: 0
 --- !u!114 &2811428404042408455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4770,11 +4770,10 @@ MonoBehaviour:
   _support: {fileID: 4884194108765725010}
   _grtCore: {fileID: 8689277701730838407}
   _buttonStart: {fileID: 0}
-  _turnsLeft: 5
-  _textTurnsLeft: {fileID: 322140071621394443}
-  _allowedTime: 20
+  _coverFinished: {fileID: 0}
   _textTimeLeft: {fileID: 7510106472163658405}
   _textPoints: {fileID: 2372143264736622852}
+  _textTurnsLeft: {fileID: 322140071621394443}
   _rotationAngles: 00000000a6ffffff4cfffffff2feffff
   _arrow: {fileID: 3762872999853564414}
   _piecesOnClock:

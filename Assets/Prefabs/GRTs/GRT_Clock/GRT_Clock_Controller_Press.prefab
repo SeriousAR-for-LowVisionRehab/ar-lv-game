@@ -3426,7 +3426,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routingTarget: {fileID: 57979412971452223}
-  InteractableOnClick: 1
+  InteractableOnClick: 0
 --- !u!114 &57979412971452223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3951,7 +3951,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routingTarget: {fileID: 57979413322529729}
-  InteractableOnClick: 1
+  InteractableOnClick: 0
 --- !u!114 &57979413322529729
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5050,7 +5050,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routingTarget: {fileID: 256553482401884040}
-  InteractableOnClick: 1
+  InteractableOnClick: 0
 --- !u!114 &256553482401884040
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -613,7 +613,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routingTarget: {fileID: 5019432876816049779}
-  InteractableOnClick: 1
+  InteractableOnClick: 0
 --- !u!114 &5019432876816049779
 MonoBehaviour:
   m_ObjectHideFlags: 0

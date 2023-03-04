@@ -31,11 +31,26 @@ public class GRTPressTower : GRTPress
         _currentTowerLevelIndex = 0;   // start at the bottom
         buttonRight = _controller.ControllerButtons[0];
         buttonLeft = _controller.ControllerButtons[1];
-        buttonRight.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(-1); });
-        buttonLeft.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
+        //buttonRight.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(-1); });
+        //buttonLeft.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
+        buttonRight.ButtonReleased.AddListener(delegate { UpdateMechanismAndCheckSolution(-1); });
+        buttonLeft.ButtonReleased.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
 
-        // Debug Mode
-        if (IsDebugMode)
+        // Add listeners to controller's buttons
+        foreach (var btn in _controller.ControllerButtons)
+        {
+            // Data
+            btn.TouchBegin.AddListener(delegate { IsTouching(true); });
+            btn.TouchBegin.AddListener(IncrementTouchCount);
+            btn.TouchEnd.AddListener(delegate { IsTouching(false); });
+            btn.ButtonPressed.AddListener(delegate { IsPressing(true); });
+            btn.ButtonPressed.AddListener(IncrementPressedCount);
+            btn.ButtonReleased.AddListener(delegate { IsPressing(false); });
+            btn.ButtonReleased.AddListener(IncrementReleasedCount);
+        }
+
+            // Debug Mode
+            if (IsDebugMode)
         {
             Debug.Log("[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);

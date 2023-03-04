@@ -301,7 +301,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
 
         //TODO Remove <- was for debug
-        // GameManager.Instance.SaveGame();
+        GameManager.Instance.SaveGame();
     }
 
     private void OnExitSolved()

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using UnityEngine;
 /// <summary>
@@ -23,6 +24,42 @@ public class ButtonData: ICommonDataTask
         get { return _nbMissedClicks; }
         set { _nbMissedClicks = value; }
     }
+
+    [SerializeField] int _touchCount;
+    public int TouchCount
+    {
+        get { return _touchCount; }
+        set { _touchCount = value; }
+    }
+
+    [SerializeField] float _touchDuration;
+    public float TouchDuration
+    {
+        get { return _touchDuration; }
+        set { _touchDuration = value; }
+    }
+
+    [SerializeField] int _buttonPressedCount;
+    public int ButtonPressedCount
+    {
+        get { return _buttonPressedCount; }
+        set { _buttonPressedCount = value; }
+    }
+
+    [SerializeField] int _buttonReleasedCount;
+    public int ButtonReleasedCount
+    {
+        get { return _buttonReleasedCount; }
+        set { _buttonReleasedCount = value; }
+    }
+
+    [SerializeField] float _buttonPressedDuration;
+    public float ButtonPressedDuration
+    {
+        get { return _buttonPressedDuration; }
+        set { _buttonPressedDuration = value; }
+    }
+
     #endregion
 
     #region CommonDataTask

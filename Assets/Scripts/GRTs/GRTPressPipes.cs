@@ -35,7 +35,7 @@ public class GRTPressPipes : GRTPress
             if (_remainingTime <= 0)
             {
                 // _moveToNextTurn = true;
-                Debug.Log("[GRTPressPipres:RemainingTime] Temps écoulé -> Fin de la tâche! ");
+                // Debug.Log("[GRTPressPipres:RemainingTime] Temps écoulé -> Fin de la tâche! ");
             }
         }
     }
@@ -64,7 +64,18 @@ public class GRTPressPipes : GRTPress
         // Add listeners to controller's buttons
         foreach(var btn in _controller.ControllerButtons)
         {
-            btn.ButtonPressed.AddListener(MoveKeyToThisButtonAndHideIt);
+            // Data
+            btn.TouchBegin.AddListener(delegate { IsTouching(true); });
+            btn.TouchBegin.AddListener(IncrementTouchCount);
+            btn.TouchEnd.AddListener(delegate { IsTouching(false); });
+            btn.ButtonPressed.AddListener(delegate { IsPressing(true); });
+            btn.ButtonPressed.AddListener(IncrementPressedCount);
+            btn.ButtonReleased.AddListener(delegate { IsPressing(false); });
+            btn.ButtonReleased.AddListener(IncrementReleasedCount);
+
+            // Mechanic
+            //btn.ButtonPressed.AddListener(MoveKeyToThisButtonAndHideIt);
+            btn.ButtonReleased.AddListener(MoveKeyToThisButtonAndHideIt);
             btn.gameObject.SetActive(false);
         }
 

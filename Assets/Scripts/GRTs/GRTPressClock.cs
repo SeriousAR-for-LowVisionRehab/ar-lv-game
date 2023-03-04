@@ -95,9 +95,25 @@ public class GRTPressClock : GRTPress
         buttonRight = _controller.ControllerButtons[0];
         buttonLeft = _controller.ControllerButtons[1];
         buttonValidate = _controller.ControllerButtons[2];
-        buttonRight.ButtonPressed.AddListener(MoveCursorRight);
-        buttonLeft.ButtonPressed.AddListener(MoveCursorLeft);
-        buttonValidate.ButtonPressed.AddListener(ValidateChoice);
+        //buttonRight.ButtonPressed.AddListener(MoveCursorRight);
+        //buttonLeft.ButtonPressed.AddListener(MoveCursorLeft);
+        //buttonValidate.ButtonPressed.AddListener(ValidateChoice);
+        buttonRight.ButtonReleased.AddListener(MoveCursorRight);
+        buttonLeft.ButtonReleased.AddListener(MoveCursorLeft);
+        buttonValidate.ButtonReleased.AddListener(ValidateChoice);
+
+        // Add listeners to controller's buttons
+        foreach (var btn in _controller.ControllerButtons)
+        {
+            // Data
+            btn.TouchBegin.AddListener(delegate { IsTouching(true); });
+            btn.TouchBegin.AddListener(IncrementTouchCount);
+            btn.TouchEnd.AddListener(delegate { IsTouching(false); });
+            btn.ButtonPressed.AddListener(delegate { IsPressing(true); });
+            btn.ButtonPressed.AddListener(IncrementPressedCount);
+            btn.ButtonReleased.AddListener(delegate { IsPressing(false); });
+            btn.ButtonReleased.AddListener(IncrementReleasedCount);
+        }
 
         // Set default starting selection
         _selectionIndex = 0;
