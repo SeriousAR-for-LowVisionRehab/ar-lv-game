@@ -78,6 +78,18 @@ public class GRTPinchSlideClock : GRTPinchSlide
         _sliderValidation = _controller.ControllerButtons[1];
         ResetControllerPosition(0.5f);
 
+        // Data listeners
+        foreach( var slider in _controller.ControllerButtons)
+        {
+            slider.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
+            slider.OnHoverEntered.AddListener(delegate { IncrementHoverCount(); });
+            slider.OnHoverExited.AddListener(delegate { IsOnHover(false); });
+            slider.OnInteractionStarted.AddListener(delegate { IsOnInteraction(true); });
+            slider.OnInteractionStarted.AddListener(delegate { IncrementOnInteractionCount(); });
+            slider.OnInteractionEnded.AddListener(delegate { IsOnInteraction(false); });
+        }
+
+        // Mechanic listeners
         SliderController.OnInteractionEnded.AddListener(delegate { UpdateSelectionIndex(); });
         _sliderValidation.OnInteractionEnded.AddListener(delegate { ValidateChoice(); });
 
@@ -103,6 +115,8 @@ public class GRTPinchSlideClock : GRTPinchSlide
 
     protected override void OnUpdateSolving()
     {
+        base.OnUpdateSolving();
+
         if (!IsGRTTerminated)
         {
             if (!_moveToNextTurn)

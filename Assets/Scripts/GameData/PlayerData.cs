@@ -1,4 +1,3 @@
-using Microsoft.MixedReality.Toolkit.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,9 +29,11 @@ public class PlayerData
     public PlayerData(int numberOfTasksToSolve)
     {
         // Initialize Data
+        PlayerAlias = String.Concat("Participant", GameManager.Instance.GameSettings.ParticipantNumber);
         PlayerID = DateTime.Now;  // Time.time;
         FileName = String.Concat(
-            "Participant_", 
+            PlayerAlias, 
+            "_",
             PlayerID.ToString("ddMMyyyy_HHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo), 
             ".json"
         );

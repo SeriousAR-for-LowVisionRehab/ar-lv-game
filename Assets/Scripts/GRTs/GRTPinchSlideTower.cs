@@ -42,6 +42,17 @@ public class GRTPinchSlideTower : GRTPinchSlide
         SliderController = _controller.ControllerButtons[0];
         SliderController.OnInteractionEnded.AddListener(delegate { UpdateMechanismAndCheckSolution(); });
 
+        // Data listeners
+        foreach (var slider in _controller.ControllerButtons)
+        {
+            slider.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
+            slider.OnHoverEntered.AddListener(delegate { IncrementHoverCount(); });
+            slider.OnHoverExited.AddListener(delegate { IsOnHover(false); });
+            slider.OnInteractionStarted.AddListener(delegate { IsOnInteraction(true); });
+            slider.OnInteractionStarted.AddListener(delegate { IncrementOnInteractionCount(); });
+            slider.OnInteractionEnded.AddListener(delegate { IsOnInteraction(false); });
+        }
+
         _currentSliderValue = SliderController.SliderValue;
 
         // Debug Mode
@@ -61,6 +72,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
     protected override void OnUpdateSolving()
     {
+        base.OnUpdateSolving();
+
         if (IsGRTTerminated)
         {
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");

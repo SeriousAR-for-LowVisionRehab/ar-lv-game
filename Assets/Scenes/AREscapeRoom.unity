@@ -619,6 +619,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 924225858010549179, guid: 596b6b00b4249514b98e3755ec9d41a4, type: 3}
   m_PrefabInstance: {fileID: 259211922}
   m_PrefabAsset: {fileID: 0}
+--- !u!102 &259211924 stripped
+TextMesh:
+  m_CorrespondingSourceObject: {fileID: 7709813323966129064, guid: 596b6b00b4249514b98e3755ec9d41a4, type: 3}
+  m_PrefabInstance: {fileID: 259211922}
+  m_PrefabAsset: {fileID: 0}
 --- !u!102 &283294133 stripped
 TextMesh:
   m_CorrespondingSourceObject: {fileID: 2372143264736622852, guid: 48ecb89bdf601d741a5092b05ea7bf44, type: 3}
@@ -5332,6 +5337,10 @@ PrefabInstance:
       propertyPath: _puzzlesPrefabs.Array.data[2]
       value: 
       objectReference: {fileID: 1864302033}
+    - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
+      propertyPath: _participantNumberCreationMode
+      value: 
+      objectReference: {fileID: 259211924}
     - target: {fileID: 7434908148423313111, guid: 1312138f29bd92445937228a8886e6f6, type: 3}
       propertyPath: _tutorialPrefabs.Array.data[0]
       value: 

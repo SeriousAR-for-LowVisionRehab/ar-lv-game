@@ -51,6 +51,8 @@ public class GRTPressTower : GRTPress
 
     protected override void OnUpdateSolving()
     {
+        base.OnUpdateSolving();
+
         if (IsGRTTerminated)
         {
             Debug.Log("[GRTPressTower:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");

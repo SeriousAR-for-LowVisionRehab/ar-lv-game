@@ -6,6 +6,7 @@ using UnityEngine;
 [Serializable]
 public class ButtonData: ICommonDataTask
 {
+    #region Button Data
     [SerializeField] private int _nbSuccessClicks;
     public virtual int NbSuccessClicks
     {
@@ -22,6 +23,7 @@ public class ButtonData: ICommonDataTask
         get { return _nbMissedClicks; }
         set { _nbMissedClicks = value; }
     }
+    #endregion
 
     #region CommonDataTask
     [SerializeField] private string _taskID;
@@ -43,6 +45,13 @@ public class ButtonData: ICommonDataTask
     {
         get { return _taskDuration; }
         set { _taskDuration = value; }
+    }
+    #endregion
+
+    #region Constructor
+    public ButtonData(string taskID)
+    {
+        TaskID = taskID;
     }
     #endregion
 }

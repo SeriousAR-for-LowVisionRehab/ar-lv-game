@@ -32,10 +32,14 @@ public class GRTPressPipes : GRTPress
         set
         {
             _remainingTime = value;
-            if (_remainingTime <= 0) _moveToNextTurn = true;
+            if (_remainingTime <= 0)
+            {
+                // _moveToNextTurn = true;
+                Debug.Log("[GRTPressPipres:RemainingTime] Temps écoulé -> Fin de la tâche! ");
+            }
         }
     }
-    private bool _moveToNextTurn = true;                                     // true at start, and then only if _remainingTime <= 0
+    // private bool _moveToNextTurn = true;                                     // true at start, and then only if _remainingTime <= 0
 
     // Pipes
     [Header("Main Objects")]
@@ -79,6 +83,8 @@ public class GRTPressPipes : GRTPress
 
     protected override void OnUpdateSolving()
     {
+        base.OnUpdateSolving();
+
         if (!IsGRTTerminated)
         {
             RemainingTime -= Time.deltaTime;

@@ -11,6 +11,13 @@ public class GameSettings
     private string _fileName;
     private string _fullPath;
 
+    [SerializeField] private int _participantNumber = 0;
+    public int ParticipantNumber
+    {
+        get { return _participantNumber; }
+        set { _participantNumber = value; }
+    }
+
     [SerializeField] private int _numberOfTasksToSolve = 3;
     public int NumberOfTasksToSolve
     {

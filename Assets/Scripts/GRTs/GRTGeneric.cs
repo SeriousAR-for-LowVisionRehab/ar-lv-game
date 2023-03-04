@@ -193,18 +193,12 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         // Data
         if(typeof(T) == typeof(PressableButtonHoloLens2))
         {
-            ButtonTaskData = new ButtonData();
+            ButtonTaskData = new ButtonData(this.name);
         }else if (typeof(T) == typeof(PinchSlider))
         {
-            SliderTaskData = new SliderData();
+            SliderTaskData = new SliderData(this.name);
         }
         
-
-
-
-        Debug.LogAssertion("type of GRTGeneric: " + typeof(T));
-        // Debug.LogAssertion("[GRTGeneric:" + this.name + "] TaskData created with ID=" + this.name);
-
         TimeInGRT = 0f;
     }
 
@@ -292,13 +286,6 @@ public abstract class GRTGeneric<T> : MonoBehaviour
             GameManager.Instance.PlayerData.DataOfSliderTasks.Add(SliderTaskData);
         }
         
-        Debug.LogAssertion(
-            "[GRTGeneric:OnEnterSolved] PlayerData.DataOfButtonTasks count = " 
-            + GameManager.Instance.PlayerData.DataOfButtonTasks.Count 
-            + "PlayerData.DataOfSliderTasks count = " 
-            + GameManager.Instance.PlayerData.DataOfSliderTasks.Count
-        );
-
         // Counters
         GameManager.Instance.NumberOfTasksSolved += 1;
         if(!GameManager.Instance.IsEscapeRoomButtonsSolved || !GameManager.Instance.IsEscapeRoomSlidersSolved)
@@ -314,7 +301,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
 
         //TODO Remove <- was for debug
-        GameManager.Instance.SaveGame();
+        // GameManager.Instance.SaveGame();
     }
 
     private void OnExitSolved()

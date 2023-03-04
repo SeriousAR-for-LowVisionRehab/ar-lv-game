@@ -33,7 +33,8 @@ public class GameManager : MonoBehaviour
 {
     [Tooltip("Debug elements")]
     private bool _isDebugMode = false;            // allow to go directly to Escape Room
-    public TextMesh _homeMenuText; 
+    public TextMesh _homeMenuText;
+    public TextMesh _participantNumberCreationMode;
     public static GameManager Instance;
     private WorldLockingManager _worldLockingManager { get { return WorldLockingManager.GetInstance(); } }
     public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
@@ -238,12 +239,14 @@ public class GameManager : MonoBehaviour
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
         _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
 
-        // Add Listeners to CREATION buttons: 0=pin, 1=Save, 2=Reset, 3=Unfreeze, 4=Home
+        // Add Listeners to CREATION buttons: 0=pin, 1=Save, 2=Reset, 3=Unfreeze, 4=Home, 5=decrease Participant #, 6=increase participant #
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
         _creationButtons[2].ButtonPressed.AddListener(SetTasksPositionFromMarkers);
         _creationButtons[3].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
         _creationButtons[4].ButtonPressed.AddListener(SetStateHome);
         _creationButtons[5].ButtonPressed.AddListener(ResetGame);
+        _creationButtons[6].ButtonPressed.AddListener(delegate { UpdateParticipantNb(-1); });
+        _creationButtons[7].ButtonPressed.AddListener(delegate { UpdateParticipantNb(+1); });
 
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
         _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHomeAndPauseEscapeRoom);
@@ -436,6 +439,7 @@ public class GameManager : MonoBehaviour
     void OnEnterCreation()
     {
         // UI
+        _participantNumberCreationMode.text = $"Participant\n #{GameSettings.ParticipantNumber}";
         _currentMenu = _menusUI[_menusUIIndexCreation];
         _currentMenu.SetActive(true);
 
@@ -615,4 +619,13 @@ public class GameManager : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Change the number of the player/participant by <paramref name="numberChange"/>.
+    /// </summary>
+    /// <param name="numberChange"></param>
+    private void UpdateParticipantNb(int numberChange)
+    {
+        GameSettings.ParticipantNumber += numberChange;
+        _participantNumberCreationMode.text = $"Participant\n #{GameSettings.ParticipantNumber}";
+    }
 }

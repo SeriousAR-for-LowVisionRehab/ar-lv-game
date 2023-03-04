@@ -26,19 +26,19 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         _keyOriginalPosition = _key.transform.position;
 
         // Slider
-        foreach (var button in _controller.ControllerButtons)
+        foreach (var slider in _controller.ControllerButtons)
         {
             // Data
-            button.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
-            button.OnHoverEntered.AddListener(delegate { IncrementHoverCount(); });
-            button.OnHoverExited.AddListener(delegate { IsOnHover(false); });
-            button.OnInteractionStarted.AddListener(delegate { IsOnInteraction(true); });
-            button.OnInteractionStarted.AddListener(delegate { IncrementOnInteractionCount(); });
-            button.OnInteractionEnded.AddListener(delegate { IsOnInteraction(false); });
+            slider.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
+            slider.OnHoverEntered.AddListener(delegate { IncrementHoverCount(); });
+            slider.OnHoverExited.AddListener(delegate { IsOnHover(false); });
+            slider.OnInteractionStarted.AddListener(delegate { IsOnInteraction(true); });
+            slider.OnInteractionStarted.AddListener(delegate { IncrementOnInteractionCount(); });
+            slider.OnInteractionEnded.AddListener(delegate { IsOnInteraction(false); });
 
             // Mechanic
-            button.OnInteractionEnded.AddListener(delegate { SliderReleased(); });
-            button.gameObject.SetActive(false);
+            slider.OnInteractionEnded.AddListener(delegate { SliderReleased(); });
+            slider.gameObject.SetActive(false);
         }
         _currentSliderIndex = 0;
         SliderController = _controller.ControllerButtons[_currentSliderIndex];
@@ -54,6 +54,8 @@ public class GRTPinchSlidePipes : GRTPinchSlide
 
     protected override void OnUpdateSolving()
     {
+        base.OnUpdateSolving();
+
         if (IsGRTTerminated)
         {
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _currentSliderIndex + " points! Well done!");

@@ -6,6 +6,7 @@ using UnityEngine;
 [Serializable]
 public class SliderData: ICommonDataTask
 {
+    #region Slider Data
     [SerializeField] private int _nbSuccessPinches;
     public virtual int NbSuccessPinches
     {
@@ -41,6 +42,7 @@ public class SliderData: ICommonDataTask
         get { return _onInteractionCount; }
         set { _onInteractionCount = value; }
     }
+    #endregion
 
     #region CommonDataTask
     [SerializeField] private string _taskID;
@@ -65,4 +67,10 @@ public class SliderData: ICommonDataTask
     }
     #endregion
 
+    #region Constructor
+    public SliderData(string taskID)
+    {
+        TaskID = taskID;
+    }
+    #endregion
 }
