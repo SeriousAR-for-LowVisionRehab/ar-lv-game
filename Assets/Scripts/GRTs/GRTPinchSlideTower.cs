@@ -1,4 +1,3 @@
-using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 
 /// <summary>
@@ -37,6 +36,11 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         base.Start();
 
+        // Counters
+        TurnsLeft = _towerComponents.Length;
+        AllowedTime = 30.0f;
+        RemainingTime = AllowedTime;
+
         // Set initial parameters and helper
         _currentTowerLevelIndex = 0;   // start at the bottom
         SliderController = _controller.ControllerButtons[0];
@@ -54,6 +58,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
         }
 
         _currentSliderValue = SliderController.SliderValue;
+        _helpDialog.gameObject.SetActive(false);
 
         // Debug Mode
         if (IsDebugMode)
@@ -66,6 +71,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     protected override void OnEnterSolving()
     {
         base.OnEnterSolving();
+        _helpDialog.gameObject.SetActive(true);
         UpdateComponentsHighlight(_currentTowerLevelIndex);
         UpdateHelpInformation(_currentTowerLevelIndex);
     }
@@ -74,16 +80,19 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         base.OnUpdateSolving();
 
+        // CheckSolution() sets IsGRTTerminated to true when conditions are met
         if (IsGRTTerminated)
         {
+            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
     }
 
     /// <summary>
-    /// Compare current selection's rotation against solution.
-    /// If correction solution, call function to prepare next level.
+    /// Called at each slider's release in the UpdateMechanismAndCheckSolution():
+    ///  - Compare current selection's rotation against solution.
+    ///  - If correct solution, call function to prepare next level.
     /// </summary>
     protected override void CheckSolution()
     {
@@ -100,7 +109,9 @@ public class GRTPinchSlideTower : GRTPinchSlide
                 return;
             }
 
-            UpdateUI();
+            AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
+
+            //UpdateUI();
             PrepareNextLevel();
         }
     }
@@ -108,9 +119,16 @@ public class GRTPinchSlideTower : GRTPinchSlide
     public override void ResetGRT()
     {
         base.ResetGRT();
+
+        // Counters
+        TurnsLeft = _towerComponents.Length;
+
         _currentSliderValue = 0.5f;
     }
 
+    /// <summary>
+    /// Called at each slider's release (i.e. OnInteractionEnded)
+    /// </summary>
     public void UpdateMechanismAndCheckSolution()
     {
         // Data
@@ -163,6 +181,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
     private void PrepareNextLevel()
     {
         _currentTowerLevelIndex += 1;
+        // Counters
+        TurnsLeft -= 1;
 
         ResetControllerPosition(0.5f);
         UpdateComponentsHighlight(_currentTowerLevelIndex);
@@ -177,7 +197,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         // Y position of the dialogue
         var dialogPosition = _helpDialog.transform.position;
-        var levelPositionY = _towerComponents[_currentTowerLevelIndex].transform.position.y;
+        var levelPositionY = SliderController.transform.position.y + 0.15f; // _towerComponents[_currentTowerLevelIndex].transform.position.y;
 
         _helpDialog.transform.position = new Vector3(dialogPosition.x, levelPositionY, dialogPosition.z);
 
@@ -199,7 +219,11 @@ public class GRTPinchSlideTower : GRTPinchSlide
     /// </summary>
     private void UpdateComponentsHighlight(int towerLevelIndexToActivate)
     {
-        if (towerLevelIndexToActivate != 0) _towerComponents[towerLevelIndexToActivate-1].GetComponent<Renderer>().material = _colorLevelOff;
+        if (towerLevelIndexToActivate != 0)
+        {
+            _towerComponents[towerLevelIndexToActivate - 1].GetComponent<Renderer>().material = _colorLevelOff;
+        }
+        
         _towerComponents[towerLevelIndexToActivate].GetComponent<Renderer>().material = _colorLevelOn;
     }
 }

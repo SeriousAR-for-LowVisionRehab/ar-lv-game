@@ -56,6 +56,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         get { return _coverFinished; }
     }
 
+    [SerializeField] protected AudioClip CorrectChoiceSoundFX;
+    [SerializeField] protected AudioClip TaskCompletedSoundFX;
+    [SerializeField] protected AudioSource AudioSource;
+
     #region Data
     private SliderData _sliderTaskData;
     public SliderData SliderTaskData
@@ -190,8 +194,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
         FinishedCover = _support.Find("FinishedCover");
 
+        AudioSource = GetComponent<AudioSource>();
+
         // Data
-        if(typeof(T) == typeof(PressableButtonHoloLens2))
+        if (typeof(T) == typeof(PressableButtonHoloLens2))
         {
             ButtonTaskData = new ButtonData(this.name);
         }else if (typeof(T) == typeof(PinchSlider))
@@ -262,6 +268,11 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     {
         // Data
         TimeInGRT += Time.deltaTime;
+
+        RemainingTime -= Time.deltaTime;
+
+        // UI
+        UpdateUI();
     }
 
     /// <summary>
@@ -298,10 +309,6 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfTasksSolved + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
         // GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         _controller.Parent.gameObject.SetActive(false);
-
-
-        //TODO Remove <- was for debug
-        GameManager.Instance.SaveGame();
     }
 
     private void OnExitSolved()
@@ -323,6 +330,9 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     {
         // Status
         IsGRTTerminated = false;
+
+        // Counter
+        RemainingTime = AllowedTime;
 
         // UI        
         TimeInGRT = 0.0f;
@@ -347,7 +357,9 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     /// </summary>
     public virtual void UpdateUI()
     {
-        TextPoints.text = $"Points: {Mathf.Round(Points)}";
+        TextPoints.text = $"Points: {Points}";
+        TextTimeLeft.text = $"Time: {Mathf.Round(RemainingTime)}";
+        TextTurnsLeft.text = $"Turns left: {TurnsLeft}";
     }
     #endregion
 }

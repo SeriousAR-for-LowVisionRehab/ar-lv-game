@@ -27,6 +27,11 @@ public class GRTPressTower : GRTPress
     {
         base.Start();
 
+        // Counters
+        TurnsLeft = _towerComponents.Length;
+        AllowedTime = 30.0f;
+        RemainingTime = AllowedTime;
+
         // Set initial parameters and helper
         _currentTowerLevelIndex = 0;   // start at the bottom
         buttonRight = _controller.ControllerButtons[0];
@@ -49,8 +54,10 @@ public class GRTPressTower : GRTPress
             btn.ButtonReleased.AddListener(IncrementReleasedCount);
         }
 
-            // Debug Mode
-            if (IsDebugMode)
+        _helpDialog.gameObject.SetActive(false);
+
+        // Debug Mode
+        if (IsDebugMode)
         {
             Debug.Log("[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);
@@ -60,6 +67,9 @@ public class GRTPressTower : GRTPress
     protected override void OnEnterSolving()
     {
         base.OnEnterSolving();
+
+        _helpDialog.gameObject.SetActive(true);
+
         UpdateComponentsHighlight(_currentTowerLevelIndex);
         UpdateHelpInformation(_currentTowerLevelIndex);
     }
@@ -70,6 +80,7 @@ public class GRTPressTower : GRTPress
 
         if (IsGRTTerminated)
         {
+            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
             Debug.Log("[GRTPressTower:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
@@ -94,7 +105,8 @@ public class GRTPressTower : GRTPress
                 return;
             }
 
-            UpdateUI();
+            AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
+            // UpdateUI();
             PrepareNextLevel();
         }
     }
@@ -102,6 +114,9 @@ public class GRTPressTower : GRTPress
     public override void ResetGRT()
     {
         base.ResetGRT();
+
+        // Counters
+        TurnsLeft = _towerComponents.Length;
     }
 
     /// <summary>
@@ -148,6 +163,8 @@ public class GRTPressTower : GRTPress
     private void PrepareNextLevel()
     {
         _currentTowerLevelIndex += 1;
+        // Counters
+        TurnsLeft -= 1;
 
         UpdateComponentsHighlight(_currentTowerLevelIndex);
         UpdateHelpInformation(_currentTowerLevelIndex);
@@ -161,7 +178,7 @@ public class GRTPressTower : GRTPress
     {
         // Y position of the dialogue
         var dialogPosition = _helpDialog.transform.position;
-        var levelPositionY = _towerComponents[_currentTowerLevelIndex].transform.position.y;
+        var levelPositionY = buttonRight.transform.position.y + 0.15f; // _towerComponents[_currentTowerLevelIndex].transform.position.y;
 
         _helpDialog.transform.position = new Vector3(dialogPosition.x, levelPositionY, dialogPosition.z);
 

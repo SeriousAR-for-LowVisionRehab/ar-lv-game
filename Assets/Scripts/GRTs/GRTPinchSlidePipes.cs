@@ -1,4 +1,3 @@
-using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 
 public class GRTPinchSlidePipes : GRTPinchSlide
@@ -21,8 +20,10 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     protected override void Start()
     {
         base.Start();
-        IsDebugMode = true;
 
+        TurnsLeft = 1;  // You only get the key out of the pipes once.
+        AllowedTime = 45.0f;
+        RemainingTime = AllowedTime;
         _keyOriginalPosition = _key.transform.position;
 
         // Slider
@@ -58,6 +59,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
 
         if (IsGRTTerminated)
         {
+            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _currentSliderIndex + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
@@ -70,7 +72,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
                 SliderController.gameObject.SetActive(false);                            // Deactivate Used Slider
                 _currentSliderIndex += 1;                                              // Increment Slider
                 Points = _currentSliderIndex;
-                UpdateUI();
+                //UpdateUI();
 
                 // Call CheckSolution before preparing next move:
                 CheckSolution();
@@ -97,6 +99,9 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     public override void ResetGRT()
     {
         base.ResetGRT();
+
+        TurnsLeft = 1;
+
         _key.transform.position = _keyOriginalPosition;
         _currentSliderIndex = 0;
         SliderController = _controller.ControllerButtons[_currentSliderIndex];
@@ -114,6 +119,8 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     {
         if (SliderController.SliderValue == 1)
         {
+            AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
+
             SliderTaskData.NbSuccessPinches += 1;
             _isNextSliderReady = true;
             ResetControllerPosition(0.0f);

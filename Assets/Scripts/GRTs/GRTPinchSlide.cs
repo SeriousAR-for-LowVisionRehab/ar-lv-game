@@ -73,7 +73,7 @@ public abstract class GRTPinchSlide : GRTGeneric<PinchSlider>
     /// </summary>
     protected void ResetControllerPosition(float resetValue)
     {
-        _sliderController.SliderValue = resetValue;
+        SliderController.SliderValue = resetValue;
     }
     #endregion
 }

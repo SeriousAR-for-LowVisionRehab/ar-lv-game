@@ -61,24 +61,33 @@ public class GRTPressClock : GRTPress
     private Quaternion _arrowInitRotation;
     [SerializeField] private GameObject[] _piecesOnClock;
 
+    [SerializeField] private Material _materialPieceOnSelection;                             // when piece is selected
+    [SerializeField] private Material _materialPieceOffSelection;                            // when piece is not selected
+
     // User
     [SerializeField] private GameObject[] _piecesToSelect;                   // what the user should select
     private PressableButtonHoloLens2 buttonRight;
     private PressableButtonHoloLens2 buttonLeft;
     private PressableButtonHoloLens2 buttonValidate;
+    private int _selectionIndexNeutralPosition;                              // where the selection reset to after each validation
     private int _selectionIndex;
     private int SelectionIndex
     {
         get { return _selectionIndex; }
         set 
         {
+            //int oldIndex = _selectionIndex;
             _selectionIndex = value;
             if (_selectionIndex < 0) _selectionIndex = 0;
             if (_selectionIndex > _piecesToSelect.Length - 1) _selectionIndex = _piecesToSelect.Length - 1;
+            //if(_selectionIndex == 2)
+            //{
+            //    if (oldIndex < 2) _selectionIndex = 3;
+            //    if (oldIndex > 2) _selectionIndex = 1;
+            //}
         }
     }
-    private Transform _currentSelectionHighlight;
-    private Transform _currentClockPieceHighlight;
+    //private Transform _currentClockPieceHighlight;
     private bool _isSelectionValidated = false;
     #endregion
 
@@ -116,14 +125,16 @@ public class GRTPressClock : GRTPress
         }
 
         // Set default starting selection
-        _selectionIndex = 0;
-        _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
+        _selectionIndexNeutralPosition = 2;
+        SelectionIndex = _selectionIndexNeutralPosition;
+        // _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
         _rotationIndex = 0;
-        _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
+        // _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
 
         // Counters
         TurnsLeft = 5;
         AllowedTime = 30.0f;
+        RemainingTime = AllowedTime;
 
         // Debug Mode
         if (IsDebugMode)
@@ -151,9 +162,6 @@ public class GRTPressClock : GRTPress
         {
             if (!_moveToNextTurn)
             {
-                RemainingTime -= Time.deltaTime;
-                TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
-
                 if (_isSelectionValidated)
                 {
                     CheckSolution();
@@ -167,6 +175,7 @@ public class GRTPressClock : GRTPress
         }
         else
         {
+            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
@@ -179,25 +188,26 @@ public class GRTPressClock : GRTPress
     {
         if (_piecesOnClock[_rotationIndex].name == _piecesToSelect[SelectionIndex].name)
         {
-            // Sound FX
-            // TODO: add win sound
+            AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
 
             // UI
             Points += 1;
-            TextPoints.text = $"Points: {Mathf.Round(Points)}";
 
             // Game Mechanic
+            ResetArrow();
             _rotationIndex += 1;
             _moveToNextTurn = true;
-            _currentSelectionHighlight.gameObject.SetActive(false);
         }
         else
         {
             Debug.Log("Pieces: clock(index " + _rotationIndex + ") = " + _piecesOnClock[_rotationIndex].name +
                 ", selection (index " +  SelectionIndex + ") = " + _piecesToSelect[SelectionIndex].name);
-
-            //TODO: add lose sound
         }
+
+        // Highlight + reset 
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
+        SelectionIndex = _selectionIndexNeutralPosition;
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
 
         // Player's selection
         _isSelectionValidated = false;
@@ -207,11 +217,15 @@ public class GRTPressClock : GRTPress
     {
         base.ResetGRT();
 
-        _selectionIndex = 0;
+        // Counters
+        TurnsLeft = 5;
+
+        SelectionIndex = _selectionIndexNeutralPosition;
         _rotationIndex = 0;
         _isSelectionValidated = false;
     }
 
+    #region Clock
     /// <summary>
     /// Reset the clock (arrow and piece), selected piece, and time,
     /// and set a new rotation index for next play
@@ -220,11 +234,9 @@ public class GRTPressClock : GRTPress
     {
         // UI
         TurnsLeft -= 1;
-        TextTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
         RemainingTime = AllowedTime;
 
         // Arrow
-        ResetArrow();
         if (_rotationIndex < _rotationAngles.Length)
         {
             PlaceArrow();
@@ -243,8 +255,7 @@ public class GRTPressClock : GRTPress
         _arrow.transform.Rotate(newAngle);
         _arrow.transform.localScale = new Vector3(2, 2, 2);
 
-        _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
-        _currentClockPieceHighlight.gameObject.SetActive(true);
+        UpdateComponentsHighlight(_piecesOnClock, _rotationIndex, _materialPieceOnSelection, 3, 3);
 
     }
     
@@ -256,9 +267,11 @@ public class GRTPressClock : GRTPress
         //_arrow.transform.SetPositionAndRotation(_arrowInitPosition, _arrowInitRotation);
         _arrow.transform.position = _arrowInitPosition;
         _arrow.transform.rotation = _arrowInitRotation;
-        _currentClockPieceHighlight.gameObject.SetActive(false);
+        UpdateComponentsHighlight(_piecesOnClock, _rotationIndex, _materialPieceOffSelection, 3, 3);
     }
+    #endregion
 
+    #region User Controller
     /// <summary>
     /// Perform operations related to the validation of the user's choice.
     /// </summary>
@@ -276,10 +289,9 @@ public class GRTPressClock : GRTPress
     private void MoveCursorLeft()
     {
         // Mechanism
-        _currentSelectionHighlight.gameObject.SetActive(false);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
         SelectionIndex -= 1;
-        _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
-        _currentSelectionHighlight.gameObject.SetActive(true);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
 
         // Data
         _NbClickButtonLeft += 1;
@@ -290,10 +302,9 @@ public class GRTPressClock : GRTPress
     private void MoveCursorRight()
     {
         // Mechanism
-        _currentSelectionHighlight.gameObject.SetActive(false);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
         SelectionIndex += 1;
-        _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
-        _currentSelectionHighlight.gameObject.SetActive(true);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
 
         // Data
         _NbClickButtonRight += 1;
@@ -301,4 +312,27 @@ public class GRTPressClock : GRTPress
         ButtonTaskData.NbSuccessClicks += 1;
     }
 
+    /// <summary>
+    /// Turn on highlight for the selected piece, and off for the previous selection.
+    /// 
+    /// Remark: NeutralPosition (index=2) and Cross (index=4) are composite of children, and have their Renderer material in children objects
+    /// The if-elseif() and foreach are there to reach those Renderer in children objects.
+    /// </summary>
+    private void UpdateComponentsHighlight(GameObject[] pieces, int index, Material material, int exception1, int exception2)
+    {
+        if (index == exception1 || index == exception2)
+        {
+            Renderer[] childRenderers = pieces[index].GetComponentsInChildren<Renderer>();
+            foreach (Renderer childRenderer in childRenderers)
+            {
+                childRenderer.material = material;
+            }
+
+        }
+        else if (index != exception1)
+        {
+            pieces[index].GetComponent<Renderer>().material = material;
+        }
+    }
+    #endregion
 }

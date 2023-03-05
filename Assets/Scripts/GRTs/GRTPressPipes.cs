@@ -57,6 +57,8 @@ public class GRTPressPipes : GRTPress
     {
         base.Start();
 
+        // Initial setup
+        TurnsLeft = 1;  // You only get the key out of the pipes once.
         AllowedTime = 45.0f;
         RemainingTime = AllowedTime;
         _keyOriginalPosition = _key.transform.position;
@@ -98,13 +100,14 @@ public class GRTPressPipes : GRTPress
 
         if (!IsGRTTerminated)
         {
-            RemainingTime -= Time.deltaTime;
-            TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
+            // RemainingTime -= Time.deltaTime;   // -> move to parent OnUpdateSolving
+            //TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
 
             CheckSolution();
         }
         else
         {
+            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
@@ -128,6 +131,9 @@ public class GRTPressPipes : GRTPress
     public override void ResetGRT()
     {
         base.ResetGRT();
+
+        TurnsLeft = 1;
+
         _key.transform.position = _keyOriginalPosition;
         _currentButtonIndex = 0;
         _currentButton = _controller.ControllerButtons[_currentButtonIndex];
@@ -156,9 +162,11 @@ public class GRTPressPipes : GRTPress
             _currentButton.gameObject.SetActive(true);
         }
 
+        AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
+
         // Points
         Points += 1;
-        UpdateUI();
+        //UpdateUI();
 
         // Clicks
         ButtonTaskData.NbSuccessClicks += 1;

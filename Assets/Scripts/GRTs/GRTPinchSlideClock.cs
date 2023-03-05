@@ -1,4 +1,5 @@
 using Microsoft.MixedReality.Toolkit.UI;
+using System;
 using UnityEngine;
 
 public class GRTPinchSlideClock : GRTPinchSlide
@@ -41,15 +42,20 @@ public class GRTPinchSlideClock : GRTPinchSlide
     // Clock
     private int _rotationIndex;                                              // an index chosen at random: for rotation, and piece on clock
     private int[] _rotationsOrder = {1, 3, 0, 2};                            // pre-determined order of rotation
-    [SerializeField] private int[] _rotationAngles = { 0, -90, -180, -270 }; // assume four pieces displayed    
+    [SerializeField] private int[] _rotationAngles = { 90, 270, 0, 180 }; // assume four pieces displayed    
     [SerializeField] private GameObject _arrow;
     private Vector3 _arrowInitPosition;
     private Quaternion _arrowInitRotation;
     [SerializeField] private GameObject[] _piecesOnClock;
 
+
+    [SerializeField] private Material _materialPieceOnSelection;                             // when piece is selected
+    [SerializeField] private Material _materialPieceOffSelection;
+
     // User
     private PinchSlider _sliderValidation;
     [SerializeField] private GameObject[] _piecesToSelect;                   // what the user should select
+    private int _selectionIndexNeutralPosition;                              // where the selection reset to after each validation
     private int _selectionIndex;
     private int SelectionIndex
     {
@@ -61,7 +67,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
             if (_selectionIndex > _piecesToSelect.Length - 1) _selectionIndex = _piecesToSelect.Length - 1;
         }
     }
-    private Transform _currentSelectionHighlight;
+
     private Transform _currentClockPieceHighlight;
     private bool _isSelectionValidated = false;
     #endregion
@@ -70,6 +76,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
     private int _NbClickButtonLeft, _NbClickButtonRight, _NbClickButtonValidate;
     #endregion
 
+    #region Overrides
     // Start is called before the first frame update
     protected override void Start()
     {
@@ -77,9 +84,10 @@ public class GRTPinchSlideClock : GRTPinchSlide
         SliderController = _controller.ControllerButtons[0];
         _sliderValidation = _controller.ControllerButtons[1];
         ResetControllerPosition(0.5f);
+        _sliderValidation.SliderValue = 0.0f;
 
         // Data listeners
-        foreach( var slider in _controller.ControllerButtons)
+        foreach ( var slider in _controller.ControllerButtons)
         {
             slider.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
             slider.OnHoverEntered.AddListener(delegate { IncrementHoverCount(); });
@@ -94,16 +102,18 @@ public class GRTPinchSlideClock : GRTPinchSlide
         _sliderValidation.OnInteractionEnded.AddListener(delegate { ValidateChoice(); });
 
         // Set default starting selection
-        _selectionIndex = 0;
-        _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
+        _selectionIndexNeutralPosition = 2;
+        SelectionIndex = _selectionIndexNeutralPosition;
+        //_currentSelectionHighlight = _piecesToSelect[SelectionIndex].transform.Find("SelectionForm");
         _rotationIndex = 0;
-        _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
+        //_currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
         _arrowInitPosition = _arrow.transform.localPosition;
         _arrowInitRotation = _arrow.transform.localRotation;
 
         // Counters
         TurnsLeft = 5;
         AllowedTime = 30.0f;
+        RemainingTime = AllowedTime;
 
         // Debug Mode
         if (IsDebugMode)
@@ -121,10 +131,10 @@ public class GRTPinchSlideClock : GRTPinchSlide
         {
             if (!_moveToNextTurn)
             {
-                MoveCursor();
+                // MoveCursor();
 
-                RemainingTime -= Time.deltaTime;
-                TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
+                // RemainingTime -= Time.deltaTime;
+                //TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
 
                 if (_isSelectionValidated)
                 {
@@ -139,6 +149,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         }
         else
         {
+            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
             Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
@@ -151,14 +162,20 @@ public class GRTPinchSlideClock : GRTPinchSlide
     {
         if (_piecesOnClock[_rotationIndex].name == _piecesToSelect[SelectionIndex].name)
         {
+            AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
             // UI
             Points += 1;
-            TextPoints.text = $"Points: {Mathf.Round(Points)}";
 
             // Game Mechanic
+            ResetArrow();
+            _rotationIndex += 1;
             _moveToNextTurn = true;
-            _currentSelectionHighlight.gameObject.SetActive(false);
         }
+
+        // Highlight + reset 
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
+        SelectionIndex = _selectionIndexNeutralPosition;
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
 
         // Player's selection
         _isSelectionValidated = false;
@@ -167,12 +184,19 @@ public class GRTPinchSlideClock : GRTPinchSlide
     public override void ResetGRT()
     {
         base.ResetGRT();
-        _turnsLeft = 5;
-        _selectionIndex = 0;
+
+        // Counters
+        TurnsLeft = 5;
+
+        SelectionIndex = _selectionIndexNeutralPosition;
+
         _rotationIndex = 0;
+        _isSelectionValidated = false;
 
     }
+    #endregion
 
+    #region Clock
     /// <summary>
     /// Reset the clock (arrow and piece), selected piece, and time,
     /// and set a new rotation index for next play
@@ -180,28 +204,20 @@ public class GRTPinchSlideClock : GRTPinchSlide
     private void PrepareTurn()
     {
         ResetControllerPosition(0.5f);
+        _sliderValidation.SliderValue = 0.0f;
 
         // UI
         TurnsLeft -= 1;
-        TextTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
         RemainingTime = AllowedTime;
 
         // Arrow
-        ResetArrow();
-        _rotationIndex = GenerateRotationIndex();
-        PlaceArrow();
+        if (_rotationIndex < _rotationAngles.Length)
+        {
+            PlaceArrow();
+        }
 
         // Player's selection
         _isSelectionValidated = false;
-    }
-
-    /// <summary>
-    /// Return a random index for a rotation
-    /// </summary>
-    /// <returns></returns>
-    private int GenerateRotationIndex()
-    {
-        return Random.Range(0, _rotationAngles.Length - 1);
     }
 
     /// <summary>
@@ -213,8 +229,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         _arrow.transform.Rotate(newAngle);
         _arrow.transform.localScale = new Vector3(2, 2, 2);
 
-        _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
-        _currentClockPieceHighlight.gameObject.SetActive(true);
+        UpdateComponentsHighlight(_piecesOnClock, _rotationIndex, _materialPieceOnSelection, 3, 3);
         _arrowInitPosition = _arrow.transform.localPosition;
 
     }
@@ -224,12 +239,13 @@ public class GRTPinchSlideClock : GRTPinchSlide
     /// </summary>
     private void ResetArrow()
     {
-        //_arrow.transform.SetPositionAndRotation(_arrowInitPosition, _arrowInitRotation);
         _arrow.transform.localPosition = _arrowInitPosition;
         _arrow.transform.localRotation = _arrowInitRotation;
-        _currentClockPieceHighlight.gameObject.SetActive(false);
+        UpdateComponentsHighlight(_piecesOnClock, _rotationIndex, _materialPieceOffSelection, 3, 3);
     }
+    #endregion
 
+    #region User Controller
     /// <summary>
     /// Perform operations related to the validation of the user's choice.
     /// </summary>
@@ -239,27 +255,20 @@ public class GRTPinchSlideClock : GRTPinchSlide
 
         _isSelectionValidated = true;
         ResetControllerPosition(0.5f);
+        _sliderValidation.SliderValue = 0.0f;
 
         // Data
         SliderTaskData.NbSuccessPinches += 1;
     }
 
     
-    /// <summary>
-    /// Select (highlight) a new piece on the horizontal choices.
-    /// </summary>
-    private void MoveCursor()
-    {
-        // Mechanism
-        _currentSelectionHighlight.gameObject.SetActive(false);
-        _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
-        _currentSelectionHighlight.gameObject.SetActive(true);
-    }
-
     private void UpdateSelectionIndex()
     {
         // Data
         SliderTaskData.NbSuccessPinches += 1;
+
+        // Highlight OFF
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
 
         // slider to selectionIndex:  0->0, 0.25 -> 1, 0.5 -> middle/none, 0.75 -> 2, 1 -> 3
         switch (SliderController.SliderValue)
@@ -271,19 +280,45 @@ public class GRTPinchSlideClock : GRTPinchSlide
                 SelectionIndex = 1;
                 break;
             case 0.50f:
-                // Debug.Log("[GRTPinchSlideClock:MoveCursor] Reset cursor to middle-off position.");
+                SelectionIndex = _selectionIndexNeutralPosition;
                 break;
             case 0.75f:
-                SelectionIndex = 2;
+                SelectionIndex = 3;
                 break;
             case 1.00f:
-                SelectionIndex = 3;
+                SelectionIndex = 4;
                 break;
             default:
                 Debug.LogError("[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
                 break;
         }
+
+        // Highlight ON
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
     }
 
+    /// <summary>
+    /// Turn on highlight for the selected piece, and off for the previous selection.
+    /// 
+    /// Remark: NeutralPosition (index=2) and Cross (index=4) are composite of children, and have their Renderer material in children objects
+    /// The if-elseif() and foreach are there to reach those Renderer in children objects.
+    /// </summary>
+    private void UpdateComponentsHighlight(GameObject[] pieces, int index, Material material, int exception1, int exception2)
+    {
+        if (index == exception1 || index == exception2)
+        {
+            Renderer[] childRenderers = pieces[index].GetComponentsInChildren<Renderer>();
+            foreach (Renderer childRenderer in childRenderers)
+            {
+                childRenderer.material = material;
+            }
 
+        }
+        else if (index != exception1)
+        {
+            pieces[index].GetComponent<Renderer>().material = material;
+        }
+    }
+
+    #endregion
 }
