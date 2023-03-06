@@ -25,6 +25,14 @@ public class GameSettings
         get { return _numberOfTasksToSolve; }
     }
 
+    [SerializeField] private List<GameObject> _markers;                 // added by hand in Inspector
+
+    public List<GameObject> Markers
+    {
+        get { return _markers; }
+        set { _markers = value; }
+    }
+
     [SerializeField] private List<Vector3> _markersPositions;   // positions w.r.t. to origin when headset start, no offset applied
     public List<Vector3> MarkersPositions
     {
@@ -99,14 +107,25 @@ public class GameSettings
     /// <summary>
     /// Clear the positions in GameSettings. Add new positions from list given in parameter
     /// </summary>
-    public void SetMarkersPositionsInGameSettingsUsingListInParameter(List<GameObject> markersGameObjects)
+    public void SetMarkersPositionsInGameSettingsUsingListInParameter()
     {
         MarkersPositions.Clear();
-        foreach(GameObject marker in markersGameObjects)
+        foreach(GameObject marker in Markers)
         {
             MarkersPositions.Add(marker.transform.position);
         }
         Debug.Log("[GameSettings:SetMarkersPositions] new positions set.");
+    }
+
+    /// <summary>
+    /// Set Markers' GameObject Position from the GameSettings' Vector3
+    /// </summary>
+    public void SetMarkersUsingGameSettings()
+    {
+        for(int i=0; i < Markers.Count; i++)
+        {
+            Markers[i].transform.position = MarkersPositions[i];
+        }
     }
     #endregion
 }

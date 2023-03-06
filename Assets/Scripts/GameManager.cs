@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
     public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
 
     [Tooltip("Markers to place prefabs. These are NOT WLT anchors!")]
-    [SerializeField] private List<GameObject> _markers;                 // added by hand in Inspector
+    
 
     #region FSMs
     private FiniteStateMachine<GameState> _gameStateMachine; // = new FiniteStateMachine<GameStates>();
@@ -169,7 +169,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         GameSettings = new GameSettings();
-        GameSettings.LoadMarkersPositionsFromFile();
+        GameSettings.ResetSettingsToDefault();
         NumberOfTasksToSolve = 3;
         NumberOfTasksSolved = 0;
         PlayerData = new PlayerData(NumberOfTasksToSolve);
@@ -451,24 +451,8 @@ public class GameManager : MonoBehaviour
         _currentMenu = _menusUI[_menusUIIndexCreation];
         _currentMenu.SetActive(true);
 
-        // Set _markers position from GameSettings
-        if (GameSettings.MarkersPositions.Count > 0)
-        {
-            Debug.Log("[GameManager:OnEnterCreation] Placing _markers w.r.t. settings...");
-            for (int i = 0; i < GameSettings.MarkersPositions.Count; i++)
-            {
-                _markers[i].transform.position = GameSettings.MarkersPositions[i];
-            }
-        }
-
         // Tasks
         ShowMarkers(true);
-        //FreezeTasksInPlace(false);
-        //foreach (var task in _tasksPrefabs)
-        //{
-        //    task.SetActive(true);
-        //}
-        //PlaceTasksOnMarkers();                 // Position the GRTs on their respective marker
 
         Debug.Log("[GameManager:OnEnterCreationMode] UI activated. _markers position set from settings. Tasks placed on markers.");
     }
@@ -497,19 +481,23 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void PlaceTasksOnMarkers()
     {
+        var markers = GameSettings.Markers;
+        // Markers in the Creation are re-positionned based on the GameSettings.
+        GameSettings.SetMarkersUsingGameSettings();
+
         // one marker per type of task (pipes, clock, and tower)
         // recall that tasks' prefab are set manually in the inspector:
         // e.g. marker[0] is for pipes with buttons (prefab 0) and with sliders (prefab 3)
         // e.g. marker[1] is for clocks with buttons (prefab 1) and with sliders (prefab 4)
-        for (int markerIndex = 0; markerIndex < _markers.Count; markerIndex++)
+        for (int markerIndex = 0; markerIndex < markers.Count; markerIndex++)
         {
             _tasksPrefabs[markerIndex].SetActive(true);
             _tasksPrefabs[markerIndex + 3].SetActive(true);
-            _tasksPrefabs[markerIndex].transform.position = _markers[markerIndex].transform.position;
-            _tasksPrefabs[markerIndex + 3].transform.position = _markers[markerIndex].transform.position;
+            _tasksPrefabs[markerIndex].transform.position = markers[markerIndex].transform.position;
+            _tasksPrefabs[markerIndex + 3].transform.position = markers[markerIndex].transform.position;
 
-            _tasksPrefabs[markerIndex].transform.rotation = _markers[markerIndex].transform.rotation;
-            _tasksPrefabs[markerIndex + 3].transform.rotation = _markers[markerIndex].transform.rotation;
+            _tasksPrefabs[markerIndex].transform.rotation = markers[markerIndex].transform.rotation;
+            _tasksPrefabs[markerIndex + 3].transform.rotation = markers[markerIndex].transform.rotation;
         }
         Debug.Log("[GameManager:SetTasksPositionFromMarkers] Tasks set on markers");
     }
@@ -549,7 +537,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void ShowMarkers(bool markerShown)
     {
-        foreach (var marker in Instance._markers)
+        foreach (var marker in GameSettings.Markers)
         {
             marker.SetActive(markerShown);
         }
@@ -606,7 +594,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void SaveTheseMarkersPositionsToGameSettingsFile()
     {
-        GameSettings.SetMarkersPositionsInGameSettingsUsingListInParameter(_markers);
+        GameSettings.SetMarkersPositionsInGameSettingsUsingListInParameter();
         GameSettings.SaveGameSettingsToFile();
     }
     #endregion
