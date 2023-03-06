@@ -10,6 +10,7 @@ public class GameSettings
 {
     private string _fileName;
     private string _fullPath;
+    private string _pathToDefaultSettings;
 
     [SerializeField] private int _participantNumber = 0;
     public int ParticipantNumber
@@ -39,9 +40,26 @@ public class GameSettings
         _fileName = "GameSettings.json";
         _fullPath = Path.Combine(Application.persistentDataPath, _fileName);
 
+        _pathToDefaultSettings = Path.Combine(Application.persistentDataPath, "GameSettingsDefault.json");
+
         MarkersPositions = new List<Vector3>();
 
         Debug.Log("[GameSettings] Created instance");
+    }
+
+    public void ResetSettingsToDefault()
+    {
+        if (!File.Exists(_pathToDefaultSettings)) return;
+
+        string json;
+        GameSettings temporaryGameSettings;
+
+        // Read file
+        json = File.ReadAllText(_pathToDefaultSettings);
+        temporaryGameSettings = JsonUtility.FromJson<GameSettings>(json);
+
+        // Load data to this instance
+        MarkersPositions = temporaryGameSettings.MarkersPositions;
     }
 
     /// <summary>
@@ -79,10 +97,9 @@ public class GameSettings
     }
 
     /// <summary>
-    /// Clear current list of markers' position, and 
-    /// Add new position from a list of GameObject.
+    /// Clear the positions in GameSettings. Add new positions from list given in parameter
     /// </summary>
-    public void SetMarkersPositionsFromList(List<GameObject> markersGameObjects)
+    public void SetMarkersPositionsInGameSettingsUsingListInParameter(List<GameObject> markersGameObjects)
     {
         MarkersPositions.Clear();
         foreach(GameObject marker in markersGameObjects)

@@ -239,14 +239,22 @@ public class GameManager : MonoBehaviour
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
         _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
 
-        // Add Listeners to CREATION buttons: 0=pin, 1=Save, 2=Reset, 3=Unfreeze, 4=Home, 5=decrease Participant #, 6=increase participant #
+        // Add Listeners to CREATION buttons: 0=pin,
+        // 1=Save Creation, 2=Unfreeze Tasks, 3=Text "Task: Free/Unfrozen"
+        // 4=Load Settings, 5=Save Settings, 6=Reset Settings To Default,
+        // 7=Place Tasks On Marks, 8=Reset Game, 9=Return Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
-        _creationButtons[2].ButtonPressed.AddListener(SetTasksPositionFromMarkers);
-        _creationButtons[3].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
-        _creationButtons[4].ButtonPressed.AddListener(SetStateHome);
-        _creationButtons[5].ButtonPressed.AddListener(ResetGame);
-        _creationButtons[6].ButtonPressed.AddListener(delegate { UpdateParticipantNb(-1); });
-        _creationButtons[7].ButtonPressed.AddListener(delegate { UpdateParticipantNb(+1); });
+        _creationButtons[2].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
+        _creationButtons[3].ButtonPressed.AddListener(SaveTheseMarkersPositionsToGameSettingsFile);
+        _creationButtons[4].ButtonPressed.AddListener(GameSettings.LoadMarkersPositionsFromFile);
+        _creationButtons[5].ButtonPressed.AddListener(GameSettings.ResetSettingsToDefault);
+        _creationButtons[6].ButtonPressed.AddListener(PlaceTasksOnMarkers);
+        _creationButtons[7].ButtonPressed.AddListener(ResetGame);
+        _creationButtons[8].ButtonPressed.AddListener(SetStateHome);
+        _creationButtons[9].ButtonPressed.AddListener(delegate { UpdateParticipantNb(-1); });
+        _creationButtons[10].ButtonPressed.AddListener(delegate { UpdateParticipantNb(+1); });
+
+        //_creationButtons[3].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
 
         // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
         _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHomeAndPauseEscapeRoom);
@@ -454,13 +462,13 @@ public class GameManager : MonoBehaviour
         }
 
         // Tasks
-        FreezeTasksInPlace(false);
         ShowMarkers(true);
-        foreach (var task in _tasksPrefabs)
-        {
-            task.SetActive(true);
-        }
-        SetTasksPositionFromMarkers();                 // Position the GRTs on their respective marker
+        //FreezeTasksInPlace(false);
+        //foreach (var task in _tasksPrefabs)
+        //{
+        //    task.SetActive(true);
+        //}
+        //PlaceTasksOnMarkers();                 // Position the GRTs on their respective marker
 
         Debug.Log("[GameManager:OnEnterCreationMode] UI activated. _markers position set from settings. Tasks placed on markers.");
     }
@@ -487,16 +495,21 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Position the tasks w.r.t. the positions of the markers' GameObjects
     /// </summary>
-    private void SetTasksPositionFromMarkers()
+    private void PlaceTasksOnMarkers()
     {
         // one marker per type of task (pipes, clock, and tower)
+        // recall that tasks' prefab are set manually in the inspector:
         // e.g. marker[0] is for pipes with buttons (prefab 0) and with sliders (prefab 3)
+        // e.g. marker[1] is for clocks with buttons (prefab 1) and with sliders (prefab 4)
         for (int markerIndex = 0; markerIndex < _markers.Count; markerIndex++)
         {
             _tasksPrefabs[markerIndex].SetActive(true);
             _tasksPrefabs[markerIndex + 3].SetActive(true);
             _tasksPrefabs[markerIndex].transform.position = _markers[markerIndex].transform.position;
             _tasksPrefabs[markerIndex + 3].transform.position = _markers[markerIndex].transform.position;
+
+            _tasksPrefabs[markerIndex].transform.rotation = _markers[markerIndex].transform.rotation;
+            _tasksPrefabs[markerIndex + 3].transform.rotation = _markers[markerIndex].transform.rotation;
         }
         Debug.Log("[GameManager:SetTasksPositionFromMarkers] Tasks set on markers");
     }
@@ -544,15 +557,12 @@ public class GameManager : MonoBehaviour
 
 
     /// <summary>
-    /// Save tasks' position to file, set escape room state to READY.
+    /// Froze Tasks in place, hide markers and set escape room state to READY.
     /// </summary>
     public void SaveCreation()
     {
         FreezeTasksInPlace(true);
         ShowMarkers(false);
-
-        GameSettings.SetMarkersPositionsFromList(_markers);
-        GameSettings.SaveGameSettingsToFile();
 
         EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
         Debug.Log("[GameManager:SaveCreation] Creation saved");
@@ -590,6 +600,14 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
 
+    }
+    /// <summary>
+    /// Take the positions of the markers in _markers, save them in GameSettings and save to JSON file.
+    /// </summary>
+    private void SaveTheseMarkersPositionsToGameSettingsFile()
+    {
+        GameSettings.SetMarkersPositionsInGameSettingsUsingListInParameter(_markers);
+        GameSettings.SaveGameSettingsToFile();
     }
     #endregion
 
