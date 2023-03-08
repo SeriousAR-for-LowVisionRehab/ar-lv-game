@@ -131,6 +131,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     /// </summary>
     public void UpdateMechanismAndCheckSolution()
     {
+        Debug.Log("[GRTPinchSlideTower:UpdateMechanismAndCheckSolution] starting method ... ");
         // Data
         SliderTaskData.NbSuccessPinches += 1;
 

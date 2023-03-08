@@ -59,6 +59,10 @@ public class GameManager : MonoBehaviour
     private PressableButtonHoloLens2[] _creationButtons;           // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _escapeRoomButtons;         // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2 _tutorialGesturePressButton;  // the button to learn the gesture (used GetComponent)
+
+    private TextMesh _textMarkerPipesPosition;
+    private TextMesh _textMarkerClockPosition;
+    private TextMesh _textMarkerTowerPosition;
     #endregion
 
     #region Data
@@ -169,7 +173,10 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         GameSettings = new GameSettings();
-        GameSettings.ResetSettingsToDefault();
+        GameSettings.LoadMarkersPositionsFromFile();
+        GameSettings.SetMarkersUsingJsonPositions();
+
+        //GameSettings.ResetSettingsToDefault();
         NumberOfTasksToSolve = 3;
         NumberOfTasksSolved = 0;
         PlayerData = new PlayerData(NumberOfTasksToSolve);
@@ -204,7 +211,7 @@ public class GameManager : MonoBehaviour
                 GameState.CREATION,
                 OnEnterCreation,
                 OnExitCreation,
-                null,
+                OnUpdateCreation,
                 null
                 )
             );
@@ -245,14 +252,19 @@ public class GameManager : MonoBehaviour
         // 7=Place Tasks On Marks, 8=Reset Game, 9=Return Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
         _creationButtons[2].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
-        _creationButtons[3].ButtonPressed.AddListener(SaveTheseMarkersPositionsToGameSettingsFile);
-        _creationButtons[4].ButtonPressed.AddListener(GameSettings.LoadMarkersPositionsFromFile);
+        _creationButtons[3].ButtonPressed.AddListener(GameSettings.LoadMarkersPositionsFromFile);
+        _creationButtons[4].ButtonPressed.AddListener(SaveTheseMarkersPositionsToGameSettingsFile);        
         _creationButtons[5].ButtonPressed.AddListener(GameSettings.ResetSettingsToDefault);
         _creationButtons[6].ButtonPressed.AddListener(PlaceTasksOnMarkers);
         _creationButtons[7].ButtonPressed.AddListener(ResetGame);
         _creationButtons[8].ButtonPressed.AddListener(SetStateHome);
         _creationButtons[9].ButtonPressed.AddListener(delegate { UpdateParticipantNb(-1); });
         _creationButtons[10].ButtonPressed.AddListener(delegate { UpdateParticipantNb(+1); });
+
+        var buttoncollectionregrouped = _menusUI[_menusUIIndexCreation].transform.Find("ButtonCollectionRegrouped");
+        _textMarkerPipesPosition = buttoncollectionregrouped.transform.Find("TextMarkerPipesPosition").GetComponent<TextMesh>();
+        _textMarkerClockPosition = buttoncollectionregrouped.transform.Find("TextMarkerClockPosition").GetComponent<TextMesh>();
+        _textMarkerTowerPosition = buttoncollectionregrouped.transform.Find("TextMarkerTowerPosition").GetComponent<TextMesh>();
 
         //_creationButtons[3].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
 
@@ -454,7 +466,7 @@ public class GameManager : MonoBehaviour
         // Tasks
         ShowMarkers(true);
 
-        Debug.Log("[GameManager:OnEnterCreationMode] UI activated. _markers position set from settings. Tasks placed on markers.");
+        Debug.Log("[GameManager:OnEnterCreationMode] UI activated. Markers shown.");
     }
 
     /// <summary>
@@ -475,6 +487,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void OnUpdateCreation()
+    {
+        _textMarkerPipesPosition.text = $"Marker Pipes:\n #{GameSettings.Markers[0].transform.position}";
+        _textMarkerClockPosition.text = $"Marker Clock:\n #{GameSettings.Markers[1].transform.position}";
+        _textMarkerTowerPosition.text = $"Marker Tower:\n #{GameSettings.Markers[2].transform.position}";
+    }
+
 
     /// <summary>
     /// Position the tasks w.r.t. the positions of the markers' GameObjects
@@ -482,8 +501,6 @@ public class GameManager : MonoBehaviour
     private void PlaceTasksOnMarkers()
     {
         var markers = GameSettings.Markers;
-        // Markers in the Creation are re-positionned based on the GameSettings.
-        GameSettings.SetMarkersUsingGameSettings();
 
         // one marker per type of task (pipes, clock, and tower)
         // recall that tasks' prefab are set manually in the inspector:
@@ -522,11 +539,11 @@ public class GameManager : MonoBehaviour
         string tempText;
         if (freezedTask)
         {
-            tempText = "Tasks: Frozen";
+            tempText = "Tasks: Fixed";
         }
         else
         {
-            tempText = "Tasks: Unfrozen";
+            tempText = "Tasks: Free";
         }
         CreationUpdateTasksStatus(tempText);
     }
@@ -561,8 +578,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void CreationUpdateTasksStatus(string newText)
     {
-        int indexTasksStatus = 5;
-        Transform taskStatus = _menusUI[_menusUIIndexCreation].transform.GetChild(indexTasksStatus);
+        // int indexTasksStatus = 5;
+        var buttoncollectionregrouped = _menusUI[_menusUIIndexCreation].transform.Find("ButtonCollectionRegrouped");
+        Transform taskStatus = buttoncollectionregrouped.transform.Find("TextTasksStatus");  //GetChild(indexTasksStatus);
         taskStatus.GetComponent<TextMesh>().text = newText;
     }
 

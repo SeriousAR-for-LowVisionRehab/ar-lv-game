@@ -25,14 +25,15 @@ public class GameSettings
         get { return _numberOfTasksToSolve; }
     }
 
+    // User can move these markers
     [SerializeField] private List<GameObject> _markers;                 // added by hand in Inspector
-
     public List<GameObject> Markers
     {
         get { return _markers; }
         set { _markers = value; }
     }
 
+    // What is actually saved to the JSON
     [SerializeField] private List<Vector3> _markersPositions;   // positions w.r.t. to origin when headset start, no offset applied
     public List<Vector3> MarkersPositions
     {
@@ -40,8 +41,10 @@ public class GameSettings
         set { _markersPositions = value; }
     }
 
+
+
     /// <summary>
-    /// Constructor: set path and initialize empty MarkersPositions' list.
+    /// Constructor: set path, add Markers from Hierarchy, and initialize empty MarkersPositions' list.
     /// </summary>
     public GameSettings()
     {
@@ -50,24 +53,44 @@ public class GameSettings
 
         _pathToDefaultSettings = Path.Combine(Application.persistentDataPath, "GameSettingsDefault.json");
 
+        Markers = new List<GameObject>();
         MarkersPositions = new List<Vector3>();
+
+        // Get Markers GameObjets from Hierarchy
+        foreach (Transform marker in GameObject.Find("Markers").transform)
+        {
+            Markers.Add(marker.gameObject);
+        }
+
+        // TODO: why does it create an Stack Overflow (repeated creation of GameSetting instance)
+        // Read the positions in the JSON "GameSettings"
+        // LoadMarkersPositionsFromFile();
+
+        // Set Markers GameObjects' positions to the positions read from the JSON
+        // SetMarkersUsingJsonPositions();
+
 
         Debug.Log("[GameSettings] Created instance");
     }
 
+    /// <summary>
+    /// Read the Positions in the default JSON and load it to MarkersPositions' List<Vector3>.</Vector3>
+    /// (i.e. for a given experiment/study, a default settings exist in the _pathToDefaultSettings JSON.)    /// 
+    /// </summary>
     public void ResetSettingsToDefault()
     {
         if (!File.Exists(_pathToDefaultSettings)) return;
 
         string json;
-        GameSettings temporaryGameSettings;
 
         // Read file
         json = File.ReadAllText(_pathToDefaultSettings);
-        temporaryGameSettings = JsonUtility.FromJson<GameSettings>(json);
+        MarkersPositions = JsonUtility.FromJson<GameSettings>(json).MarkersPositions;
 
-        // Load data to this instance
-        MarkersPositions = temporaryGameSettings.MarkersPositions;
+        // Update GameObjects 
+        SetMarkersUsingJsonPositions();
+
+        Debug.Log("[GameSettings] Settings reset to default.");
     }
 
     /// <summary>
@@ -78,16 +101,24 @@ public class GameSettings
         if (!File.Exists(_fullPath)) return;
 
         string json;
-        GameSettings temporaryGameSettings;
 
         // Read file
         json = File.ReadAllText(_fullPath);
-        temporaryGameSettings = JsonUtility.FromJson<GameSettings>(json);
-        
-        // Import/Load data to this instance
-        MarkersPositions = temporaryGameSettings.MarkersPositions;
+        MarkersPositions = JsonUtility.FromJson<GameSettings>(json).MarkersPositions;
 
         Debug.Log("[GameSettings:LoadMarkersPositionsFromFile] new positions loaded.");
+    }
+
+    /// <summary>
+    /// Set Markers' GameObject Position from the GameSettings' Vector3
+    /// </summary>
+    public void SetMarkersUsingJsonPositions()
+    {
+        for (int i = 0; i < Markers.Count; i++)
+        {
+            Markers[i].transform.position = MarkersPositions[i];
+        }
+        Debug.Log("[GameSettings] SetMarkersUsingJsonPositions done.");
     }
 
     #region public methods
@@ -117,15 +148,6 @@ public class GameSettings
         Debug.Log("[GameSettings:SetMarkersPositions] new positions set.");
     }
 
-    /// <summary>
-    /// Set Markers' GameObject Position from the GameSettings' Vector3
-    /// </summary>
-    public void SetMarkersUsingGameSettings()
-    {
-        for(int i=0; i < Markers.Count; i++)
-        {
-            Markers[i].transform.position = MarkersPositions[i];
-        }
-    }
+
     #endregion
 }
