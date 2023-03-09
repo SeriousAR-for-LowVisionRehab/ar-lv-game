@@ -41,9 +41,11 @@ public class GRTPinchSlidePipes : GRTPinchSlide
             slider.OnInteractionEnded.AddListener(delegate { SliderReleased(); });
             slider.gameObject.SetActive(false);
         }
+
         _currentSliderIndex = 0;
         SliderController = _controller.ControllerButtons[_currentSliderIndex];
         SliderController.gameObject.SetActive(true);
+
 
         // Debug Mode
         if (IsDebugMode)
@@ -57,32 +59,23 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     {
         base.OnUpdateSolving();
 
-        if (IsGRTTerminated)
+        if (!IsGRTTerminated && _isNextSliderReady)
         {
-            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + _currentSliderIndex + " points! Well done!");
-            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
-        }
-        else
-        {
-            if (_isNextSliderReady)
-            {
-                // Actions needed after slider was released:
-                MoveKeyToNextPosition();    
-                SliderController.gameObject.SetActive(false);                            // Deactivate Used Slider
-                _currentSliderIndex += 1;                                              // Increment Slider
-                Points = _currentSliderIndex;
-                //UpdateUI();
+            // Actions needed after slider was released:
+            MoveKeyToNextPosition();    
+            SliderController.gameObject.SetActive(false);                            // Deactivate Used Slider
+            _currentSliderIndex += 1;                                              // Increment Slider
+            Points = _currentSliderIndex;
+            //UpdateUI();
 
-                // Call CheckSolution before preparing next move:
-                CheckSolution();
-                if (IsGRTTerminated) return;
+            // Call CheckSolution before preparing next move:
+            CheckSolution();
+            if (IsGRTTerminated) return;
 
-                // Prepare Next Move:
-                SliderController = _controller.ControllerButtons[_currentSliderIndex];
-                SliderController.gameObject.SetActive(true);                
-                _isNextSliderReady = false;
-            }
+            // Prepare Next Move:
+            SliderController = _controller.ControllerButtons[_currentSliderIndex];
+            SliderController.gameObject.SetActive(true);                
+            _isNextSliderReady = false;
         }
     }
 
@@ -107,6 +100,8 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         SliderController = _controller.ControllerButtons[_currentSliderIndex];
         ResetControllerPosition(0.0f);
         SliderController.gameObject.SetActive(true);
+        _isNextSliderReady = false;
+
 
     }
     #endregion

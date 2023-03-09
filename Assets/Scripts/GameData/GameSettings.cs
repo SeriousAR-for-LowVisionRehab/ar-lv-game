@@ -53,24 +53,24 @@ public class GameSettings
 
         _pathToDefaultSettings = Path.Combine(Application.persistentDataPath, "GameSettingsDefault.json");
 
+        // Init lists
         Markers = new List<GameObject>();
         MarkersPositions = new List<Vector3>();
 
-        // Get Markers GameObjets from Hierarchy
+        // Fill in lists
         foreach (Transform marker in GameObject.Find("Markers").transform)
         {
             Markers.Add(marker.gameObject);
         }
+        MarkersPositions.Add(new Vector3(-0.5f, 0, 0));
+        MarkersPositions.Add(new Vector3(0, 0, 0));
+        MarkersPositions.Add(new Vector3(0.5f, 0, 0));
 
-        // TODO: why does it create an Stack Overflow (repeated creation of GameSetting instance)
-        // Read the positions in the JSON "GameSettings"
-        // LoadMarkersPositionsFromFile();
-
-        // Set Markers GameObjects' positions to the positions read from the JSON
-        // SetMarkersUsingJsonPositions();
+        // Set Markers GameObjects' positions to the positions
+        SetGameObjectPositionsUsingVector3();
 
 
-        Debug.Log("[GameSettings] Created instance");
+        Debug.Log("[GameSettings] Created instance. Markers count=" + Markers.Count + ", Positions count=" + MarkersPositions.Count);
     }
 
     /// <summary>
@@ -79,7 +79,11 @@ public class GameSettings
     /// </summary>
     public void ResetSettingsToDefault()
     {
-        if (!File.Exists(_pathToDefaultSettings)) return;
+        if (!File.Exists(_pathToDefaultSettings))
+        {
+            Debug.LogAssertion("[GameSettings:ResetSettingsToDefault] _pathToDefaultSettings not found: " + _pathToDefaultSettings);
+            return;
+        }
 
         string json;
 
@@ -88,7 +92,7 @@ public class GameSettings
         MarkersPositions = JsonUtility.FromJson<GameSettings>(json).MarkersPositions;
 
         // Update GameObjects 
-        SetMarkersUsingJsonPositions();
+        SetGameObjectPositionsUsingVector3();
 
         Debug.Log("[GameSettings] Settings reset to default.");
     }
@@ -98,7 +102,12 @@ public class GameSettings
     /// </summary>
     public void LoadMarkersPositionsFromFile()
     {
-        if (!File.Exists(_fullPath)) return;
+        if (!File.Exists(_fullPath))
+        {
+            Debug.Log("[GameSettings:LoadMarkersPositionsFromFile] _fullPath not found: " + _fullPath + ". Creating a new one now...");
+            SaveGameSettingsToFile();  // Create a first GameSettings JSON
+            return;
+        }
 
         string json;
 
@@ -106,13 +115,13 @@ public class GameSettings
         json = File.ReadAllText(_fullPath);
         MarkersPositions = JsonUtility.FromJson<GameSettings>(json).MarkersPositions;
 
-        Debug.Log("[GameSettings:LoadMarkersPositionsFromFile] new positions loaded.");
+        Debug.Log("[GameSettings:LoadMarkersPositionsFromFile] new positions loaded. Markers count=" +Markers.Count + ", Positions count=" + MarkersPositions.Count);
     }
 
     /// <summary>
     /// Set Markers' GameObject Position from the GameSettings' Vector3
     /// </summary>
-    public void SetMarkersUsingJsonPositions()
+    public void SetGameObjectPositionsUsingVector3()
     {
         for (int i = 0; i < Markers.Count; i++)
         {
@@ -136,9 +145,10 @@ public class GameSettings
     }
 
     /// <summary>
-    /// Clear the positions in GameSettings. Add new positions from list given in parameter
+    /// Clear the positions in GameSettings. Add new positions from list of GameObjects Markers
+    /// Set parameter to true if you want to save to JSON file.
     /// </summary>
-    public void SetMarkersPositionsInGameSettingsUsingListInParameter()
+    public void UpdateVector3UsingGameObjectsPositions(bool saveToGameSettingsJSON)
     {
         MarkersPositions.Clear();
         foreach(GameObject marker in Markers)
@@ -146,6 +156,8 @@ public class GameSettings
             MarkersPositions.Add(marker.transform.position);
         }
         Debug.Log("[GameSettings:SetMarkersPositions] new positions set.");
+
+        if (saveToGameSettingsJSON) SaveGameSettingsToFile();
     }
 
 

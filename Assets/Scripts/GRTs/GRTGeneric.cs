@@ -1,4 +1,5 @@
 using Microsoft.MixedReality.Toolkit.UI;
+using System.Collections;
 using UnityEngine;
 
 public enum GRTState
@@ -59,6 +60,8 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     [SerializeField] protected AudioClip CorrectChoiceSoundFX;
     [SerializeField] protected AudioClip TaskCompletedSoundFX;
     [SerializeField] protected AudioSource AudioSource;
+    protected float TaskCompletedVolumeScale;
+    private bool _hasTaskCompletedSoundFXStarted;
 
     #region Data
     private SliderData _sliderTaskData;
@@ -161,7 +164,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
                 "READY",
                 GRTState.READY,
                 OnEnterReady,
-                OnExitReady,
+                null,
                 null,
                 null
                 )
@@ -171,7 +174,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
                 "SOLVING",
                 GRTState.SOLVING,
                 OnEnterSolving,
-                OnExitSolving,
+                null,
                 OnUpdateSolving,
                 null
                 )
@@ -181,7 +184,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
                 "SOLVED",
                 GRTState.SOLVED,
                 OnEnterSolved,
-                OnExitSolved,
+                null,
                 null,
                 null
                 )
@@ -195,6 +198,8 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         FinishedCover = _support.Find("FinishedCover");
 
         AudioSource = GetComponent<AudioSource>();
+        TaskCompletedVolumeScale = 0.5F;
+        _hasTaskCompletedSoundFXStarted = false;
 
         // Data
         if (typeof(T) == typeof(PressableButtonHoloLens2))
@@ -238,11 +243,6 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Debug.Log("[GRTGeneric(" + this.name + "):OnEnterReady] Entered Ready mode");
     }
 
-    private void OnExitReady()
-    {
-        Debug.Log("[GRTGeneric(" + this.name + "):OnExitReady] Exiting Ready mode");
-    }
-
     /// <summary>
     /// - Set the state of this GRT to SOLVING
     /// - Deactivate START button, Activate Controllers.
@@ -254,11 +254,6 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         GRTStateMachine.SetCurrentState(GRTState.SOLVING);
         _buttonStart.gameObject.SetActive(false);
         _controller.Parent.gameObject.SetActive(true);
-    }
-
-    private void OnExitSolving()
-    {
-        Debug.Log("[GRTGeneric(" + this.name + "):OnExitSolving] Exiting Solving mode");
     }
 
     /// <summary>
@@ -273,6 +268,22 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
         // UI
         UpdateUI();
+
+
+        // GRT Terminated
+        if(IsGRTTerminated)
+        {
+            //if (!_hasTaskCompletedSoundFXStarted)
+            //{
+            //    if (AudioSource.isPlaying) AudioSource.Stop();  // stop previous fx: the last CorrectChoiceSoundFX
+            //    AudioSource.PlayOneShot(TaskCompletedSoundFX, TaskCompletedVolumeScale);
+            //    _hasTaskCompletedSoundFXStarted = true;
+            //}          
+
+            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
+            // _hasTaskCompletedSoundFXStarted = false;
+            Debug.Log("[GRTGeneric(" + this.name + "):OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
+        }
     }
 
     /// <summary>
@@ -283,6 +294,15 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     /// </summary>
     private void OnEnterSolved()
     {
+
+        AudioSource.PlayOneShot(TaskCompletedSoundFX, TaskCompletedVolumeScale);
+        
+        StartCoroutine(WaitForLengthOfAudioClip(TaskCompletedSoundFX));
+
+        if (AudioSource.isPlaying)
+        {
+            Debug.Log("Something is playing in AudioSource.");
+        }
         // Data
         if (typeof(T) == typeof(PressableButtonHoloLens2))
         {
@@ -296,24 +316,26 @@ public abstract class GRTGeneric<T> : MonoBehaviour
             SliderTaskData.IsSolved = true;
             GameManager.Instance.PlayerData.DataOfSliderTasks.Add(SliderTaskData);
         }
-        
+
+        Debug.Log("[GRTGeneric(" + this.name
+            + "):OnEnterSolved] IsEscapeRoomButtons Solved="
+            + GameManager.Instance.IsEscapeRoomButtonsSolved
+            + "; IsEscapeRoomSlidersSolved="
+            + GameManager.Instance.IsEscapeRoomSlidersSolved
+            );
+
         // Counters
-        GameManager.Instance.NumberOfTasksSolved += 1;
-        if(!GameManager.Instance.IsEscapeRoomButtonsSolved || !GameManager.Instance.IsEscapeRoomSlidersSolved)
+        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + (GameManager.Instance.NumberOfTasksSolved + 1) + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
+        GameManager.Instance.NumberOfTasksSolved += 1;     
+
+        if (!GameManager.Instance.IsEscapeRoomButtonsSolved || !GameManager.Instance.IsEscapeRoomSlidersSolved)
         {
             // Move to next task if escape room is still not solved
             GameManager.Instance.EscapeRoomStateMachine.NextTaskToSolveIndex += 1;
         }
         
         // Mechanism
-        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + GameManager.Instance.NumberOfTasksSolved + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
-        // GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         _controller.Parent.gameObject.SetActive(false);
-    }
-
-    private void OnExitSolved()
-    {
-        Debug.Log("[GRTGeneric(" + this.name + "):OnExitSolved] Exiting Solved mode");
     }
     #endregion
 
@@ -337,12 +359,12 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         // UI        
         TimeInGRT = 0.0f;
         TextTurnsLeft.gameObject.SetActive(true);
-        TextTurnsLeft.text = $"Turns Left: {Mathf.Round(TurnsLeft)}";
+        TextTurnsLeft.text = $"Turns Left:";
         TextTimeLeft.gameObject.SetActive(true);
-        TextTimeLeft.text = $"Time Left: {Mathf.Round(AllowedTime)}";
+        TextTimeLeft.text = $"Time Left:";
         Points = 0;
         TextPoints.gameObject.SetActive(true);
-        TextPoints.text = $"Points: {Mathf.Round(Points)}";
+        TextPoints.text = $"Points:";
 
         // GameObjects
         _buttonStart.gameObject.SetActive(true);
@@ -350,6 +372,8 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
         // FSM State
         GRTStateMachine.SetCurrentState(GRTState.READY);
+
+        Debug.LogAssertion("[GRTGeneric_" + this.name + "ResetGRT] Done.");
     }
 
     /// <summary>
@@ -360,6 +384,19 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         TextPoints.text = $"Points: {Points}";
         TextTimeLeft.text = $"Time: {Mathf.Round(RemainingTime)}";
         TextTurnsLeft.text = $"Turns left: {TurnsLeft}";
+    }
+
+    /// <summary>
+    /// Plays the audioClip at volumeScale and waits for the sounds to finish playing.
+    /// </summary>
+    /// <param name="audioClip"></param>
+    /// <param name="volumeScale"></param>
+    /// <returns></returns>
+    IEnumerator WaitForLengthOfAudioClip(AudioClip audioClip)
+    {
+        Debug.Log("--------------------------------------------------before yield return ...... ");
+        yield return new WaitForSeconds(audioClip.length);
+        Debug.Log("--------------------------------------------------....................after yield return ...... ");
     }
     #endregion
 }

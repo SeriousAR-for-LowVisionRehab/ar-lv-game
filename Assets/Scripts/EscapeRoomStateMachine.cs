@@ -26,7 +26,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
     private bool _isNextTaskPrepared = false;
     public bool IsNextTaskPrepared { 
         get { return _isNextTaskPrepared; } 
-        private set { _isNextTaskPrepared = value; }
+        set { _isNextTaskPrepared = value; }
     }
 
     private int _nextTaskToSolveIndex = 0;
@@ -52,7 +52,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
                 "READY",
                 EscapeRoomState.READY,
                 OnEnterReady,
-                OnExitReady,
+                null,
                 null,
                 null
                 )
@@ -64,7 +64,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
                 "PLAYING_PRESS",
                 EscapeRoomState.PLAYING_PRESS,
                 OnEnterPlayingPress,
-                OnExitPlaying,
+                null,
                 OnUpdatePlaying,
                 null
                 )
@@ -76,7 +76,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
                 "PLAYING_PINCHSLIDE",
                 EscapeRoomState.PLAYING_PINCHSLIDE,
                 OnEnterPlayingPinchSlide,
-                OnExitPlaying,
+                null,
                 OnUpdatePlaying,
                 null
                 )
@@ -88,7 +88,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
                 "PAUSE",
                 EscapeRoomState.PAUSE,
                 OnEnterPause,
-                OnExitPause,
+                null,
                 null,
                 null
                 )
@@ -100,7 +100,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
                 "SOLVED",
                 EscapeRoomState.SOLVED,
                 OnEnterSolved,
-                OnExitSolved,
+                null,
                 null,
                 null
                 )
@@ -114,10 +114,10 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         GameManager.Instance.UpdateHomeButtonSliderForEscapeRoom();
     }
 
-    void OnExitReady()
-    {
-        Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Exited Ready mode");
-    }
+    //void OnExitReady()
+    //{
+    //    Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Exited Ready mode");
+    //}
 
     /// <summary>
     /// - Set the Player Data and Task Index for "PinchSlide"/Sliders
@@ -158,11 +158,11 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         currentGrt.SetActive(true);
     }
 
-    void OnExitPlaying()
-    {
-        Debug.Log("[EscapeRoomStateMachine:OnExitPlaying] Exited Playing " + GetCurrentState() + " mode.");
+    //void OnExitPlaying()
+    //{
+    //    Debug.Log("[EscapeRoomStateMachine:OnExitPlaying] Exited Playing " + GetCurrentState() + " mode.");
 
-    }
+    //}
 
 
     void OnUpdatePlaying()
@@ -177,12 +177,13 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
     void OnEnterPause()
     {
         Debug.Log("[EscapeRoomStateMachine:OnEnterPause] Entered Pause mode");
+
     }
 
-    void OnExitPause()
-    {
-        Debug.Log("[EscapeRoomStateMachine:OnExitPause] Exited Pause mode");
-    }
+    //void OnExitPause()
+    //{
+    //    Debug.Log("[EscapeRoomStateMachine:OnExitPause] Exited Pause mode");
+    //}
 
     /// <summary>
     /// - Save Game Data
@@ -213,7 +214,6 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         // Hide GRTs in this Escape Room
         for(int grtIndex = NextTaskToSolveIndex; grtIndex < NextTaskToSolveIndex + 3; grtIndex++)
         {
-            Debug.Log("grtIndex: " + grtIndex);
             GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[grtIndex];
             currentGrt.SetActive(false);
         }
@@ -221,7 +221,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         // Change States
         GameManager.Instance.SaveGame();
 
-        Debug.Log("EscapeROomStateMachine: OnEnterSolved] boolean BUtton = "
+        Debug.Log("EscapeROomStateMachine: OnEnterSolved] boolean Button = "
             + GameManager.Instance.IsEscapeRoomButtonsSolved +
             "; slider: " + GameManager.Instance.IsEscapeRoomSlidersSolved);
 
@@ -229,10 +229,10 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         GameManager.Instance.SetStateHome();
     }
 
-    void OnExitSolved()
-    {
-        Debug.Log("[EscapeRoomStateMachine:OnExitSolved] Exited Solved mode");
-    }
+    //void OnExitSolved()
+    //{
+    //    Debug.Log("[EscapeRoomStateMachine:OnExitSolved] Exited Solved mode");
+    //}
 
 
 

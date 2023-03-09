@@ -1,4 +1,5 @@
 using Microsoft.MixedReality.Toolkit.UI;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GRTPressTower : GRTPress
@@ -16,6 +17,7 @@ public class GRTPressTower : GRTPress
     [SerializeField] private GameObject[] _towerComponents;
     [SerializeField] private Material _colorLevelOn;
     [SerializeField] private Material _colorLevelOff;
+    private List<Quaternion> _towerComponentDefaultRotation;
 
     [Header("Help Window")]
     [SerializeField] private GameObject _helpDialog;
@@ -33,11 +35,14 @@ public class GRTPressTower : GRTPress
         RemainingTime = AllowedTime;
 
         // Set initial parameters and helper
+        _towerComponentDefaultRotation = new List<Quaternion>();
+        foreach (GameObject component in _towerComponents)
+        {
+            _towerComponentDefaultRotation.Add(component.transform.rotation);
+        }
         _currentTowerLevelIndex = 0;   // start at the bottom
         buttonRight = _controller.ControllerButtons[0];
         buttonLeft = _controller.ControllerButtons[1];
-        //buttonRight.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(-1); });
-        //buttonLeft.ButtonPressed.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
         buttonRight.ButtonReleased.AddListener(delegate { UpdateMechanismAndCheckSolution(-1); });
         buttonLeft.ButtonReleased.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
 
@@ -74,18 +79,6 @@ public class GRTPressTower : GRTPress
         UpdateHelpInformation(_currentTowerLevelIndex);
     }
 
-    protected override void OnUpdateSolving()
-    {
-        base.OnUpdateSolving();
-
-        if (IsGRTTerminated)
-        {
-            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
-            Debug.Log("[GRTPressTower:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
-            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
-        }
-    }
-
     /// <summary>
     /// Compare current selection's rotation against solution.
     /// If correction solution, call function to prepare next level.
@@ -99,14 +92,15 @@ public class GRTPressTower : GRTPress
             if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
             {
                 IsGRTTerminated = true;
-                _helpDialog.transform.parent.gameObject.SetActive(false);
+                _helpDialog.gameObject.SetActive(false);
                 FinishedCover.gameObject.SetActive(true);
                 FinishedCover.GetComponent<Renderer>().material = CoverFinished;
                 return;
             }
 
+            Points += 1;
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
-            // UpdateUI();
+
             PrepareNextLevel();
         }
     }
@@ -115,8 +109,28 @@ public class GRTPressTower : GRTPress
     {
         base.ResetGRT();
 
+        _helpDialog.gameObject.SetActive(false);
+
         // Counters
         TurnsLeft = _towerComponents.Length;
+        _currentTowerLevelIndex = 0;   // start at the bottom
+
+        // tower component
+        for (int componentIndex = 0; componentIndex < _towerComponents.Length; componentIndex++)
+        {
+            _towerComponents[componentIndex].transform.rotation = _towerComponentDefaultRotation[componentIndex];
+        }
+        //_towerComponents[0].transform.Rotate(new Vector3(0, 0, 0));
+        //_towerComponents[1].transform.Rotate(new Vector3(0, 90, 0));
+        //_towerComponents[2].transform.Rotate(new Vector3(0, 180, 0));
+        //_towerComponents[3].transform.Rotate(new Vector3(0, -90, 0));
+        _towerComponents[_towerComponents.Length - 1].GetComponent<Renderer>().material = _colorLevelOff;
+
+        // help
+        foreach(GameObject shape in _shapeSolutionPerLevel)
+        {
+            shape.SetActive(false);
+        }
     }
 
     /// <summary>

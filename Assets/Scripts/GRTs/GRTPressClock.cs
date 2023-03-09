@@ -1,4 +1,5 @@
 using Microsoft.MixedReality.Toolkit.UI;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -31,11 +32,6 @@ public class GRTPressClock : GRTPress
             if (_turnsLeft == 0)
             {
                 IsGRTTerminated = true;
-                FinishedCover.gameObject.SetActive(true);
-                FinishedCover.GetComponent<Renderer>().material = CoverFinished;
-                TextTurnsLeft.gameObject.SetActive(false);
-                TextTimeLeft.gameObject.SetActive(false);
-                TextPoints.gameObject.SetActive(false);
             }
         }
     }    
@@ -51,7 +47,7 @@ public class GRTPressClock : GRTPress
             if (_remainingTime <= 0) _moveToNextTurn = true;
         }
     }
-    private bool _moveToNextTurn = true;                                     // true at start, and then only if _remainingTime <= 0
+    private bool _moveToNextTurn;                                     
 
     // Clock
     private int _rotationIndex;                                              // an index for rotation, and piece on clock
@@ -87,8 +83,7 @@ public class GRTPressClock : GRTPress
             //}
         }
     }
-    //private Transform _currentClockPieceHighlight;
-    private bool _isSelectionValidated = false;
+    private bool _isSelectionValidated;
     #endregion
 
     #region Data
@@ -104,9 +99,6 @@ public class GRTPressClock : GRTPress
         buttonRight = _controller.ControllerButtons[0];
         buttonLeft = _controller.ControllerButtons[1];
         buttonValidate = _controller.ControllerButtons[2];
-        //buttonRight.ButtonPressed.AddListener(MoveCursorRight);
-        //buttonLeft.ButtonPressed.AddListener(MoveCursorLeft);
-        //buttonValidate.ButtonPressed.AddListener(ValidateChoice);
         buttonRight.ButtonReleased.AddListener(MoveCursorRight);
         buttonLeft.ButtonReleased.AddListener(MoveCursorLeft);
         buttonValidate.ButtonReleased.AddListener(ValidateChoice);
@@ -127,14 +119,15 @@ public class GRTPressClock : GRTPress
         // Set default starting selection
         _selectionIndexNeutralPosition = 2;
         SelectionIndex = _selectionIndexNeutralPosition;
-        // _currentSelectionHighlight = _piecesToSelect[_selectionIndex].transform.Find("SelectionForm");
         _rotationIndex = 0;
-        // _currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
 
         // Counters
         TurnsLeft = 5;
         AllowedTime = 30.0f;
         RemainingTime = AllowedTime;
+
+        _moveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
+        _isSelectionValidated = false;
 
         // Debug Mode
         if (IsDebugMode)
@@ -175,9 +168,12 @@ public class GRTPressClock : GRTPress
         }
         else
         {
-            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
-            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
+            FinishedCover.gameObject.SetActive(true);
+            FinishedCover.GetComponent<Renderer>().material = CoverFinished;
+            TextTurnsLeft.gameObject.SetActive(false);
+            TextTimeLeft.gameObject.SetActive(false);
+            TextPoints.gameObject.SetActive(false);
+            //ResetArrow();
         }
     }
 
@@ -217,12 +213,15 @@ public class GRTPressClock : GRTPress
     {
         base.ResetGRT();
 
+        // ResetArrow();
+
         // Counters
         TurnsLeft = 5;
-
         SelectionIndex = _selectionIndexNeutralPosition;
         _rotationIndex = 0;
         _isSelectionValidated = false;
+        _moveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
+
     }
 
     #region Clock
@@ -264,7 +263,7 @@ public class GRTPressClock : GRTPress
     /// </summary>
     private void ResetArrow()
     {
-        //_arrow.transform.SetPositionAndRotation(_arrowInitPosition, _arrowInitRotation);
+        _arrow.transform.localScale = new Vector3(1, 1, 1);
         _arrow.transform.position = _arrowInitPosition;
         _arrow.transform.rotation = _arrowInitRotation;
         UpdateComponentsHighlight(_piecesOnClock, _rotationIndex, _materialPieceOffSelection, 3, 3);

@@ -16,11 +16,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
             if (_turnsLeft == 0)
             {
                 IsGRTTerminated = true;
-                FinishedCover.gameObject.SetActive(true);
-                FinishedCover.GetComponent<Renderer>().material = CoverFinished;
-                TextTurnsLeft.gameObject.SetActive(false);
-                TextTimeLeft.gameObject.SetActive(false);
-                TextPoints.gameObject.SetActive(false);
             }
         }
     }
@@ -104,9 +99,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         // Set default starting selection
         _selectionIndexNeutralPosition = 2;
         SelectionIndex = _selectionIndexNeutralPosition;
-        //_currentSelectionHighlight = _piecesToSelect[SelectionIndex].transform.Find("SelectionForm");
         _rotationIndex = 0;
-        //_currentClockPieceHighlight = _piecesOnClock[_rotationIndex].transform.Find("SelectionForm");
         _arrowInitPosition = _arrow.transform.localPosition;
         _arrowInitRotation = _arrow.transform.localRotation;
 
@@ -131,11 +124,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
         {
             if (!_moveToNextTurn)
             {
-                // MoveCursor();
-
-                // RemainingTime -= Time.deltaTime;
-                //TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
-
                 if (_isSelectionValidated)
                 {
                     CheckSolution();
@@ -149,9 +137,12 @@ public class GRTPinchSlideClock : GRTPinchSlide
         }
         else
         {
-            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
-            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
+            FinishedCover.gameObject.SetActive(true);
+            FinishedCover.GetComponent<Renderer>().material = CoverFinished;
+            TextTurnsLeft.gameObject.SetActive(false);
+            TextTimeLeft.gameObject.SetActive(false);
+            TextPoints.gameObject.SetActive(false);
+            //ResetArrow();
         }
     }
 
@@ -185,13 +176,17 @@ public class GRTPinchSlideClock : GRTPinchSlide
     {
         base.ResetGRT();
 
+        ResetControllerPosition(0.5f);
+        _sliderValidation.SliderValue = 0.0f;
+
         // Counters
         TurnsLeft = 5;
 
         SelectionIndex = _selectionIndexNeutralPosition;
-
         _rotationIndex = 0;
         _isSelectionValidated = false;
+        _moveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
+
 
     }
     #endregion

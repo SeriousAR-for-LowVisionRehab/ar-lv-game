@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 /// <summary>
@@ -26,6 +28,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     [SerializeField] private GameObject[] _towerComponents;
     [SerializeField] private Material _colorLevelOn;
     [SerializeField] private Material _colorLevelOff;
+    private List<Quaternion> _towerComponentDefaultRotation;
 
     [Header("Help Window")]
     [SerializeField] private GameObject _helpDialog;
@@ -42,6 +45,12 @@ public class GRTPinchSlideTower : GRTPinchSlide
         RemainingTime = AllowedTime;
 
         // Set initial parameters and helper
+        _towerComponentDefaultRotation = new List<Quaternion>();
+        foreach(GameObject component in _towerComponents)
+        {
+            _towerComponentDefaultRotation.Add(component.transform.rotation);
+        }
+
         _currentTowerLevelIndex = 0;   // start at the bottom
         SliderController = _controller.ControllerButtons[0];
         SliderController.OnInteractionEnded.AddListener(delegate { UpdateMechanismAndCheckSolution(); });
@@ -76,18 +85,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
         UpdateHelpInformation(_currentTowerLevelIndex);
     }
 
-    protected override void OnUpdateSolving()
-    {
-        base.OnUpdateSolving();
-
-        // CheckSolution() sets IsGRTTerminated to true when conditions are met
-        if (IsGRTTerminated)
-        {
-            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
-            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
-        }
-    }
 
     /// <summary>
     /// Called at each slider's release in the UpdateMechanismAndCheckSolution():
@@ -103,15 +100,14 @@ public class GRTPinchSlideTower : GRTPinchSlide
             if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
             {
                 IsGRTTerminated = true;
-                _helpDialog.transform.parent.gameObject.SetActive(false);
+                _helpDialog.gameObject.SetActive(false);
                 FinishedCover.gameObject.SetActive(true);
                 FinishedCover.GetComponent<Renderer>().material = CoverFinished;
                 return;
             }
 
+            Points += 1;
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
-
-            //UpdateUI();
             PrepareNextLevel();
         }
     }
@@ -120,10 +116,31 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         base.ResetGRT();
 
-        // Counters
-        TurnsLeft = _towerComponents.Length;
+        _helpDialog.gameObject.SetActive(false);
 
+        // Counters
         _currentSliderValue = 0.5f;
+        ResetControllerPosition(0.5f);
+        TurnsLeft = _towerComponents.Length;
+        _currentTowerLevelIndex = 0;   // start at the bottom
+
+        // tower component
+        for (int componentIndex = 0; componentIndex < _towerComponents.Length; componentIndex++)
+        {
+            _towerComponents[componentIndex].transform.rotation = _towerComponentDefaultRotation[componentIndex];
+        }
+        //_towerComponents[0].transform.Rotate(new Vector3(0, 0, 0));
+        //_towerComponents[1].transform.Rotate(new Vector3(0, 90, 0));
+        //_towerComponents[2].transform.Rotate(new Vector3(0, 180, 0));
+        //_towerComponents[3].transform.Rotate(new Vector3(0, -90, 0));
+
+        _towerComponents[_towerComponents.Length - 1].GetComponent<Renderer>().material = _colorLevelOff;
+
+        // help
+        foreach (GameObject shape in _shapeSolutionPerLevel)
+        {
+            shape.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -196,6 +213,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     /// <param name="towerLevelIndexToActivate"></param>
     private void UpdateHelpInformation(int towerLevelIndexToActivate)
     {
+        // TODO: move transform.position operations outside this Update..() function. Because the transform.position operations are done only once now that help is above controller
         // Y position of the dialogue
         var dialogPosition = _helpDialog.transform.position;
         var levelPositionY = SliderController.transform.position.y + 0.15f; // _towerComponents[_currentTowerLevelIndex].transform.position.y;

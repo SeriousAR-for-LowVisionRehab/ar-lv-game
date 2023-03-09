@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: AR Escape Room for PVI
+  productName: AR Escape Room for PVI Rehab
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -134,8 +134,9 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 0.3.0
+  bundleVersion: 0.3.1
   preloadedAssets:
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -687,14 +688,14 @@ PlayerSettings:
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: AREscapeRoomforPVI
-  metroPackageVersion: 0.3.0.0
+  metroPackageName: AREscapeRoomforPVIRehab
+  metroPackageVersion: 0.3.1.0
   metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
   metroCertificateSubject: DefaultCompany
   metroCertificateIssuer: DefaultCompany
   metroCertificateNotAfter: 0032c542e8d9d901
-  metroApplicationDescription: pretest v0.3.0
+  metroApplicationDescription: pretest v0.3.1
   wsaImages:
     65636: Assets/Resources/Logo/fovea_logo_50x50.png
     65661: Assets/Resources/Logo/fovea_logo_63x63.png
@@ -707,7 +708,7 @@ PlayerSettings:
     2162788: Assets/Resources/Logo/fovea_logo_150x150.png
     2228324: Assets/Resources/Logo/fovea_logo_310x310.png
     2228424: Assets/Resources/Logo/fovea_logo_620x620.png
-  metroTileShortName: ar-lv-game
+  metroTileShortName: AR Escape Room for PVI Rehab
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0

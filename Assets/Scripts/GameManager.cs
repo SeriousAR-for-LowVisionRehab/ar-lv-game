@@ -126,9 +126,15 @@ public class GameManager : MonoBehaviour
         get { return _isExperimentDone; }
         private set
         {
-            if(IsEscapeRoomButtonsSolved & IsEscapeRoomSlidersSolved)
+            if(IsEscapeRoomButtonsSolved & IsEscapeRoomSlidersSolved & (value is true))
             {
+                Debug.LogAssertion("***********************************   EXPERIMENT  DONE  ***********************************************");
                 _isExperimentDone = true;
+            }
+            else if (value is false)
+            {
+                _isExperimentDone = false;
+                Debug.LogAssertion("***********************************   Experiment in progres ...  ***********************************************");
             }
         }
     }
@@ -173,8 +179,6 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         GameSettings = new GameSettings();
-        GameSettings.LoadMarkersPositionsFromFile();
-        GameSettings.SetMarkersUsingJsonPositions();
 
         //GameSettings.ResetSettingsToDefault();
         NumberOfTasksToSolve = 3;
@@ -246,14 +250,14 @@ public class GameManager : MonoBehaviour
         // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
         _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
 
-        // Add Listeners to CREATION buttons: 0=pin,
-        // 1=Save Creation, 2=Unfreeze Tasks, 3=Text "Task: Free/Unfrozen"
-        // 4=Load Settings, 5=Save Settings, 6=Reset Settings To Default,
-        // 7=Place Tasks On Marks, 8=Reset Game, 9=Return Home
+        // Add Listeners to CREATION buttons: 
+        // 0=pin, 1=Save Creation, 2=Unfreeze Tasks,
+        // 3=Load Settings, 4=Save Settings, 5=Reset Settings To Default,
+        // 6=Place Tasks On Marks, 7=Reset Game, 8=Return Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
         _creationButtons[2].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
         _creationButtons[3].ButtonPressed.AddListener(GameSettings.LoadMarkersPositionsFromFile);
-        _creationButtons[4].ButtonPressed.AddListener(SaveTheseMarkersPositionsToGameSettingsFile);        
+        _creationButtons[4].ButtonPressed.AddListener(delegate { GameSettings.UpdateVector3UsingGameObjectsPositions(true); });        
         _creationButtons[5].ButtonPressed.AddListener(GameSettings.ResetSettingsToDefault);
         _creationButtons[6].ButtonPressed.AddListener(PlaceTasksOnMarkers);
         _creationButtons[7].ButtonPressed.AddListener(ResetGame);
@@ -592,7 +596,12 @@ public class GameManager : MonoBehaviour
     {
         IsEscapeRoomButtonsSolved = false;
         IsEscapeRoomSlidersSolved = false;
+        IsExperimentDone = false;
+        GameManager.Instance.NumberOfTasksSolved = 0;
         UpdateHomeButtonSliderForEscapeRoom();
+
+        EscapeRoomStateMachine.IsNextTaskPrepared = false;
+        EscapeRoomStateMachine.NextTaskToSolveIndex = 0;
 
         //TODO: reset all counters
         foreach(var grt in _tasksPrefabs)
@@ -607,14 +616,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
 
     }
-    /// <summary>
-    /// Take the positions of the markers in _markers, save them in GameSettings and save to JSON file.
-    /// </summary>
-    private void SaveTheseMarkersPositionsToGameSettingsFile()
-    {
-        GameSettings.SetMarkersPositionsInGameSettingsUsingListInParameter();
-        GameSettings.SaveGameSettingsToFile();
-    }
+
     #endregion
 
     /// <summary>
@@ -622,7 +624,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SaveGame()
     {
-        WorldLockingManager.Save();
+        // WorldLockingManager.Save();
 
         // Save Global Duration
         switch (CurrentGesture)

@@ -100,16 +100,7 @@ public class GRTPressPipes : GRTPress
 
         if (!IsGRTTerminated)
         {
-            // RemainingTime -= Time.deltaTime;   // -> move to parent OnUpdateSolving
-            //TextTimeLeft.text = $"Time Left: {Mathf.Round(RemainingTime)}";
-
             CheckSolution();
-        }
-        else
-        {
-            AudioSource.PlayOneShot(TaskCompletedSoundFX, 0.5F);
-            Debug.Log("[GRTPressClock:OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
-            GRTStateMachine.SetCurrentState(GRTState.SOLVED);
         }
     }
 
@@ -148,6 +139,7 @@ public class GRTPressPipes : GRTPress
     private void MoveKeyToThisButtonAndHideIt()
     {
         _currentButtonTransform = _currentButton.transform;
+        //TODO: check if need to use local position
         var _btnPos = _currentButtonTransform.position;
 
         // Key
@@ -166,7 +158,6 @@ public class GRTPressPipes : GRTPress
 
         // Points
         Points += 1;
-        //UpdateUI();
 
         // Clicks
         ButtonTaskData.NbSuccessClicks += 1;
