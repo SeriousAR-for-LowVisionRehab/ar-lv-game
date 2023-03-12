@@ -45,6 +45,7 @@ public class GRTPressPipes : GRTPress
     [Header("Main Objects")]
     [SerializeField] private GameObject _key;
     [SerializeField] private GameObject _endGoal;
+    [SerializeField] private GameObject[] _keyPositions;  // where the key will move
     private Vector3 _keyOriginalPosition;
 
     private int _currentButtonIndex;
@@ -61,10 +62,10 @@ public class GRTPressPipes : GRTPress
         TurnsLeft = 1;  // You only get the key out of the pipes once.
         AllowedTime = 45.0f;
         RemainingTime = AllowedTime;
-        _keyOriginalPosition = _key.transform.position;
+        _keyOriginalPosition = _key.transform.localPosition;
 
         // Add listeners to controller's buttons
-        foreach(var btn in _controller.ControllerButtons)
+        foreach(var btn in Controller.ControllerButtons)
         {
             // Data
             btn.TouchBegin.AddListener(delegate { IsTouching(true); });
@@ -82,13 +83,13 @@ public class GRTPressPipes : GRTPress
         }
 
         _currentButtonIndex = 0;
-        _currentButton = _controller.ControllerButtons[_currentButtonIndex];
+        _currentButton = Controller.ControllerButtons[_currentButtonIndex];
         _currentButton.gameObject.SetActive(true);
 
         // Debug Mode
         if (IsDebugMode)
         {
-            Debug.Log("[GRTPressClock:Start]");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);
         }
 
@@ -110,12 +111,12 @@ public class GRTPressPipes : GRTPress
     protected override void CheckSolution()
     {
         // index from 0 to 6 + final extra increment = 7 = nb of buttons
-        if (_currentButtonIndex == _controller.ControllerButtons.Length)
+        if (_currentButtonIndex == _keyPositions.Length)
         {
             IsGRTTerminated = true;
             FinishedCover.gameObject.SetActive(true);
             FinishedCover.GetComponent<Renderer>().material = CoverFinished;
-            Debug.Log("[GRTPerssPipes:CheckSolution] Check solution result = GRT is terminated!");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPerssPipes:CheckSolution] Check solution result = GRT is terminated!");
         }
     }
 
@@ -125,9 +126,9 @@ public class GRTPressPipes : GRTPress
 
         TurnsLeft = 1;
 
-        _key.transform.position = _keyOriginalPosition;
+        _key.transform.localPosition = _keyOriginalPosition;
         _currentButtonIndex = 0;
-        _currentButton = _controller.ControllerButtons[_currentButtonIndex];
+        _currentButton = Controller.ControllerButtons[_currentButtonIndex];
         _currentButton.gameObject.SetActive(true);
     }
 
@@ -138,22 +139,23 @@ public class GRTPressPipes : GRTPress
     /// </summary>
     private void MoveKeyToThisButtonAndHideIt()
     {
-        _currentButtonTransform = _currentButton.transform;
-        //TODO: check if need to use local position
-        var _btnPos = _currentButtonTransform.position;
-
         // Key
-        _key.transform.position = new Vector3(_btnPos.x, _btnPos.y, _key.transform.position.z);
-        
+        var _keyNextPos = _keyPositions[_currentButtonIndex].transform.localPosition;
+        _key.transform.localPosition = new Vector3(_keyNextPos.x, _keyNextPos.y, _key.transform.localPosition.z);
+        //_currentButtonTransform = _currentButton.transform;
+        //var _btnPos = _currentButtonTransform.localPosition;
+        //_key.transform.localPosition = new Vector3(_btnPos.x, _btnPos.y, _key.transform.localPosition.z);
+
         // Button
         _currentButton.gameObject.SetActive(false);
         _currentButtonIndex += 1;
-        if (_currentButtonIndex < _controller.ControllerButtons.Length)
+        if (_currentButtonIndex < Controller.ControllerButtons.Length)
         {
-            _currentButton = _controller.ControllerButtons[_currentButtonIndex];
+            _currentButton = Controller.ControllerButtons[_currentButtonIndex];
             _currentButton.gameObject.SetActive(true);
         }
 
+        // Audio FX
         AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
 
         // Points

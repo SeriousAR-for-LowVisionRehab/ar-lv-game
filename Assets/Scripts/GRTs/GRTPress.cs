@@ -22,6 +22,14 @@ public abstract class GRTPress : GRTGeneric<PressableButtonHoloLens2>
     #endregion
 
     #region Overrides
+    protected override void Start()
+    {
+        base.Start();
+
+        // Start button
+        ControllerStart.gameObject.GetComponent<PressableButton>().ButtonPressed.AddListener(SetGRTStateToSolving);
+    }
+
     protected override void OnUpdateSolving()
     {
         base.OnUpdateSolving();

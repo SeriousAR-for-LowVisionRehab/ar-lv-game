@@ -24,10 +24,11 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         TurnsLeft = 1;  // You only get the key out of the pipes once.
         AllowedTime = 45.0f;
         RemainingTime = AllowedTime;
-        _keyOriginalPosition = _key.transform.position;
+        _keyOriginalPosition = _key.transform.localPosition; // _key.transform.position;
+        //Debug.LogAssertion("GRTPinchSlidePipes:Start] key original position (local) = " + _keyOriginalPosition);
 
         // Slider
-        foreach (var slider in _controller.ControllerButtons)
+        foreach (var slider in Controller.ControllerButtons)
         {
             // Data
             slider.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
@@ -43,14 +44,14 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         }
 
         _currentSliderIndex = 0;
-        SliderController = _controller.ControllerButtons[_currentSliderIndex];
+        SliderController = Controller.ControllerButtons[_currentSliderIndex];
         SliderController.gameObject.SetActive(true);
 
 
         // Debug Mode
         if (IsDebugMode)
         {
-            Debug.Log("[GRTPressClock:Start]");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);
         }
     }
@@ -73,7 +74,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
             if (IsGRTTerminated) return;
 
             // Prepare Next Move:
-            SliderController = _controller.ControllerButtons[_currentSliderIndex];
+            SliderController = Controller.ControllerButtons[_currentSliderIndex];
             SliderController.gameObject.SetActive(true);                
             _isNextSliderReady = false;
         }
@@ -95,9 +96,11 @@ public class GRTPinchSlidePipes : GRTPinchSlide
 
         TurnsLeft = 1;
 
-        _key.transform.position = _keyOriginalPosition;
+        //_key.transform.position = _keyOriginalPosition;
+        _key.transform.localPosition = _keyOriginalPosition;
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogAssertion", "GRTPinchSlidePipes:ResetGRT] _key.transform.localPosition = _keyOriginalPosition; => _key.transform.localPosition = " + _key.transform.localPosition);
         _currentSliderIndex = 0;
-        SliderController = _controller.ControllerButtons[_currentSliderIndex];
+        SliderController = Controller.ControllerButtons[_currentSliderIndex];
         ResetControllerPosition(0.0f);
         SliderController.gameObject.SetActive(true);
         _isNextSliderReady = false;
@@ -122,7 +125,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         }
         else
         {
-            Debug.Log("[GRTPinchSliderPipes:SliderReleased] else slidervalue: " + SliderController.SliderValue);
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPinchSliderPipes:SliderReleased] else slidervalue: " + SliderController.SliderValue);
         }
         
     }
@@ -132,8 +135,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     /// </summary>
     private void MoveKeyToNextPosition()
     {
-        var _keyNextPos = _keyPositions[_currentSliderIndex].transform.position;
-        _key.transform.position = new Vector3(_keyNextPos.x, _keyNextPos.y, _key.transform.position.z);
+        var _keyNextPos = _keyPositions[_currentSliderIndex].transform.localPosition;
+        _key.transform.localPosition  = new Vector3(_keyNextPos.x, _keyNextPos.y, _key.transform.localPosition.z);
     }
-
 }

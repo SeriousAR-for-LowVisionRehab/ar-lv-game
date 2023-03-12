@@ -9,9 +9,12 @@ using UnityEngine;
 [Serializable]
 public class PlayerData
 {
+    private GameManager _gameManagerInstance;
+
     public DateTime PlayerID;                        // Generated automatically by DateTime.Now
     public string PlayerAlias;                       // Chosen by the player at login/start.
-    public string FileName;
+    public string FileNameBase;
+    public string FileExtension;
     public int NumberOfTasksToSolve;
     public int NumberOfTasksSolved;
     public float EscapeRoomPressDuration;
@@ -20,7 +23,6 @@ public class PlayerData
     public List<SliderData> DataOfSliderTasks;
 
     private string _savePathDir;
-    private string _fullPath;
 
     /// <summary>
     /// For each new PlayerData instance, a new file with current time (Time.time) is created
@@ -28,15 +30,9 @@ public class PlayerData
     /// <param name="numberOfTasksToSolve"></param>
     public PlayerData(int numberOfTasksToSolve)
     {
-        // Initialize Data
-        PlayerAlias = String.Concat("Participant", GameManager.Instance.GameSettings.ParticipantNumber);
-        PlayerID = DateTime.Now;  // Time.time;
-        FileName = String.Concat(
-            PlayerAlias, 
-            "_",
-            PlayerID.ToString("ddMMyyyy_HHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo), 
-            ".json"
-        );
+        _gameManagerInstance = GameManager.Instance;
+
+        // Data
         NumberOfTasksToSolve = numberOfTasksToSolve;
         NumberOfTasksSolved = 0;
         EscapeRoomPressDuration = 0.0f;
@@ -44,11 +40,18 @@ public class PlayerData
         DataOfButtonTasks = new List<ButtonData>();
         DataOfSliderTasks = new List<SliderData>();
 
-        // Full Path
+        // File Name and Path
+        PlayerAlias = String.Concat("Participant", GameManager.Instance.GameSettings.ParticipantNumber);
+        PlayerID = DateTime.Now;  // Time.time;
+        FileNameBase = String.Concat(
+            PlayerAlias,
+            "_",
+            PlayerID.ToString("ddMMyyyy_HHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+        );
+        FileExtension = ".json";
         _savePathDir = Application.persistentDataPath;
-        _fullPath = Path.Combine(_savePathDir, this.FileName);
 
-        Debug.Log("[PlayerData] Constructed PlayerData.");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[PlayerData] Constructed PlayerData.");
     }
 
 
@@ -58,22 +61,38 @@ public class PlayerData
     /// <param name="playerData"></param>
     public void SavePlayerDataToJson()
     {
+        // Path
+        string tempNameWithExtension = String.Concat(
+            FileNameBase,
+            FileExtension
+        );
+        string tempPath = Path.Combine(_savePathDir, tempNameWithExtension);
         // Serialize
         string jsonString = JsonUtility.ToJson(this);
-        File.WriteAllText(_fullPath, jsonString);
+        File.WriteAllText(tempPath, jsonString);
 
-        Debug.Log("Player data is saved under: " + _fullPath);
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "Player data is saved under: " + tempPath);
     }
 
-
     /// <summary>
-    /// Load, from a JSON PlayerData.json on the persistenDataPath, the PlayerData
+    /// Add ExtraFileName to filename: "_savePathDir/PlayerAlias_PlayerID_<ExtraFileName>.json"
     /// </summary>
-    /// <returns></returns>
-    public PlayerData LoadPlayerDataFromJson()
+    /// <param name="extraFileName"></param>
+    public void SavePlayerDataToJson(string extraFileName)
     {
-        string json = File.ReadAllText(_fullPath);
-        PlayerData newPlayerData = JsonUtility.FromJson<PlayerData>(json);
-        return newPlayerData;
+        // Path
+        string tempNameWithExtension = String.Concat(
+            FileNameBase,
+            "_",
+            extraFileName,
+            FileExtension
+        );
+        string tempPath = Path.Combine(_savePathDir, tempNameWithExtension);
+
+        // Serialize
+        string jsonString = JsonUtility.ToJson(this);
+        File.WriteAllText(tempPath, jsonString);
+
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "Player data is saved under: " + tempPath);
     }
 }

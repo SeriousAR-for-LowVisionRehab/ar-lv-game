@@ -33,6 +33,16 @@ public abstract class GRTPinchSlide : GRTGeneric<PinchSlider>
     #endregion
 
     #region Overrides
+    protected override void Start()
+    {
+        base.Start();
+
+        // Start button
+        var pinchSliderController = ControllerStart.gameObject.GetComponent<PinchSlider>();
+        pinchSliderController.SliderValue = 0.0f;
+        pinchSliderController.OnInteractionEnded.AddListener(delegate { SetGRTStateToSolving(pinchSliderController.SliderValue); });
+    }
+
     protected override void OnUpdateSolving()
     {
         base.OnUpdateSolving();

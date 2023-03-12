@@ -1,6 +1,8 @@
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.WorldLocking.Core;
+using Microsoft.MixedReality.WorldLocking.Tools;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -32,7 +34,9 @@ public enum GameState
 public class GameManager : MonoBehaviour
 {
     [Tooltip("Debug elements")]
-    private bool _isDebugMode = false;            // allow to go directly to Escape Room
+    private bool _isDebugMode;            // allow to go directly to Escape Room
+    public bool IsDebugVerbose;
+    [SerializeField] private TextMeshPro _debugConsoleText;
     public TextMesh _homeMenuText;
     public TextMesh _participantNumberCreationMode;
     public static GameManager Instance;
@@ -59,6 +63,8 @@ public class GameManager : MonoBehaviour
     private PressableButtonHoloLens2[] _creationButtons;           // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _escapeRoomButtons;         // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2 _tutorialGesturePressButton;  // the button to learn the gesture (used GetComponent)
+    [SerializeField] protected AudioClip CorrectChoiceSoundFX;
+    [SerializeField] protected AudioSource AudioSource;
 
     private TextMesh _textMarkerPipesPosition;
     private TextMesh _textMarkerClockPosition;
@@ -107,20 +113,20 @@ public class GameManager : MonoBehaviour
     }
     public TextMesh TextNumberOfTasksSolved;
 
-    private bool _isEscapeRoomButtonsSolved = false;
+    private bool _isEscapeRoomButtonsSolved;
     public bool IsEscapeRoomButtonsSolved
     {
         get { return _isEscapeRoomButtonsSolved; }
         set { _isEscapeRoomButtonsSolved = value; }
     }
-    private bool _isEscapeRoomSlidersSolved = false;
+    private bool _isEscapeRoomSlidersSolved;
     public bool IsEscapeRoomSlidersSolved
     {
         get { return _isEscapeRoomSlidersSolved; }
         set { _isEscapeRoomSlidersSolved = value; }
     }
 
-    private bool _isExperimentDone = false;
+    private bool _isExperimentDone;
     public bool IsExperimentDone
     {
         get { return _isExperimentDone; }
@@ -128,13 +134,13 @@ public class GameManager : MonoBehaviour
         {
             if(IsEscapeRoomButtonsSolved & IsEscapeRoomSlidersSolved & (value is true))
             {
-                Debug.LogAssertion("***********************************   EXPERIMENT  DONE  ***********************************************");
+                if(IsDebugVerbose) WriteDebugLog("LogAssertion", "***********************************   EXPERIMENT  DONE  ***********************************************");
                 _isExperimentDone = true;
             }
             else if (value is false)
             {
                 _isExperimentDone = false;
-                Debug.LogAssertion("***********************************   Experiment in progres ...  ***********************************************");
+                if (IsDebugVerbose) WriteDebugLog("LogAssertion", "***********************************   Experiment in progres ...  ***********************************************");
             }
         }
     }
@@ -144,7 +150,7 @@ public class GameManager : MonoBehaviour
     #region Prefabs
     [Tooltip("Prefabs used in the Tutorial state to learn gestures")]  
     [SerializeField] private List<GameObject> _tutorialPrefabs;         // added by hand in Inspector
-    private int _tutorialPrefabsIndexPress, _tutorialPrefabsIndexBall;  // _tutorialPrefabsIndexPinchSlide
+    //private int _tutorialPrefabsIndexPress, _tutorialPrefabsIndexBall;  // _tutorialPrefabsIndexPinchSlide
     [Tooltip("Videos to illustrate each gestures shown in Tutorial")]
     [SerializeField] private List<VideoPlayer> _gestureVideos;          // added by hand in Inspector
     [Tooltip("Tasks' Prefabs to be solved by the player in the Escape Room")]
@@ -160,8 +166,14 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Awake()
     {
+        _isDebugMode = false;
+        IsDebugVerbose = false;
+        _isEscapeRoomButtonsSolved = false;
+        _isEscapeRoomSlidersSolved = false;
+        _isExperimentDone = false;
+
         // Singleton: only one single GameManager GameObject
-        if(Instance != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
@@ -173,7 +185,10 @@ public class GameManager : MonoBehaviour
         EscapeRoomStateMachine = new EscapeRoomStateMachine();
 
         // WLT name file
-        Debug.Log("[GameManager:Awake] FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
+        if (IsDebugVerbose)
+        {
+            WriteDebugLog("Log", "[GameManager:Awake] FrozenWorldFileName : " + _worldLockingManager.FrozenWorldFileName);
+        }
     }
 
     private void Start()
@@ -192,9 +207,9 @@ public class GameManager : MonoBehaviour
         _menusUIIndexEscapeRoom = 3;
 
         // Indices w.r.t. _tutorialPrefabs list
-        _tutorialPrefabsIndexPress = 0;
+        // _tutorialPrefabsIndexPress = 0;
         //_tutorialPrefabsIndexPinchSlide = 1
-        _tutorialPrefabsIndexBall = 2;
+        // _tutorialPrefabsIndexBall = 2;
 
         // Add the HOME state to the GameManager's state machine
         _gameStateMachine.Add(
@@ -237,8 +252,8 @@ public class GameManager : MonoBehaviour
         _homeSliders = _menusUI[_menusUIIndexHome].GetComponentsInChildren<PinchSlider>();
         _escapeRoomButtons = _menusUI[_menusUIIndexEscapeRoom].GetComponentsInChildren<PressableButtonHoloLens2>();
         _creationButtons = _menusUI[_menusUIIndexCreation].GetComponentsInChildren<PressableButtonHoloLens2>();
-        _tutorialButtons = _menusUI[_menusUIIndexTutorial].GetComponentsInChildren<PressableButtonHoloLens2>();
-        _tutorialGesturePressButton = _tutorialPrefabs[_tutorialPrefabsIndexPress].GetComponent<PressableButtonHoloLens2>();
+        //_tutorialButtons = _menusUI[_menusUIIndexTutorial].GetComponentsInChildren<PressableButtonHoloLens2>();
+        //_tutorialGesturePressButton = _tutorialPrefabs[_tutorialPrefabsIndexPress].GetComponent<PressableButtonHoloLens2>();
 
         // Add Listeners to HOME buttons: 0=pin, 1=Escape Room Buttons (Press Gesture), 2=creation. Slider: 0=Escape Room Sliders (Pinch & Slide Gesture)
         _homeButtons[1].ButtonPressed.AddListener(SetStateEscapeRoomAndGesturePress);
@@ -247,8 +262,10 @@ public class GameManager : MonoBehaviour
         _homeSliders[0].gameObject.SetActive(false);  // need to create escape room first
         _homeButtons[2].ButtonPressed.AddListener(SetStateCreation);
 
-        // Add Listeners to TUTORIAL buttons: 0=pin, 1=press, 2=pinch/slide, 3=home
-        _tutorialGesturePressButton.ButtonPressed.AddListener(TutorialPressButtonTriggersBall);
+        // Add Listeners to TUTORIAL controllers
+        AudioSource = GetComponent<AudioSource>();
+        _tutorialPrefabs[0].GetComponent<PressableButtonHoloLens2>().ButtonPressed.AddListener(TutorialPlayOneShot);
+        _tutorialPrefabs[1].GetComponent<PinchSlider>().OnInteractionEnded.AddListener(delegate { TutorialPlayOneShot(); });        
 
         // Add Listeners to CREATION buttons: 
         // 0=pin, 1=Save Creation, 2=Unfreeze Tasks,
@@ -312,23 +329,31 @@ public class GameManager : MonoBehaviour
 
         _homeSliders[0].gameObject.SetActive(!IsEscapeRoomSlidersSolved);
         _homeButtons[1].gameObject.SetActive(!IsEscapeRoomButtonsSolved);
-        Debug.Log("[GameManager:UpdateHomeButtonSliderForEscapeRoom] Done.");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:UpdateHomeButtonSliderForEscapeRoom] Done.");
     }
 
     #region FSM Methods - Not Setting State
     void OnEnterHome()
     {
-        Debug.Log("[GameManager:OnEnterHome] Entered HOME state");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:OnEnterHome] Entered HOME state");
         // Activate Home Menu
         _currentMenu = _menusUI[_menusUIIndexHome];
         _currentMenu.SetActive(true);
+
+        // Activate Tutorial
+        _tutorialPrefabs[0].SetActive(true);
+        _tutorialPrefabs[1].SetActive(true);
     }
 
     void OnExitHome()
     {
-        Debug.Log("[GameManager:OnExitHome] Exit Home state");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:OnExitHome] Exit Home state");
         // Deactivate Home Menu
         _currentMenu.SetActive(false);
+
+        // Deactivate Tutorial
+        _tutorialPrefabs[0].SetActive(false);
+        _tutorialPrefabs[1].SetActive(false);
     }
 
     #endregion
@@ -342,8 +367,8 @@ public class GameManager : MonoBehaviour
     private void SetStateEscapeRoomAndGesturePress() 
     {
         CurrentGesture = TypeOfGesture.PRESS;
-        _gameStateMachine.SetCurrentState(GameState.ESCAPEROOM);        
-        Debug.Log("[GameManager:SetStateEscapeRoomAndGesturePress] new CurrentTypeOfGesture: " + CurrentGesture);
+        _gameStateMachine.SetCurrentState(GameState.ESCAPEROOM);
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:SetStateEscapeRoomAndGesturePress] new CurrentTypeOfGesture: " + CurrentGesture);
     }
 
     /// <summary>
@@ -356,7 +381,7 @@ public class GameManager : MonoBehaviour
             _homeSliders[0].SliderValue = 0;   // reset slider to zero/left position.
             CurrentGesture = TypeOfGesture.PINCHSLIDE;
             _gameStateMachine.SetCurrentState(GameState.ESCAPEROOM);
-            Debug.Log("[GameManager:SetStateEscapeRoomAndGesturePinchSlide] new CurrentTypeOfGesture: " + CurrentGesture);
+            if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:SetStateEscapeRoomAndGesturePinchSlide] new CurrentTypeOfGesture: " + CurrentGesture);
         }
     }
 
@@ -370,7 +395,7 @@ public class GameManager : MonoBehaviour
     {
         if (EscapeRoomStateMachine.GetCurrentState().Equals(EscapeRoomState.PLAYING_PRESS) || EscapeRoomStateMachine.GetCurrentState().Equals(EscapeRoomState.PLAYING_PINCHSLIDE))
         {
-            Debug.Log("[GameManager:SetStateHomeAndPauseEscapeRoom] EscapeRoom FSM is paused.");
+            if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:SetStateHomeAndPauseEscapeRoom] EscapeRoom FSM is paused.");
             EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.PAUSE);
         }
 
@@ -395,7 +420,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[GameManager:OnEnterEscapeRoom] CurrentTypeOfGesture NOT recognized. EscapeRoom's FSM state not changed.");
+            if (IsDebugVerbose) WriteDebugLog("LogError", "[GameManager:OnEnterEscapeRoom] CurrentTypeOfGesture NOT recognized. EscapeRoom's FSM state not changed.");
         }
 
         // display escape room menu
@@ -405,7 +430,7 @@ public class GameManager : MonoBehaviour
 
     void OnExitEscapeRoom()
     {
-        Debug.Log("[GameManager:OnExitEscapeRoom] Exited Escape Room.");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:OnExitEscapeRoom] Exited Escape Room.");
 
         // hide Escape Room menu
         _currentMenu.SetActive(false);
@@ -448,10 +473,9 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// TUTORIAL: when the player press the "press" button in the tutorial, a ball pops up and disappears after 2 seconds
     /// </summary>
-    private void TutorialPressButtonTriggersBall()
+    private void TutorialPlayOneShot()
     {
-        GameObject bouncyBall = Instantiate(_tutorialPrefabs[_tutorialPrefabsIndexBall], transform);
-        Destroy(bouncyBall, 2.0f);
+        AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
     }
     #endregion
 
@@ -470,7 +494,7 @@ public class GameManager : MonoBehaviour
         // Tasks
         ShowMarkers(true);
 
-        Debug.Log("[GameManager:OnEnterCreationMode] UI activated. Markers shown.");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:OnEnterCreationMode] UI activated. Markers shown.");
     }
 
     /// <summary>
@@ -478,7 +502,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void OnExitCreation()
     {
-        Debug.Log("[GameManager:OnExitCreationMode] Exited Creation Mode state");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:OnExitCreationMode] Exited Creation Mode state");
         // hide UI and markers, and freeze and hide tasks
         _currentMenu.SetActive(false);
         // HideMarkers();
@@ -520,7 +544,7 @@ public class GameManager : MonoBehaviour
             _tasksPrefabs[markerIndex].transform.rotation = markers[markerIndex].transform.rotation;
             _tasksPrefabs[markerIndex + 3].transform.rotation = markers[markerIndex].transform.rotation;
         }
-        Debug.Log("[GameManager:SetTasksPositionFromMarkers] Tasks set on markers");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:SetTasksPositionFromMarkers] Tasks set on markers");
     }
 
     /// <summary>
@@ -574,7 +598,7 @@ public class GameManager : MonoBehaviour
         ShowMarkers(false);
 
         EscapeRoomStateMachine.SetCurrentState(EscapeRoomState.READY);
-        Debug.Log("[GameManager:SaveCreation] Creation saved");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:SaveCreation] Creation saved");
     }
 
     /// <summary>
@@ -613,7 +637,7 @@ public class GameManager : MonoBehaviour
         // Create New Player Data File
         PlayerData = new PlayerData(NumberOfTasksToSolve);
 
-        Debug.Log("[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
+        if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
 
     }
 
@@ -622,7 +646,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// ESCAPE ROOM: Save anchors and data of the player
     /// </summary>
-    public void SaveGame()
+    public void SaveGame(string escapeRoomSolved)
     {
         // WorldLockingManager.Save();
 
@@ -638,10 +662,17 @@ public class GameManager : MonoBehaviour
                 PlayerData.NumberOfTasksSolved += NumberOfTasksSolved;
                 break;
             default:
-                Debug.Log("[GameManager:SaveGame] CurrentTypeOfGesture not recognized - EscapeRoom Duration not calculated correctly.");
+                if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:SaveGame] CurrentTypeOfGesture not recognized - EscapeRoom Duration not calculated correctly.");
                 break;
         }
-        PlayerData.SavePlayerDataToJson();
+
+        // Write to JSON at each escape room solved, and at end of both
+        PlayerData.SavePlayerDataToJson(escapeRoomSolved);
+        IsExperimentDone = (IsEscapeRoomButtonsSolved && IsEscapeRoomSlidersSolved);
+        if (IsExperimentDone)
+        {
+            PlayerData.SavePlayerDataToJson();
+        }
     }
 
 
@@ -653,5 +684,34 @@ public class GameManager : MonoBehaviour
     {
         GameSettings.ParticipantNumber += numberChange;
         _participantNumberCreationMode.text = $"Participant\n #{GameSettings.ParticipantNumber}";
+    }
+
+    /// <summary>
+    /// Write <paramref name="msg"/> to the Debug.<paramref name="levelDebug"/>.
+    /// </summary>
+    /// <param name="levelDebug"></param>
+    /// <param name="msg"></param>
+    public void WriteDebugLog(string levelDebug, string msg)
+    {
+        if (_debugConsoleText.text.Length > 800)
+        {
+            _debugConsoleText.text = msg;
+        }
+        _debugConsoleText.text += $"\n" + msg;
+
+        //switch (levelDebug){
+        //    case "Log":
+        //        Debug.Log(msg);
+        //        break;
+        //    case "LogError":
+        //        Debug.LogError(msg);
+        //        break;
+        //    case "LogAssertion":
+        //        Debug.LogAssertion(msg);
+        //        break;
+        //    default:
+        //        Debug.Log(msg);
+        //        break;
+        //}
     }
 }

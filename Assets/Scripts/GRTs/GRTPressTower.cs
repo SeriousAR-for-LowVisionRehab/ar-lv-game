@@ -41,13 +41,13 @@ public class GRTPressTower : GRTPress
             _towerComponentDefaultRotation.Add(component.transform.rotation);
         }
         _currentTowerLevelIndex = 0;   // start at the bottom
-        buttonRight = _controller.ControllerButtons[0];
-        buttonLeft = _controller.ControllerButtons[1];
+        buttonRight = Controller.ControllerButtons[0];
+        buttonLeft = Controller.ControllerButtons[1];
         buttonRight.ButtonReleased.AddListener(delegate { UpdateMechanismAndCheckSolution(-1); });
         buttonLeft.ButtonReleased.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
 
         // Add listeners to controller's buttons
-        foreach (var btn in _controller.ControllerButtons)
+        foreach (var btn in Controller.ControllerButtons)
         {
             // Data
             btn.TouchBegin.AddListener(delegate { IsTouching(true); });
@@ -64,7 +64,7 @@ public class GRTPressTower : GRTPress
         // Debug Mode
         if (IsDebugMode)
         {
-            Debug.Log("[GRTPressClock:Start]");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);
         }
     }
@@ -79,13 +79,24 @@ public class GRTPressTower : GRTPress
         UpdateHelpInformation(_currentTowerLevelIndex);
     }
 
+    protected override void OnUpdateSolving()
+    {
+        base.OnUpdateSolving();
+        //CheckSolution();
+    }
+
     /// <summary>
     /// Compare current selection's rotation against solution.
     /// If correction solution, call function to prepare next level.
     /// </summary>
     protected override void CheckSolution()
     {
-        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
+        //_currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
+        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.localRotation.eulerAngles.y;
+
+        _gameManagerInstance.WriteDebugLog("Log", "[GRTPressTower:CheckSolution] _currentTowerLevelIndex: "
+    + _currentTowerLevelIndex + ", _currentSelectionRotationY=" + _currentSelectionRotationY
+    + ", _solutionsDegrees[_currentTowerLevelIndex]=" + _solutionsDegrees[_currentTowerLevelIndex]);
 
         if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
         {

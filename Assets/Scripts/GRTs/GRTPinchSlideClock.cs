@@ -1,5 +1,4 @@
 using Microsoft.MixedReality.Toolkit.UI;
-using System;
 using UnityEngine;
 
 public class GRTPinchSlideClock : GRTPinchSlide
@@ -76,13 +75,13 @@ public class GRTPinchSlideClock : GRTPinchSlide
     protected override void Start()
     {
         base.Start();
-        SliderController = _controller.ControllerButtons[0];
-        _sliderValidation = _controller.ControllerButtons[1];
+        SliderController = Controller.ControllerButtons[0];
+        _sliderValidation = Controller.ControllerButtons[1];
         ResetControllerPosition(0.5f);
         _sliderValidation.SliderValue = 0.0f;
 
         // Data listeners
-        foreach ( var slider in _controller.ControllerButtons)
+        foreach ( var slider in Controller.ControllerButtons)
         {
             slider.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
             slider.OnHoverEntered.AddListener(delegate { IncrementHoverCount(); });
@@ -102,6 +101,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         _rotationIndex = 0;
         _arrowInitPosition = _arrow.transform.localPosition;
         _arrowInitRotation = _arrow.transform.localRotation;
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
 
         // Counters
         TurnsLeft = 5;
@@ -111,7 +111,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         // Debug Mode
         if (IsDebugMode)
         {
-            Debug.Log("[GRTPressClock:Start]");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);
         }
     }
@@ -284,7 +284,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
                 SelectionIndex = 4;
                 break;
             default:
-                Debug.LogError("[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
+                if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
                 break;
         }
 

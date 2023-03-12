@@ -21,6 +21,7 @@ public enum GRTState
 /// </summary>
 public abstract class GRTGeneric<T> : MonoBehaviour
 {
+    protected GameManager _gameManagerInstance;
     public FiniteStateMachine<GRTState> GRTStateMachine;
 
     private bool _isDebugMode = false;
@@ -40,10 +41,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
     [Header("GRT Components")]
     [Tooltip("These GameObjects are find automatically in Awake() function.")]
-    [SerializeField] protected Transform _support;                // on what the GRT itself sits on.
-    [SerializeField] protected Transform _grtCore;                // the central element, what must be solved
-    [SerializeField] protected GRTController<T> _controller;      // what the player interacts with to change GRT's status
-    [SerializeField] protected Transform _buttonStart;            // Effectively start the GRT (any count down, counting, etc.)
+    [SerializeField] protected Transform Support;                // on what the GRT itself sits on.
+    [SerializeField] protected Transform GrtCore;                // the central element, what must be solved
+    [SerializeField] protected GRTController<T> Controller;      // what the player interacts with to change GRT's status
+    [SerializeField] protected Transform ControllerStart;        // Effectively start the GRT (any count down, counting, etc.)
 
     private Transform _finishedCover;
     public Transform FinishedCover
@@ -61,7 +62,6 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     [SerializeField] protected AudioClip TaskCompletedSoundFX;
     [SerializeField] protected AudioSource AudioSource;
     protected float TaskCompletedVolumeScale;
-    private bool _hasTaskCompletedSoundFXStarted;
 
     #region Data
     private SliderData _sliderTaskData;
@@ -132,12 +132,14 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     private void Awake()
     {
         // Get the elements of the GRT
-        _support = transform.Find("Support");
-        _controller = new GRTController<T>();
-        _controller.Parent = transform.Find("Controller");
-        _controller.ControllerButtons = _controller.Parent.GetComponentsInChildren<T>();
-        _grtCore = transform.Find("Core");
-        _buttonStart = transform.Find("ButtonStart");
+        Support = transform.Find("Support");
+        Controller = new GRTController<T>();
+        Controller.Parent = transform.Find("Controller");
+        Debug.Log("Controller name: " + Controller.Parent);
+        Controller.ControllerButtons = Controller.Parent.GetComponentsInChildren<T>();
+        GrtCore = transform.Find("Core");
+        ControllerStart = transform.Find("ControllerStart");
+        Debug.Log("ControllerStart name: " + ControllerStart.name);
     }
 
     /// <summary>
@@ -147,6 +149,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     /// </summary>
     protected virtual void Start()
     {
+        _gameManagerInstance = GameManager.Instance;
         GRTStateMachine = new FiniteStateMachine<GRTState>();
         // Add states
         GRTStateMachine.Add(
@@ -154,7 +157,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
                 "PLACING",
                 GRTState.PLACING,
                 OnEnterPlacing,
-                OnExitPlacing,
+                null,
                 null,
                 null
                 )
@@ -189,17 +192,19 @@ public abstract class GRTGeneric<T> : MonoBehaviour
                 null
                 )
             );
+
+        // Start button
+        ControllerStart.gameObject.SetActive(true);
+
         // Set default state to PLACING
         GRTStateMachine.SetCurrentState(GRTState.PLACING);
-        _buttonStart.gameObject.SetActive(true);
-        _buttonStart.gameObject.GetComponent<PressableButton>().ButtonPressed.AddListener(SetGRTStateToSolving);
-        _controller.Parent.gameObject.SetActive(false);
+        Controller.Parent.gameObject.SetActive(false);
 
-        FinishedCover = _support.Find("FinishedCover");
+        FinishedCover = Support.Find("FinishedCover");
 
         AudioSource = GetComponent<AudioSource>();
         TaskCompletedVolumeScale = 0.5F;
-        _hasTaskCompletedSoundFXStarted = false;
+        //_hasTaskCompletedSoundFXStarted = false;
 
         // Data
         if (typeof(T) == typeof(PressableButtonHoloLens2))
@@ -226,13 +231,13 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     private void OnEnterPlacing()
     {
         GRTStateMachine.SetCurrentState(GRTState.PLACING);
-        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterPlacing] Entered Placing mode");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTGeneric(" + this.name + "):OnEnterPlacing] Entered Placing mode");
     }
 
-    private void OnExitPlacing()
-    {
-        Debug.Log("[GRTGeneric(" + this.name + "):OnExitPlacing] Exiting Placing mode");
-    }
+    //private void OnExitPlacing()
+    //{
+    //    if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTGeneric(" + this.name + "):OnExitPlacing] Exiting Placing mode");
+    //}
 
     /// <summary>
     /// Set state of this GRT to READY
@@ -240,7 +245,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     private void OnEnterReady()
     {
         GRTStateMachine.SetCurrentState(GRTState.READY);
-        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterReady] Entered Ready mode");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTGeneric(" + this.name + "):OnEnterReady] Entered Ready mode");
     }
 
     /// <summary>
@@ -250,10 +255,10 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     virtual protected void OnEnterSolving()
     {
         // Mechanism
-        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolving] Entered Solving mode");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTGeneric(" + this.name + "):OnEnterSolving] Entered Solving mode");
         GRTStateMachine.SetCurrentState(GRTState.SOLVING);
-        _buttonStart.gameObject.SetActive(false);
-        _controller.Parent.gameObject.SetActive(true);
+        ControllerStart.gameObject.SetActive(false);
+        Controller.Parent.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -282,7 +287,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
             GRTStateMachine.SetCurrentState(GRTState.SOLVED);
             // _hasTaskCompletedSoundFXStarted = false;
-            Debug.Log("[GRTGeneric(" + this.name + "):OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTGeneric(" + this.name + "):OnUpdateSolving] The task is done! You have " + Points + " points! Well done!");
         }
     }
 
@@ -301,7 +306,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
         if (AudioSource.isPlaying)
         {
-            Debug.Log("Something is playing in AudioSource.");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "Something is playing in AudioSource.");
         }
         // Data
         if (typeof(T) == typeof(PressableButtonHoloLens2))
@@ -317,7 +322,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
             GameManager.Instance.PlayerData.DataOfSliderTasks.Add(SliderTaskData);
         }
 
-        Debug.Log("[GRTGeneric(" + this.name
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTGeneric(" + this.name
             + "):OnEnterSolved] IsEscapeRoomButtons Solved="
             + GameManager.Instance.IsEscapeRoomButtonsSolved
             + "; IsEscapeRoomSlidersSolved="
@@ -325,7 +330,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
             );
 
         // Counters
-        Debug.Log("[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + (GameManager.Instance.NumberOfTasksSolved + 1) + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTGeneric(" + this.name + "):OnEnterSolved] Entered Solved mode: solved " + (GameManager.Instance.NumberOfTasksSolved + 1) + " out of " + GameManager.Instance.NumberOfTasksToSolve + " GRTs");
         GameManager.Instance.NumberOfTasksSolved += 1;     
 
         if (!GameManager.Instance.IsEscapeRoomButtonsSolved || !GameManager.Instance.IsEscapeRoomSlidersSolved)
@@ -335,13 +340,21 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         }
         
         // Mechanism
-        _controller.Parent.gameObject.SetActive(false);
+        Controller.Parent.gameObject.SetActive(false);
+
+        // Save data
+        GameManager.Instance.PlayerData.SavePlayerDataToJson(this.name);
     }
     #endregion
 
     #region Setter FSM states
     public void SetGRTStateToSolving()
     {
+        GRTStateMachine.SetCurrentState(GRTState.SOLVING);
+    }
+    public void SetGRTStateToSolving(float sliderValue)
+    {
+        if (sliderValue != 1.0f) return;
         GRTStateMachine.SetCurrentState(GRTState.SOLVING);
     }
     #endregion
@@ -367,13 +380,17 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         TextPoints.text = $"Points:";
 
         // GameObjects
-        _buttonStart.gameObject.SetActive(true);
+        if (typeof(T) == typeof(PinchSlider))
+        {
+            ControllerStart.GetComponent<PinchSlider>().SliderValue = 0.0f;
+        }
+        ControllerStart.gameObject.SetActive(true);
         FinishedCover.gameObject.SetActive(false);
 
         // FSM State
         GRTStateMachine.SetCurrentState(GRTState.READY);
 
-        Debug.LogAssertion("[GRTGeneric_" + this.name + "ResetGRT] Done.");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogAssertion", "[GRTGeneric_" + this.name + "ResetGRT] Done.");
     }
 
     /// <summary>
@@ -394,9 +411,9 @@ public abstract class GRTGeneric<T> : MonoBehaviour
     /// <returns></returns>
     IEnumerator WaitForLengthOfAudioClip(AudioClip audioClip)
     {
-        Debug.Log("--------------------------------------------------before yield return ...... ");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "--------------------------------------------------before yield return ...... ");
         yield return new WaitForSeconds(audioClip.length);
-        Debug.Log("--------------------------------------------------....................after yield return ...... ");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "--------------------------------------------------....................after yield return ...... ");
     }
     #endregion
 }

@@ -10,6 +10,8 @@ TagManager:
   - EndPuzzle
   - CreationPuzzlesStatus
   - NumberOfPuzzlesSolved
+  - GRT
+  - MenuUI
   layers:
   - Default
   - TransparentFX

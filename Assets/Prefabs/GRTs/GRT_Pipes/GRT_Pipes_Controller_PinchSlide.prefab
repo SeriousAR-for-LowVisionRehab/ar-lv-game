@@ -23,7 +23,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6406816843092136480}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.1586, y: 0, z: -0.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -47,7 +47,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderEndDistance
-      value: 0.04958
+      value: 0.04958022
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
+      propertyPath: sliderStartDistance
+      value: 0.0000003017485
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStepDivisions
@@ -71,11 +75,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.138
+      value: 0.009
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.324
+      value: -0.31
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.z
@@ -129,11 +133,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderEndDistance
-      value: 0.049580008
+      value: 0.049579564
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStartDistance
-      value: 0
+      value: -0.00000041350722
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStepDivisions
@@ -157,11 +161,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.2031
+      value: -0.042
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.073
+      value: 0.067
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.z
@@ -215,11 +219,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderEndDistance
-      value: 0.049580004
+      value: 0.04957968
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStartDistance
-      value: -0.0000000037252903
+      value: -0.00000011920929
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStepDivisions
@@ -243,11 +247,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.06
+      value: 0.167
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.063
+      value: -0.091
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.z
@@ -301,7 +305,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderEndDistance
-      value: 0.04959669
+      value: 0.049598195
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
+      propertyPath: sliderStartDistance
+      value: 1.9984014e-13
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStepDivisions
@@ -325,11 +333,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.263
+      value: -0.121
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.212
+      value: -0.313
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.z
@@ -383,11 +391,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderEndDistance
-      value: 0.04958
+      value: 0.049579944
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStartDistance
-      value: 0
+      value: -0.00000027194906
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStepDivisions
@@ -411,11 +419,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.085
+      value: 0.039
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.23
+      value: -0.265
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.z
@@ -469,7 +477,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderEndDistance
-      value: 0.049597524
+      value: 0.049619913
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
+      propertyPath: sliderStartDistance
+      value: -0.000000014901364
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStepDivisions
@@ -493,11 +505,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.162
+      value: -0.041
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.0432
+      value: -0.076
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.z
@@ -535,6 +547,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Location_crossroad1 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 2899108703489238738, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0008
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899108703489238738, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
 --- !u!4 &5220490849573471915 stripped
@@ -551,11 +571,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderEndDistance
-      value: 0.04960478
+      value: 0.049653865
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStartDistance
-      value: -1.9984014e-13
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183589, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: sliderStepDivisions
@@ -579,11 +599,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.063
+      value: 0.281
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.131
+      value: -0.178
       objectReference: {fileID: 0}
     - target: {fileID: 2899108701960183590, guid: b2c719d2c92a9514d9512e61dcb33d08, type: 3}
       propertyPath: m_LocalPosition.z

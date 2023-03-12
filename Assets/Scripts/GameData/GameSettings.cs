@@ -8,6 +8,8 @@ using UnityEngine;
 /// </summary>
 public class GameSettings
 {
+    private GameManager _gameManagerInstance;
+
     private string _fileName;
     private string _fullPath;
     private string _pathToDefaultSettings;
@@ -48,6 +50,8 @@ public class GameSettings
     /// </summary>
     public GameSettings()
     {
+        _gameManagerInstance = GameManager.Instance;
+
         _fileName = "GameSettings.json";
         _fullPath = Path.Combine(Application.persistentDataPath, _fileName);
 
@@ -62,15 +66,15 @@ public class GameSettings
         {
             Markers.Add(marker.gameObject);
         }
-        MarkersPositions.Add(new Vector3(-0.5f, 0, 0));
+        MarkersPositions.Add(new Vector3(-0.1f, 0, 0));
         MarkersPositions.Add(new Vector3(0, 0, 0));
-        MarkersPositions.Add(new Vector3(0.5f, 0, 0));
+        MarkersPositions.Add(new Vector3(0.1f, 0, 0));
 
         // Set Markers GameObjects' positions to the positions
         SetGameObjectPositionsUsingVector3();
 
 
-        Debug.Log("[GameSettings] Created instance. Markers count=" + Markers.Count + ", Positions count=" + MarkersPositions.Count);
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings] Created instance. Markers count=" + Markers.Count + ", Positions count=" + MarkersPositions.Count);
     }
 
     /// <summary>
@@ -81,7 +85,8 @@ public class GameSettings
     {
         if (!File.Exists(_pathToDefaultSettings))
         {
-            Debug.LogAssertion("[GameSettings:ResetSettingsToDefault] _pathToDefaultSettings not found: " + _pathToDefaultSettings);
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogAssertion", "[GameSettings:ResetSettingsToDefault] _pathToDefaultSettings not found: " + _pathToDefaultSettings + ". Save current settings as default.");
+            SaveGameSettingsToFile(_pathToDefaultSettings);
             return;
         }
 
@@ -94,7 +99,7 @@ public class GameSettings
         // Update GameObjects 
         SetGameObjectPositionsUsingVector3();
 
-        Debug.Log("[GameSettings] Settings reset to default.");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings] Settings reset to default.");
     }
 
     /// <summary>
@@ -104,8 +109,8 @@ public class GameSettings
     {
         if (!File.Exists(_fullPath))
         {
-            Debug.Log("[GameSettings:LoadMarkersPositionsFromFile] _fullPath not found: " + _fullPath + ". Creating a new one now...");
-            SaveGameSettingsToFile();  // Create a first GameSettings JSON
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings:LoadMarkersPositionsFromFile] _fullPath not found: " + _fullPath + ". Creating a new one now...");
+            SaveGameSettingsToFile(_fullPath);  // Create a first GameSettings JSON
             return;
         }
 
@@ -115,7 +120,7 @@ public class GameSettings
         json = File.ReadAllText(_fullPath);
         MarkersPositions = JsonUtility.FromJson<GameSettings>(json).MarkersPositions;
 
-        Debug.Log("[GameSettings:LoadMarkersPositionsFromFile] new positions loaded. Markers count=" +Markers.Count + ", Positions count=" + MarkersPositions.Count);
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings:LoadMarkersPositionsFromFile] new positions loaded. Markers count=" +Markers.Count + ", Positions count=" + MarkersPositions.Count);
     }
 
     /// <summary>
@@ -127,21 +132,19 @@ public class GameSettings
         {
             Markers[i].transform.position = MarkersPositions[i];
         }
-        Debug.Log("[GameSettings] SetMarkersUsingJsonPositions done.");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings] SetMarkersUsingJsonPositions done.");
     }
-
-    #region public methods
 
     /// <summary>
     /// Save this instance's public/SerializeField to a JSON on the Application.persistentDataPath
     /// </summary>
-    public void SaveGameSettingsToFile()
+    public void SaveGameSettingsToFile(string path)
     {
         // Serialize
         string jsonString = JsonUtility.ToJson(this);
-        File.WriteAllText(_fullPath, jsonString);
+        File.WriteAllText(path, jsonString);
 
-        Debug.Log("[GameSettings:SaveGameSettingsToFile] saved under " + _fullPath);
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings:SaveGameSettingsToFile] saved under " + path);
     }
 
     /// <summary>
@@ -155,11 +158,8 @@ public class GameSettings
         {
             MarkersPositions.Add(marker.transform.position);
         }
-        Debug.Log("[GameSettings:SetMarkersPositions] new positions set.");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings:SetMarkersPositions] new positions set.");
 
-        if (saveToGameSettingsJSON) SaveGameSettingsToFile();
+        if (saveToGameSettingsJSON) SaveGameSettingsToFile(_fullPath);
     }
-
-
-    #endregion
 }

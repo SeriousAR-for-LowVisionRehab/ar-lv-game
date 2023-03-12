@@ -21,7 +21,7 @@ public enum EscapeRoomState
 /// </summary>
 public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
 {
-
+    private GameManager _gameManagerInstance;
 
     private bool _isNextTaskPrepared = false;
     public bool IsNextTaskPrepared { 
@@ -46,6 +46,8 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
     /// </summary>
     public EscapeRoomStateMachine()
     {
+        _gameManagerInstance = GameManager.Instance;
+
         // Add READY state
         this.Add(
             new State<EscapeRoomState>(
@@ -109,7 +111,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
 
     void OnEnterReady()
     {
-        Debug.Log("[EscapeRoomStateMachine:OnEnterReady] Entered Ready mode");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[EscapeRoomStateMachine:OnEnterReady] Entered Ready mode");
         // Show only the rooms that are (ready and) not solved yet
         GameManager.Instance.UpdateHomeButtonSliderForEscapeRoom();
     }
@@ -136,7 +138,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[NextTaskToSolveIndex];
         currentGrt.SetActive(true);
 
-        Debug.Log("[EscapeRoomStateMachine:OnEnterPlayingPinchSlide] Gesture: " + gameManagerInstance.CurrentGesture +
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[EscapeRoomStateMachine:OnEnterPlayingPinchSlide] Gesture: " + gameManagerInstance.CurrentGesture +
             ", NextTaskToSolveIndex: " + NextTaskToSolveIndex + ". Created ThePlayerData. Initial task prepared.");
     }
 
@@ -151,7 +153,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         gameManagerInstance.PlayerData.EscapeRoomPressDuration = Time.time;
         
         NextTaskToSolveIndex = 0;
-        Debug.Log("[EscapeRoomStateMachine:OnEnterWelcome] Entered Welcome mode. ThePlayerData created.");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[EscapeRoomStateMachine:OnEnterWelcome] Entered Welcome mode. ThePlayerData created.");
 
         // Prepare initial task
         GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[_nextTaskToSolveIndex];
@@ -176,7 +178,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
 
     void OnEnterPause()
     {
-        Debug.Log("[EscapeRoomStateMachine:OnEnterPause] Entered Pause mode");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[EscapeRoomStateMachine:OnEnterPause] Entered Pause mode");
 
     }
 
@@ -186,13 +188,12 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
     //}
 
     /// <summary>
-    /// - Save Game Data
-    /// - Set State back to READY
-    /// - Set Game FSM's state to HOME
+    /// - Save Game Data. - Set State back to READY. - Set Game FSM's state to HOME
+    /// Is called when this state machine's state is set to SOLVED: by GameManager.NumberOfTasksSolved()
     /// </summary>
     void OnEnterSolved()
     {
-        Debug.Log("[EscapeRoomStateMachine:OnEnterSolved] Entered Solved mode");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[EscapeRoomStateMachine:OnEnterSolved] Entered Solved mode");
 
         // Set boolean IsEscapeRoom...Solved = true
         // Reset other counters
@@ -206,7 +207,7 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
                 NextTaskToSolveIndex = 3; // set index back to initial value w.r.t. current TypeOfGesture
                 break;
             default:
-                Debug.Log("[EscapeRoomStateMachine:OnEnterSolved] CurrentTypeOfGesture not recognized.");
+                if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[EscapeRoomStateMachine:OnEnterSolved] CurrentTypeOfGesture not recognized.");
                 break;
         }
         GameManager.Instance.NumberOfTasksSolved = 0;
@@ -219,9 +220,9 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         }
 
         // Change States
-        GameManager.Instance.SaveGame();
+        GameManager.Instance.SaveGame(GameManager.Instance.CurrentGesture.ToString());
 
-        Debug.Log("EscapeROomStateMachine: OnEnterSolved] boolean Button = "
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "EscapeROomStateMachine: OnEnterSolved] boolean Button = "
             + GameManager.Instance.IsEscapeRoomButtonsSolved +
             "; slider: " + GameManager.Instance.IsEscapeRoomSlidersSolved);
 
@@ -241,13 +242,13 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
     /// </summary>
     private void PrepareNextGRT()
     {
-        Debug.Log("[EscapeRoomStateMachine:PrepareNextGRT] NexttaskToSolveIndex = " + NextTaskToSolveIndex);
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[EscapeRoomStateMachine:PrepareNextGRT] NexttaskToSolveIndex = " + NextTaskToSolveIndex);
         if (NextTaskToSolveIndex == 0)
         {
             NextTaskToSolveIndex += 1;   // when player exits and is still on initial task
         } else if (NextTaskToSolveIndex > GameManager.Instance.AvailableTasksPrefabs.Count - 1)
         {
-            Debug.LogError("[EscapeRoomStateMachine:PrepareNextGRT] Counter NextTaskToSolve is above the nb of Tasks Prefabs available! ");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[EscapeRoomStateMachine:PrepareNextGRT] Counter NextTaskToSolve is above the nb of Tasks Prefabs available! ");
             return;
         }
 

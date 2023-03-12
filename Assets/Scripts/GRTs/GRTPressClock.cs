@@ -1,5 +1,4 @@
 using Microsoft.MixedReality.Toolkit.UI;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -96,15 +95,15 @@ public class GRTPressClock : GRTPress
         base.Start();
 
         // Add listeners to controller' buttons
-        buttonRight = _controller.ControllerButtons[0];
-        buttonLeft = _controller.ControllerButtons[1];
-        buttonValidate = _controller.ControllerButtons[2];
+        buttonRight = Controller.ControllerButtons[0];
+        buttonLeft = Controller.ControllerButtons[1];
+        buttonValidate = Controller.ControllerButtons[2];
         buttonRight.ButtonReleased.AddListener(MoveCursorRight);
         buttonLeft.ButtonReleased.AddListener(MoveCursorLeft);
         buttonValidate.ButtonReleased.AddListener(ValidateChoice);
 
         // Add listeners to controller's buttons
-        foreach (var btn in _controller.ControllerButtons)
+        foreach (var btn in Controller.ControllerButtons)
         {
             // Data
             btn.TouchBegin.AddListener(delegate { IsTouching(true); });
@@ -132,7 +131,7 @@ public class GRTPressClock : GRTPress
         // Debug Mode
         if (IsDebugMode)
         {
-            Debug.Log("[GRTPressClock:Start]");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);
         }
     }
@@ -196,7 +195,7 @@ public class GRTPressClock : GRTPress
         }
         else
         {
-            Debug.Log("Pieces: clock(index " + _rotationIndex + ") = " + _piecesOnClock[_rotationIndex].name +
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "Pieces: clock(index " + _rotationIndex + ") = " + _piecesOnClock[_rotationIndex].name +
                 ", selection (index " +  SelectionIndex + ") = " + _piecesToSelect[SelectionIndex].name);
         }
 
@@ -276,7 +275,7 @@ public class GRTPressClock : GRTPress
     /// </summary>
     private void ValidateChoice()
     {
-        Debug.Log("[GRTPressClock:ValidateChoice] User has validated her choice.");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPressClock:ValidateChoice] User has validated her choice.");
         _isSelectionValidated = true;
 
         // Data

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 
 /// <summary>
@@ -52,11 +51,11 @@ public class GRTPinchSlideTower : GRTPinchSlide
         }
 
         _currentTowerLevelIndex = 0;   // start at the bottom
-        SliderController = _controller.ControllerButtons[0];
+        SliderController = Controller.ControllerButtons[0];
         SliderController.OnInteractionEnded.AddListener(delegate { UpdateMechanismAndCheckSolution(); });
 
         // Data listeners
-        foreach (var slider in _controller.ControllerButtons)
+        foreach (var slider in Controller.ControllerButtons)
         {
             slider.OnHoverEntered.AddListener(delegate { IsOnHover(true); });
             slider.OnHoverEntered.AddListener(delegate { IncrementHoverCount(); });
@@ -72,7 +71,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
         // Debug Mode
         if (IsDebugMode)
         {
-            Debug.Log("[GRTPressClock:Start]");
+            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPressClock:Start]");
             GRTStateMachine.SetCurrentState(GRTState.SOLVING);
         }
     }
@@ -93,7 +92,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
     /// </summary>
     protected override void CheckSolution()
     {
-        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
+        //_currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
+        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.localRotation.eulerAngles.y;
 
         if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
         {
@@ -148,7 +148,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
     /// </summary>
     public void UpdateMechanismAndCheckSolution()
     {
-        Debug.Log("[GRTPinchSlideTower:UpdateMechanismAndCheckSolution] starting method ... ");
+        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPinchSlideTower:UpdateMechanismAndCheckSolution] starting method ... ");
         // Data
         SliderTaskData.NbSuccessPinches += 1;
 
