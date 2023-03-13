@@ -89,7 +89,7 @@ public class GRTPressClock : GRTPress
     private int _NbClickButtonLeft, _NbClickButtonRight, _NbClickButtonValidate;
     #endregion
 
-
+    #region Overrides
     protected override void Start()
     {
         base.Start();
@@ -222,6 +222,7 @@ public class GRTPressClock : GRTPress
         _moveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
 
     }
+    #endregion
 
     #region Clock
     /// <summary>

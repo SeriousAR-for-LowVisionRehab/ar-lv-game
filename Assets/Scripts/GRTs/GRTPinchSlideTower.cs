@@ -1,5 +1,7 @@
+using Microsoft.MixedReality.Toolkit.UI;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// Tower GRT with Pinch&Slide gesture controller.
@@ -7,7 +9,7 @@ using UnityEngine;
 ///  - square  at rotation.y =   0
 ///  - diamond at rotation.y =  90
 ///  - "sun"   at rotation.y = 180
-///  - round   at rotation.y = 270
+///  - round   at rotation.y = 270 (-90° in Inspector)
 ///  
 /// Hardcoded solution:
 ///  - level 0 = diamond = 90°
@@ -18,10 +20,51 @@ using UnityEngine;
 public class GRTPinchSlideTower : GRTPinchSlide
 {
     #region Mechanic
+    private float _previousSliderValue;
+    public float PreviousSliderValue
+    {
+        get { return _previousSliderValue; }
+        private set { _previousSliderValue = value; }
+    }
+
     private float _currentSliderValue;
+    public float CurrentSliderValue
+    {
+        get { return _currentSliderValue; }
+        private set { _currentSliderValue = value; }
+    }
     private int _currentTowerLevelIndex;
+    public int CurrentTowerLevelIndex
+    {
+        get { return _currentTowerLevelIndex; }
+        private set { _currentTowerLevelIndex = value; }
+    }
+
+    private float _degreeThresholdVictory;
+    private float[] _defaultDegrees = { 0.0f, 90.0f, 180.0f, 270.0f };
     private float[] _solutionsDegrees = { 90.0f, 270.0f, 0.0f, 180.0f };
     private float _currentSelectionRotationY;
+    public float CurrentSelectionRotationY
+    {
+        get { return _currentSelectionRotationY; }
+        private set { _currentSelectionRotationY = value; }
+    }
+
+    private int _selectionIndexNeutralPosition;   // where the selection reset to after each validation
+    public int SelectionIndexNeutralPosition
+    {
+        get { return _selectionIndexNeutralPosition; }
+        private set { _selectionIndexNeutralPosition = value; }
+    }
+    private int _selectionIndex;                  // this int correspond to the index of the face of the level, matched from slider value.
+    private int SelectionIndex
+    {
+        get { return _selectionIndex; }
+        set
+        {
+            _selectionIndex = value;
+        }
+    }
 
     [Header("Tower's Components")]
     [SerializeField] private GameObject[] _towerComponents;
@@ -34,14 +77,20 @@ public class GRTPinchSlideTower : GRTPinchSlide
     [SerializeField] private GameObject[] _shapeSolutionPerLevel;
     #endregion
 
+    #region Overrides
     protected override void Start()
     {
         base.Start();
+
+        IsSelectionValidated = false;
+        MoveToNextTurn = false;
 
         // Counters
         TurnsLeft = _towerComponents.Length;
         AllowedTime = 30.0f;
         RemainingTime = AllowedTime;
+        SelectionIndexNeutralPosition = 0;
+        _degreeThresholdVictory = 5.0f;
 
         // Set initial parameters and helper
         _towerComponentDefaultRotation = new List<Quaternion>();
@@ -52,7 +101,14 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
         _currentTowerLevelIndex = 0;   // start at the bottom
         SliderController = Controller.ControllerButtons[0];
-        SliderController.OnInteractionEnded.AddListener(delegate { UpdateMechanismAndCheckSolution(); });
+        SliderValidation = Controller.ControllerButtons[1];
+        
+        ResetControllerPosition(0.5f);
+        SliderValidation.SliderValue = 0.0f;
+
+        //SliderController.OnInteractionEnded.AddListener(delegate { UpdateSelectionIndex(); });
+        SliderController.OnValueUpdated.AddListener(delegate { RotateLevel(); });
+        SliderValidation.OnInteractionEnded.AddListener(delegate { ValidateChoice(); });
 
         // Data listeners
         foreach (var slider in Controller.ControllerButtons)
@@ -65,7 +121,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
             slider.OnInteractionEnded.AddListener(delegate { IsOnInteraction(false); });
         }
 
-        _currentSliderValue = SliderController.SliderValue;
+        CurrentSliderValue = SliderController.SliderValue;
+        PreviousSliderValue = SliderController.SliderValue;
         _helpDialog.gameObject.SetActive(false);
 
         // Debug Mode
@@ -84,6 +141,35 @@ public class GRTPinchSlideTower : GRTPinchSlide
         UpdateHelpInformation(_currentTowerLevelIndex);
     }
 
+    protected override void OnUpdateSolving()
+    {
+        base.OnUpdateSolving();
+
+        if (!IsGRTTerminated)
+        {
+            if (!MoveToNextTurn)
+            {
+                if (IsSelectionValidated)
+                {
+                    CheckSolution();
+                    ResetControllerPosition(0.5f);
+                }
+            }
+            else
+            {
+                PrepareTurn();
+                MoveToNextTurn = false;
+            }
+        }
+        else
+        {
+            FinishedCover.gameObject.SetActive(true);
+            FinishedCover.GetComponent<Renderer>().material = CoverFinished;
+            TextTurnsLeft.gameObject.SetActive(false);
+            TextTimeLeft.gameObject.SetActive(false);
+            TextPoints.gameObject.SetActive(false);
+        }
+    }
 
     /// <summary>
     /// Called at each slider's release in the UpdateMechanismAndCheckSolution():
@@ -92,10 +178,24 @@ public class GRTPinchSlideTower : GRTPinchSlide
     /// </summary>
     protected override void CheckSolution()
     {
-        //_currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
-        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.localRotation.eulerAngles.y;
+        CurrentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.localRotation.eulerAngles.y;
+        Debug.Log("index=" + _currentTowerLevelIndex + "|| CurrentSelectionRotationY = "
+            + _towerComponents[0].transform.localRotation.eulerAngles.y
+            + " (rotationQuaternionY="
+            + _towerComponents[1].transform.localRotation.eulerAngles
+            + ";"
+            + _towerComponents[2].transform.localRotation.eulerAngles
+            + ";"
+            + _towerComponents[3].transform.localRotation.eulerAngles
+            + "; _solutionsDegrees[_currentTowerLevelIndex]="
+            + _solutionsDegrees[_currentTowerLevelIndex]
+        );
 
-        if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
+        //if(Mathf.Approximately(CurrentSelectionRotationY, _solutionsDegrees[_currentTowerLevelIndex]))
+        float lowerBound = _solutionsDegrees[_currentTowerLevelIndex] - _degreeThresholdVictory;
+        float upperBound = _solutionsDegrees[_currentTowerLevelIndex] + _degreeThresholdVictory;
+        if ( (CurrentSelectionRotationY >= lowerBound && (CurrentSelectionRotationY <= upperBound))
+            )
         {
             if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
             {
@@ -105,11 +205,12 @@ public class GRTPinchSlideTower : GRTPinchSlide
                 FinishedCover.GetComponent<Renderer>().material = CoverFinished;
                 return;
             }
-
+            MoveToNextTurn = true;
             Points += 1;
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
-            PrepareNextLevel();
         }
+
+        IsSelectionValidated = false;
     }
 
     public override void ResetGRT()
@@ -119,7 +220,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
         _helpDialog.gameObject.SetActive(false);
 
         // Counters
-        _currentSliderValue = 0.5f;
+        CurrentSliderValue = 0.5f;
         ResetControllerPosition(0.5f);
         TurnsLeft = _towerComponents.Length;
         _currentTowerLevelIndex = 0;   // start at the bottom
@@ -142,34 +243,64 @@ public class GRTPinchSlideTower : GRTPinchSlide
             shape.SetActive(false);
         }
     }
+    #endregion
 
-    /// <summary>
-    /// Called at each slider's release (i.e. OnInteractionEnded)
-    /// </summary>
-    public void UpdateMechanismAndCheckSolution()
+
+    private void UpdateSelectionIndex()
     {
-        if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPinchSlideTower:UpdateMechanismAndCheckSolution] starting method ... ");
         // Data
         SliderTaskData.NbSuccessPinches += 1;
 
-        UpdateMechanism();
-        CheckSolution();
-    }
-
-    /// <summary>
-    /// Read any change in slider's value and rotate current level
-    /// </summary>
-    private void UpdateMechanism()
-    {
-        float sliderChange = SliderController.SliderValue - _currentSliderValue;
-
-        // Rotate Level
-        if(sliderChange != 0)
+        // Selection
+        switch (SliderController.SliderValue)
         {
-            _currentSliderValue = SliderController.SliderValue;
-            RotateThisLevelToNewPosition(_currentTowerLevelIndex, sliderChange);
+            case 0.00f:
+                SelectionIndex = 2;
+                break;
+            case 0.25f:
+                SelectionIndex = 3;
+                break;
+            case 0.50f:
+                SelectionIndex = SelectionIndexNeutralPosition;
+                break;
+            case 0.75f:
+                SelectionIndex = 1;
+                break;
+            case 1.00f:
+                SelectionIndex = 2;
+                break;
+            default:
+                if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
+                break;
         }
 
+        // Mechanism
+        // RotateLevel();
+    }
+
+    private void RotateLevel()
+    {
+        // change in slider value
+        if (PreviousSliderValue - SliderController.SliderValue == 0) return;
+        float currentValue = SliderController.SliderValue;
+        float deltaSlider = PreviousSliderValue - currentValue;
+        PreviousSliderValue = currentValue;
+        Debug.Log("------------------------- deltaSlider = " + deltaSlider + "("+ _towerComponents[_currentTowerLevelIndex].transform.localRotation + ")");
+
+        // angles
+        float eulerX = _towerComponents[_currentTowerLevelIndex].transform.localRotation.x;
+        //float eulerY = _towerComponents[_currentTowerLevelIndex].transform.localRotation.y;
+        float eulerZ = _towerComponents[_currentTowerLevelIndex].transform.localRotation.z;
+        Transform tempTransform = _towerComponents[_currentTowerLevelIndex].transform;
+        //Quaternion newRotation = Quaternion.Euler(
+        //    eulerX,
+        //    180 + SliderController.SliderValue * 180,
+        //    eulerZ);
+
+        tempTransform.Rotate(eulerX, deltaSlider * 360f, eulerZ);
+        Debug.Log("------------------------- deltaSlider = " + deltaSlider + "(" + _towerComponents[_currentTowerLevelIndex].transform.localRotation + ")");
+        Debug.Log("######################################################################################################");
+        //tempTransform.localRotation = newRotation;
     }
 
     /// <summary>
@@ -194,14 +325,27 @@ public class GRTPinchSlideTower : GRTPinchSlide
     }
 
     /// <summary>
+    /// Perform operations related to the validation of the user's choice.
+    /// </summary>
+    private void ValidateChoice()
+    {
+        if (SliderValidation.SliderValue != 1) return;
+
+        IsSelectionValidated = true;
+        SliderValidation.SliderValue = 0.0f;
+
+        // Data
+        SliderTaskData.NbSuccessPinches += 1;
+    }
+
+    /// <summary>
     /// Setup the next level: index, helper
     /// </summary>
-    private void PrepareNextLevel()
+    private void PrepareTurn()
     {
-        _currentTowerLevelIndex += 1;
         // Counters
         TurnsLeft -= 1;
-
+        _currentTowerLevelIndex += 1;
         ResetControllerPosition(0.5f);
         UpdateComponentsHighlight(_currentTowerLevelIndex);
         UpdateHelpInformation(_currentTowerLevelIndex);

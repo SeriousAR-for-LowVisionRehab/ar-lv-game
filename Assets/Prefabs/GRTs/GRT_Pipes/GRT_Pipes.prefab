@@ -346,9 +346,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba055719e687cea4d85647c65a31a42f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _support: {fileID: 0}
-  _grtCore: {fileID: 0}
-  _controllerStart: {fileID: 0}
+  Support: {fileID: 0}
+  GrtCore: {fileID: 0}
+  ControllerStart: {fileID: 0}
   _coverFinished: {fileID: 0}
   CorrectChoiceSoundFX: {fileID: 0}
   TaskCompletedSoundFX: {fileID: 0}
@@ -358,6 +358,7 @@ MonoBehaviour:
   _textTurnsLeft: {fileID: 0}
   _key: {fileID: 0}
   _endGoal: {fileID: 0}
+  _keyPositions: []
 --- !u!114 &5818665001744566472
 MonoBehaviour:
   m_ObjectHideFlags: 0

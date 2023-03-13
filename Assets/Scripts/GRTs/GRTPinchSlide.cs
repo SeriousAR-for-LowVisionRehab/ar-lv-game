@@ -11,7 +11,25 @@ public abstract class GRTPinchSlide : GRTGeneric<PinchSlider>
     public PinchSlider SliderController
     {
         get { return _sliderController; }
-        set { _sliderController = value; }
+        protected set { _sliderController = value; }
+    }
+    private PinchSlider _sliderValidation;
+    public PinchSlider SliderValidation
+    {
+        get { return _sliderValidation; }
+        protected set { _sliderValidation = value; }
+    }
+    private bool _isSelectionValidated;
+    public bool IsSelectionValidated
+    {
+        get { return _isSelectionValidated; }
+        protected set { _isSelectionValidated = value; }
+    }
+    private bool _moveToNextTurn;
+    public bool MoveToNextTurn
+    {
+        get { return _moveToNextTurn; }
+        protected set { _moveToNextTurn = value; }
     }
     #endregion
 

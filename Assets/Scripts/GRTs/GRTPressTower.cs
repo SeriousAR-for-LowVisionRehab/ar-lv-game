@@ -24,7 +24,7 @@ public class GRTPressTower : GRTPress
     [SerializeField] private GameObject[] _shapeSolutionPerLevel;
     #endregion
 
-    // Start is called before the first frame update
+    #region Overrides
     protected override void Start()
     {
         base.Start();
@@ -143,7 +143,7 @@ public class GRTPressTower : GRTPress
             shape.SetActive(false);
         }
     }
-
+    #endregion
     /// <summary>
     /// - Update current level w.r.t. given direction.
     /// - Then, Check solution

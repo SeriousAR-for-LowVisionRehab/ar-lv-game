@@ -27,12 +27,10 @@ public class GRTPinchSlideClock : GRTPinchSlide
         set
         {
             _remainingTime = value;
-            if (_remainingTime <= 0) _moveToNextTurn = true;
+            if (_remainingTime <= 0) MoveToNextTurn = true;
         }
     }
  
-    private bool _moveToNextTurn = true;                                     // true at start, and then only if _remainingTime <= 0
-
     // Clock
     private int _rotationIndex;                                              // an index chosen at random: for rotation, and piece on clock
     private int[] _rotationsOrder = {1, 3, 0, 2};                            // pre-determined order of rotation
@@ -47,7 +45,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
     [SerializeField] private Material _materialPieceOffSelection;
 
     // User
-    private PinchSlider _sliderValidation;
     [SerializeField] private GameObject[] _piecesToSelect;                   // what the user should select
     private int _selectionIndexNeutralPosition;                              // where the selection reset to after each validation
     private int _selectionIndex;
@@ -63,7 +60,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
     }
 
     private Transform _currentClockPieceHighlight;
-    private bool _isSelectionValidated = false;
     #endregion
 
     #region Data
@@ -76,9 +72,10 @@ public class GRTPinchSlideClock : GRTPinchSlide
     {
         base.Start();
         SliderController = Controller.ControllerButtons[0];
-        _sliderValidation = Controller.ControllerButtons[1];
+        SliderValidation = Controller.ControllerButtons[1];
         ResetControllerPosition(0.5f);
-        _sliderValidation.SliderValue = 0.0f;
+        SliderValidation.SliderValue = 0.0f;
+        IsSelectionValidated = false;
 
         // Data listeners
         foreach ( var slider in Controller.ControllerButtons)
@@ -93,7 +90,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
 
         // Mechanic listeners
         SliderController.OnInteractionEnded.AddListener(delegate { UpdateSelectionIndex(); });
-        _sliderValidation.OnInteractionEnded.AddListener(delegate { ValidateChoice(); });
+        SliderValidation.OnInteractionEnded.AddListener(delegate { ValidateChoice(); });
 
         // Set default starting selection
         _selectionIndexNeutralPosition = 2;
@@ -122,9 +119,9 @@ public class GRTPinchSlideClock : GRTPinchSlide
 
         if (!IsGRTTerminated)
         {
-            if (!_moveToNextTurn)
+            if (!MoveToNextTurn)
             {
-                if (_isSelectionValidated)
+                if (IsSelectionValidated)
                 {
                     CheckSolution();
                 }
@@ -132,7 +129,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
             else
             {
                 PrepareTurn();
-                _moveToNextTurn = false;
+                MoveToNextTurn = false;
             }
         }
         else
@@ -160,7 +157,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
             // Game Mechanic
             ResetArrow();
             _rotationIndex += 1;
-            _moveToNextTurn = true;
+            MoveToNextTurn = true;
         }
 
         // Highlight + reset 
@@ -169,7 +166,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
 
         // Player's selection
-        _isSelectionValidated = false;
+        IsSelectionValidated = false;
     }
 
     public override void ResetGRT()
@@ -177,15 +174,15 @@ public class GRTPinchSlideClock : GRTPinchSlide
         base.ResetGRT();
 
         ResetControllerPosition(0.5f);
-        _sliderValidation.SliderValue = 0.0f;
+        SliderValidation.SliderValue = 0.0f;
 
         // Counters
         TurnsLeft = 5;
 
         SelectionIndex = _selectionIndexNeutralPosition;
         _rotationIndex = 0;
-        _isSelectionValidated = false;
-        _moveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
+        IsSelectionValidated = false;
+        MoveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
 
 
     }
@@ -199,7 +196,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
     private void PrepareTurn()
     {
         ResetControllerPosition(0.5f);
-        _sliderValidation.SliderValue = 0.0f;
+        SliderValidation.SliderValue = 0.0f;
 
         // UI
         TurnsLeft -= 1;
@@ -212,7 +209,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         }
 
         // Player's selection
-        _isSelectionValidated = false;
+        IsSelectionValidated = false;
     }
 
     /// <summary>
@@ -246,11 +243,11 @@ public class GRTPinchSlideClock : GRTPinchSlide
     /// </summary>
     private void ValidateChoice()
     {
-        if (_sliderValidation.SliderValue != 1) return;
+        if (SliderValidation.SliderValue != 1) return;
 
-        _isSelectionValidated = true;
+        IsSelectionValidated = true;
         ResetControllerPosition(0.5f);
-        _sliderValidation.SliderValue = 0.0f;
+        SliderValidation.SliderValue = 0.0f;
 
         // Data
         SliderTaskData.NbSuccessPinches += 1;

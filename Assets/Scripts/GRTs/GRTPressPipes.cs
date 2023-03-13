@@ -53,7 +53,7 @@ public class GRTPressPipes : GRTPress
     private Transform _currentButtonTransform;
     #endregion
 
-    // Start is called before the first frame update
+    #region Overrides
     protected override void Start()
     {
         base.Start();
@@ -131,7 +131,7 @@ public class GRTPressPipes : GRTPress
         _currentButton = Controller.ControllerButtons[_currentButtonIndex];
         _currentButton.gameObject.SetActive(true);
     }
-
+    #endregion
     /// <summary>
     /// - Set the position of the key to the last button pressed
     /// - Hide the last button pressed
