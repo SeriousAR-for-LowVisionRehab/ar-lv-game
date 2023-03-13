@@ -167,7 +167,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         _isDebugMode = false;
-        IsDebugVerbose = false;
+        IsDebugVerbose = true;
         _isEscapeRoomButtonsSolved = false;
         _isEscapeRoomSlidersSolved = false;
         _isExperimentDone = false;

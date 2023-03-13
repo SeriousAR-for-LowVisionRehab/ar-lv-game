@@ -47,6 +47,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
     // User
     [SerializeField] private GameObject[] _piecesToSelect;                   // what the user should select
     private int _selectionIndexNeutralPosition;                              // where the selection reset to after each validation
+    private int _crossPieceIndex;
     private int _selectionIndex;
     private int SelectionIndex
     {
@@ -76,6 +77,9 @@ public class GRTPinchSlideClock : GRTPinchSlide
         ResetControllerPosition(0.5f);
         SliderValidation.SliderValue = 0.0f;
         IsSelectionValidated = false;
+        MoveToNextTurn = true;
+        _crossPieceIndex = 0;
+
 
         // Data listeners
         foreach ( var slider in Controller.ControllerButtons)
@@ -98,7 +102,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         _rotationIndex = 0;
         _arrowInitPosition = _arrow.transform.localPosition;
         _arrowInitRotation = _arrow.transform.localRotation;
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, _crossPieceIndex);
 
         // Counters
         TurnsLeft = 5;
@@ -161,9 +165,11 @@ public class GRTPinchSlideClock : GRTPinchSlide
         }
 
         // Highlight + reset 
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, 
+            _materialPieceOffSelection, _selectionIndexNeutralPosition, _crossPieceIndex);
         SelectionIndex = _selectionIndexNeutralPosition;
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, 
+            _materialPieceOnSelection, _selectionIndexNeutralPosition, _crossPieceIndex);
 
         // Player's selection
         IsSelectionValidated = false;
@@ -183,8 +189,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
         _rotationIndex = 0;
         IsSelectionValidated = false;
         MoveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
-
-
     }
     #endregion
 
@@ -260,7 +264,8 @@ public class GRTPinchSlideClock : GRTPinchSlide
         SliderTaskData.NbSuccessPinches += 1;
 
         // Highlight OFF
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, 
+            _selectionIndexNeutralPosition, _crossPieceIndex);
 
         // slider to selectionIndex:  0->0, 0.25 -> 1, 0.5 -> middle/none, 0.75 -> 2, 1 -> 3
         switch (SliderController.SliderValue)
@@ -286,13 +291,14 @@ public class GRTPinchSlideClock : GRTPinchSlide
         }
 
         // Highlight ON
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, 
+            _selectionIndexNeutralPosition, _crossPieceIndex);
     }
 
     /// <summary>
     /// Turn on highlight for the selected piece, and off for the previous selection.
     /// 
-    /// Remark: NeutralPosition (index=2) and Cross (index=4) are composite of children, and have their Renderer material in children objects
+    /// Remark: NeutralPosition (index=2) and Cross (index=0) are composite of children, and have their Renderer material in children objects
     /// The if-elseif() and foreach are there to reach those Renderer in children objects.
     /// </summary>
     private void UpdateComponentsHighlight(GameObject[] pieces, int index, Material material, int exception1, int exception2)

@@ -41,29 +41,12 @@ public class GRTPinchSlideTower : GRTPinchSlide
     }
 
     private float _degreeThresholdVictory;
-    private float[] _defaultDegrees = { 0.0f, 90.0f, 180.0f, 270.0f };
     private float[] _solutionsDegrees = { 90.0f, 270.0f, 0.0f, 180.0f };
     private float _currentSelectionRotationY;
     public float CurrentSelectionRotationY
     {
         get { return _currentSelectionRotationY; }
         private set { _currentSelectionRotationY = value; }
-    }
-
-    private int _selectionIndexNeutralPosition;   // where the selection reset to after each validation
-    public int SelectionIndexNeutralPosition
-    {
-        get { return _selectionIndexNeutralPosition; }
-        private set { _selectionIndexNeutralPosition = value; }
-    }
-    private int _selectionIndex;                  // this int correspond to the index of the face of the level, matched from slider value.
-    private int SelectionIndex
-    {
-        get { return _selectionIndex; }
-        set
-        {
-            _selectionIndex = value;
-        }
     }
 
     [Header("Tower's Components")]
@@ -89,7 +72,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
         TurnsLeft = _towerComponents.Length;
         AllowedTime = 30.0f;
         RemainingTime = AllowedTime;
-        SelectionIndexNeutralPosition = 0;
         _degreeThresholdVictory = 5.0f;
 
         // Set initial parameters and helper
@@ -99,7 +81,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
             _towerComponentDefaultRotation.Add(component.transform.rotation);
         }
 
-        _currentTowerLevelIndex = 0;   // start at the bottom
+        CurrentTowerLevelIndex = 0;   // start at the bottom
         SliderController = Controller.ControllerButtons[0];
         SliderValidation = Controller.ControllerButtons[1];
         
@@ -137,8 +119,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         base.OnEnterSolving();
         _helpDialog.gameObject.SetActive(true);
-        UpdateComponentsHighlight(_currentTowerLevelIndex);
-        UpdateHelpInformation(_currentTowerLevelIndex);
+        UpdateComponentsHighlight(CurrentTowerLevelIndex);
+        UpdateHelpInformation(CurrentTowerLevelIndex);
     }
 
     protected override void OnUpdateSolving()
@@ -178,26 +160,14 @@ public class GRTPinchSlideTower : GRTPinchSlide
     /// </summary>
     protected override void CheckSolution()
     {
-        CurrentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.localRotation.eulerAngles.y;
-        Debug.Log("index=" + _currentTowerLevelIndex + "|| CurrentSelectionRotationY = "
-            + _towerComponents[0].transform.localRotation.eulerAngles.y
-            + " (rotationQuaternionY="
-            + _towerComponents[1].transform.localRotation.eulerAngles
-            + ";"
-            + _towerComponents[2].transform.localRotation.eulerAngles
-            + ";"
-            + _towerComponents[3].transform.localRotation.eulerAngles
-            + "; _solutionsDegrees[_currentTowerLevelIndex]="
-            + _solutionsDegrees[_currentTowerLevelIndex]
-        );
+        CurrentSelectionRotationY = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.eulerAngles.y;
 
-        //if(Mathf.Approximately(CurrentSelectionRotationY, _solutionsDegrees[_currentTowerLevelIndex]))
-        float lowerBound = _solutionsDegrees[_currentTowerLevelIndex] - _degreeThresholdVictory;
-        float upperBound = _solutionsDegrees[_currentTowerLevelIndex] + _degreeThresholdVictory;
+        float lowerBound = _solutionsDegrees[CurrentTowerLevelIndex] - _degreeThresholdVictory;
+        float upperBound = _solutionsDegrees[CurrentTowerLevelIndex] + _degreeThresholdVictory;
         if ( (CurrentSelectionRotationY >= lowerBound && (CurrentSelectionRotationY <= upperBound))
             )
         {
-            if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
+            if (CurrentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
             {
                 IsGRTTerminated = true;
                 _helpDialog.gameObject.SetActive(false);
@@ -223,18 +193,13 @@ public class GRTPinchSlideTower : GRTPinchSlide
         CurrentSliderValue = 0.5f;
         ResetControllerPosition(0.5f);
         TurnsLeft = _towerComponents.Length;
-        _currentTowerLevelIndex = 0;   // start at the bottom
+        CurrentTowerLevelIndex = 0;   // start at the bottom
 
         // tower component
         for (int componentIndex = 0; componentIndex < _towerComponents.Length; componentIndex++)
         {
             _towerComponents[componentIndex].transform.rotation = _towerComponentDefaultRotation[componentIndex];
         }
-        //_towerComponents[0].transform.Rotate(new Vector3(0, 0, 0));
-        //_towerComponents[1].transform.Rotate(new Vector3(0, 90, 0));
-        //_towerComponents[2].transform.Rotate(new Vector3(0, 180, 0));
-        //_towerComponents[3].transform.Rotate(new Vector3(0, -90, 0));
-
         _towerComponents[_towerComponents.Length - 1].GetComponent<Renderer>().material = _colorLevelOff;
 
         // help
@@ -245,39 +210,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
     }
     #endregion
 
-
-    private void UpdateSelectionIndex()
-    {
-        // Data
-        SliderTaskData.NbSuccessPinches += 1;
-
-        // Selection
-        switch (SliderController.SliderValue)
-        {
-            case 0.00f:
-                SelectionIndex = 2;
-                break;
-            case 0.25f:
-                SelectionIndex = 3;
-                break;
-            case 0.50f:
-                SelectionIndex = SelectionIndexNeutralPosition;
-                break;
-            case 0.75f:
-                SelectionIndex = 1;
-                break;
-            case 1.00f:
-                SelectionIndex = 2;
-                break;
-            default:
-                if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
-                break;
-        }
-
-        // Mechanism
-        // RotateLevel();
-    }
-
     private void RotateLevel()
     {
         // change in slider value
@@ -285,45 +217,16 @@ public class GRTPinchSlideTower : GRTPinchSlide
         float currentValue = SliderController.SliderValue;
         float deltaSlider = PreviousSliderValue - currentValue;
         PreviousSliderValue = currentValue;
-        Debug.Log("------------------------- deltaSlider = " + deltaSlider + "("+ _towerComponents[_currentTowerLevelIndex].transform.localRotation + ")");
 
         // angles
-        float eulerX = _towerComponents[_currentTowerLevelIndex].transform.localRotation.x;
-        //float eulerY = _towerComponents[_currentTowerLevelIndex].transform.localRotation.y;
-        float eulerZ = _towerComponents[_currentTowerLevelIndex].transform.localRotation.z;
-        Transform tempTransform = _towerComponents[_currentTowerLevelIndex].transform;
-        //Quaternion newRotation = Quaternion.Euler(
-        //    eulerX,
-        //    180 + SliderController.SliderValue * 180,
-        //    eulerZ);
+        float eulerX = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.x;
+        float eulerZ = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.z;
+        Transform tempTransform = _towerComponents[CurrentTowerLevelIndex].transform;
 
         tempTransform.Rotate(eulerX, deltaSlider * 360f, eulerZ);
-        Debug.Log("------------------------- deltaSlider = " + deltaSlider + "(" + _towerComponents[_currentTowerLevelIndex].transform.localRotation + ")");
-        Debug.Log("######################################################################################################");
-        //tempTransform.localRotation = newRotation;
     }
 
-    /// <summary>
-    /// Take an int to rotate the _towerComponents[towerLevelIndex] by 90°C
-    /// to the right if direction > 0, or to the left if direction < 0
-    /// </summary>
-    /// <param name="towerLevelIndex"></param>
-    private void RotateThisLevelToNewPosition(int towerLevelIndex, float direction)
-    {
-        if (direction == 0) return;          // sanity check
-
-        //var currentEulerY = _towerComponents[towerLevelIndex].transform.eulerAngles.y;
-
-        if (direction > 0)
-        {
-            _towerComponents[towerLevelIndex].transform.Rotate(0, -90.0f, 0);
-        }
-        else if (direction < 0)
-        {
-            _towerComponents[towerLevelIndex].transform.Rotate(0, 90.0f, 0);
-        }
-    }
-
+   
     /// <summary>
     /// Perform operations related to the validation of the user's choice.
     /// </summary>
@@ -345,10 +248,10 @@ public class GRTPinchSlideTower : GRTPinchSlide
     {
         // Counters
         TurnsLeft -= 1;
-        _currentTowerLevelIndex += 1;
+        CurrentTowerLevelIndex += 1;
         ResetControllerPosition(0.5f);
-        UpdateComponentsHighlight(_currentTowerLevelIndex);
-        UpdateHelpInformation(_currentTowerLevelIndex);
+        UpdateComponentsHighlight(CurrentTowerLevelIndex);
+        UpdateHelpInformation(CurrentTowerLevelIndex);
     }
 
     /// <summary>
@@ -360,7 +263,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
         // TODO: move transform.position operations outside this Update..() function. Because the transform.position operations are done only once now that help is above controller
         // Y position of the dialogue
         var dialogPosition = _helpDialog.transform.position;
-        var levelPositionY = SliderController.transform.position.y + 0.15f; // _towerComponents[_currentTowerLevelIndex].transform.position.y;
+        var levelPositionY = SliderController.transform.position.y + 0.15f; // _towerComponents[CurrentTowerLevelIndex].transform.position.y;
 
         _helpDialog.transform.position = new Vector3(dialogPosition.x, levelPositionY, dialogPosition.z);
 

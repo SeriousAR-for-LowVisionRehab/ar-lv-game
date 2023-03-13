@@ -58,6 +58,24 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         get { return _coverFinished; }
     }
 
+    private bool _isSelectionValidated;
+    public bool IsSelectionValidated
+    {
+        get { return _isSelectionValidated; }
+        protected set { _isSelectionValidated = value; }
+    }
+    private bool _moveToNextTurn;
+    public bool MoveToNextTurn
+    {
+        get { return _moveToNextTurn; }
+        protected set { _moveToNextTurn = value; }
+    }
+
+    // Tower Slider Specific
+    protected int TowerSelectSliderStepDivisions;               // by how many steps is 360° divided
+    protected int TowerSelectButtonBalanceAgainstSlider;        // balance gameplay with pressing buttons (e.g. rotates the level faster? less steps?)
+
+    // Audio
     [SerializeField] protected AudioClip CorrectChoiceSoundFX;
     [SerializeField] protected AudioClip TaskCompletedSoundFX;
     [SerializeField] protected AudioSource AudioSource;
@@ -202,6 +220,11 @@ public abstract class GRTGeneric<T> : MonoBehaviour
 
         FinishedCover = Support.Find("FinishedCover");
 
+        // GRTs specifics
+        TowerSelectSliderStepDivisions = 16;
+        TowerSelectButtonBalanceAgainstSlider = 2;
+
+        // Audio
         AudioSource = GetComponent<AudioSource>();
         TaskCompletedVolumeScale = 0.5F;
         //_hasTaskCompletedSoundFXStarted = false;

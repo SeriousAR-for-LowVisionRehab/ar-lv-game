@@ -2,16 +2,42 @@ using Microsoft.MixedReality.Toolkit.UI;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Tower GRT with Press gesture controller.
+/// Each level of the tower is a cube with 4 shapes:
+///  - square  at rotation.y =   0
+///  - diamond at rotation.y =  90
+///  - "sun"   at rotation.y = 180
+///  - round   at rotation.y = 270 (-90° in Inspector)
+///  
+/// Hardcoded solution:
+///  - level 0 = diamond = 90°
+///  - level 1 = round = 270°
+///  - level 2 = square = 0°
+///  - level 3 = sun = 180°
+/// </summary>
 public class GRTPressTower : GRTPress
 {
     #region Mechanic
     private PressableButtonHoloLens2 buttonRight;
     private PressableButtonHoloLens2 buttonLeft;
+    private PressableButtonHoloLens2 buttonValidation;
 
     private int _currentTowerLevelIndex;
+    public int CurrentTowerLevelIndex
+    {
+        get { return _currentTowerLevelIndex; }
+        private set { _currentTowerLevelIndex = value; }
+    }
+
+    private float _degreeThresholdVictory;
     private float[] _solutionsDegrees = { 90.0f, 270.0f, 0.0f, 180.0f };
     private float _currentSelectionRotationY;
-
+    public float CurrentSelectionRotationY
+    {
+        get { return _currentSelectionRotationY; }
+        private set { _currentSelectionRotationY = value; }
+    }
 
     [Header("Tower's Components")]
     [SerializeField] private GameObject[] _towerComponents;
@@ -29,10 +55,14 @@ public class GRTPressTower : GRTPress
     {
         base.Start();
 
+        IsSelectionValidated = false;
+        MoveToNextTurn = false;
+
         // Counters
         TurnsLeft = _towerComponents.Length;
         AllowedTime = 30.0f;
         RemainingTime = AllowedTime;
+        _degreeThresholdVictory = 5.0f;
 
         // Set initial parameters and helper
         _towerComponentDefaultRotation = new List<Quaternion>();
@@ -40,11 +70,13 @@ public class GRTPressTower : GRTPress
         {
             _towerComponentDefaultRotation.Add(component.transform.rotation);
         }
-        _currentTowerLevelIndex = 0;   // start at the bottom
+        CurrentTowerLevelIndex = 0;   // start at the bottom
         buttonRight = Controller.ControllerButtons[0];
         buttonLeft = Controller.ControllerButtons[1];
-        buttonRight.ButtonReleased.AddListener(delegate { UpdateMechanismAndCheckSolution(-1); });
-        buttonLeft.ButtonReleased.AddListener(delegate { UpdateMechanismAndCheckSolution(1); });
+        buttonValidation = Controller.ControllerButtons[2];
+        buttonRight.ButtonReleased.AddListener(delegate { RotateLevel(1); });
+        buttonLeft.ButtonReleased.AddListener(delegate { RotateLevel(-1); });
+        buttonValidation.ButtonReleased.AddListener(delegate { ValidateChoice(); });
 
         // Add listeners to controller's buttons
         foreach (var btn in Controller.ControllerButtons)
@@ -72,17 +104,37 @@ public class GRTPressTower : GRTPress
     protected override void OnEnterSolving()
     {
         base.OnEnterSolving();
-
         _helpDialog.gameObject.SetActive(true);
-
-        UpdateComponentsHighlight(_currentTowerLevelIndex);
-        UpdateHelpInformation(_currentTowerLevelIndex);
+        UpdateComponentsHighlight(CurrentTowerLevelIndex);
+        UpdateHelpInformation(CurrentTowerLevelIndex);
     }
 
     protected override void OnUpdateSolving()
     {
         base.OnUpdateSolving();
-        //CheckSolution();
+        if (!IsGRTTerminated)
+        {
+            if (!MoveToNextTurn)
+            {
+                if (IsSelectionValidated)
+                {
+                    CheckSolution();
+                }
+            }
+            else
+            {
+                PrepareTurn();
+                MoveToNextTurn = false;
+            }
+        }
+        else
+        {
+            FinishedCover.gameObject.SetActive(true);
+            FinishedCover.GetComponent<Renderer>().material = CoverFinished;
+            TextTurnsLeft.gameObject.SetActive(false);
+            TextTimeLeft.gameObject.SetActive(false);
+            TextPoints.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -91,16 +143,15 @@ public class GRTPressTower : GRTPress
     /// </summary>
     protected override void CheckSolution()
     {
-        //_currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.rotation.eulerAngles.y;
-        _currentSelectionRotationY = _towerComponents[_currentTowerLevelIndex].transform.localRotation.eulerAngles.y;
+        //CurrentSelectionRotationY = _towerComponents[CurrentTowerLevelIndex].transform.rotation.eulerAngles.y;
+        CurrentSelectionRotationY = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.eulerAngles.y;
 
-        _gameManagerInstance.WriteDebugLog("Log", "[GRTPressTower:CheckSolution] _currentTowerLevelIndex: "
-    + _currentTowerLevelIndex + ", _currentSelectionRotationY=" + _currentSelectionRotationY
-    + ", _solutionsDegrees[_currentTowerLevelIndex]=" + _solutionsDegrees[_currentTowerLevelIndex]);
-
-        if (_currentSelectionRotationY == _solutionsDegrees[_currentTowerLevelIndex])
+        float lowerBound = _solutionsDegrees[CurrentTowerLevelIndex] - _degreeThresholdVictory;
+        float upperBound = _solutionsDegrees[CurrentTowerLevelIndex] + _degreeThresholdVictory;
+        if ((CurrentSelectionRotationY >= lowerBound && (CurrentSelectionRotationY <= upperBound))
+            )
         {
-            if (_currentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
+            if (CurrentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
             {
                 IsGRTTerminated = true;
                 _helpDialog.gameObject.SetActive(false);
@@ -108,12 +159,12 @@ public class GRTPressTower : GRTPress
                 FinishedCover.GetComponent<Renderer>().material = CoverFinished;
                 return;
             }
-
+            MoveToNextTurn = true;
             Points += 1;
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
-
-            PrepareNextLevel();
         }
+        IsSelectionValidated = false;
+
     }
 
     public override void ResetGRT()
@@ -124,17 +175,16 @@ public class GRTPressTower : GRTPress
 
         // Counters
         TurnsLeft = _towerComponents.Length;
-        _currentTowerLevelIndex = 0;   // start at the bottom
+        CurrentTowerLevelIndex = 0;   // start at the bottom
+        IsSelectionValidated = false;
+        MoveToNextTurn = false;
+        _degreeThresholdVictory = 5.0f;
 
         // tower component
         for (int componentIndex = 0; componentIndex < _towerComponents.Length; componentIndex++)
         {
             _towerComponents[componentIndex].transform.rotation = _towerComponentDefaultRotation[componentIndex];
         }
-        //_towerComponents[0].transform.Rotate(new Vector3(0, 0, 0));
-        //_towerComponents[1].transform.Rotate(new Vector3(0, 90, 0));
-        //_towerComponents[2].transform.Rotate(new Vector3(0, 180, 0));
-        //_towerComponents[3].transform.Rotate(new Vector3(0, -90, 0));
         _towerComponents[_towerComponents.Length - 1].GetComponent<Renderer>().material = _colorLevelOff;
 
         // help
@@ -155,7 +205,7 @@ public class GRTPressTower : GRTPress
         ButtonTaskData.NbSuccessClicks += 1;
 
         // Update
-        RotateThisLevelToNewPosition(_currentTowerLevelIndex, direction);
+        RotateThisLevelToNewPosition(CurrentTowerLevelIndex, direction);
         CheckSolution();
     }
 
@@ -182,17 +232,42 @@ public class GRTPressTower : GRTPress
         }
     }
 
+    private void RotateLevel(int rotationSide)
+    {
+        ButtonTaskData.NbSuccessClicks += 1;
+
+        // Slider has more incremental rotation. But Buttons is eased a little bit to balance the gameplay
+        float deltaDegree = 360.0f / (float) (TowerSelectSliderStepDivisions / TowerSelectButtonBalanceAgainstSlider); 
+
+        // angles
+        float eulerX = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.x;
+        float eulerZ = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.z;
+        Transform tempTransform = _towerComponents[CurrentTowerLevelIndex].transform;
+
+        tempTransform.Rotate(eulerX, rotationSide * deltaDegree, eulerZ);
+    }
+
+    /// <summary>
+    /// Perform operations related to the validation of the user's choice.
+    /// </summary>
+    private void ValidateChoice()
+    {
+        IsSelectionValidated = true;
+        ButtonTaskData.NbSuccessClicks += 1;
+    }
+
+
     /// <summary>
     /// Setup the next level: index, helper
     /// </summary>
-    private void PrepareNextLevel()
+    private void PrepareTurn()
     {
-        _currentTowerLevelIndex += 1;
+        CurrentTowerLevelIndex += 1;
         // Counters
         TurnsLeft -= 1;
 
-        UpdateComponentsHighlight(_currentTowerLevelIndex);
-        UpdateHelpInformation(_currentTowerLevelIndex);
+        UpdateComponentsHighlight(CurrentTowerLevelIndex);
+        UpdateHelpInformation(CurrentTowerLevelIndex);
     }
 
     /// <summary>
@@ -203,7 +278,7 @@ public class GRTPressTower : GRTPress
     {
         // Y position of the dialogue
         var dialogPosition = _helpDialog.transform.position;
-        var levelPositionY = buttonRight.transform.position.y + 0.15f; // _towerComponents[_currentTowerLevelIndex].transform.position.y;
+        var levelPositionY = buttonRight.transform.position.y + 0.15f; // _towerComponents[CurrentTowerLevelIndex].transform.position.y;
 
         _helpDialog.transform.position = new Vector3(dialogPosition.x, levelPositionY, dialogPosition.z);
 

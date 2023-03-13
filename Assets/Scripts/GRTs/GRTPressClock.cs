@@ -43,10 +43,9 @@ public class GRTPressClock : GRTPress
         set
         {
             _remainingTime = value;
-            if (_remainingTime <= 0) _moveToNextTurn = true;
+            if (_remainingTime <= 0) MoveToNextTurn = true;
         }
-    }
-    private bool _moveToNextTurn;                                     
+    }                                 
 
     // Clock
     private int _rotationIndex;                                              // an index for rotation, and piece on clock
@@ -65,6 +64,7 @@ public class GRTPressClock : GRTPress
     private PressableButtonHoloLens2 buttonLeft;
     private PressableButtonHoloLens2 buttonValidate;
     private int _selectionIndexNeutralPosition;                              // where the selection reset to after each validation
+    private int _crossPieceIndex;
     private int _selectionIndex;
     private int SelectionIndex
     {
@@ -82,7 +82,6 @@ public class GRTPressClock : GRTPress
             //}
         }
     }
-    private bool _isSelectionValidated;
     #endregion
 
     #region Data
@@ -119,14 +118,18 @@ public class GRTPressClock : GRTPress
         _selectionIndexNeutralPosition = 2;
         SelectionIndex = _selectionIndexNeutralPosition;
         _rotationIndex = 0;
+        _crossPieceIndex = 0;
 
         // Counters
         TurnsLeft = 5;
         AllowedTime = 30.0f;
         RemainingTime = AllowedTime;
 
-        _moveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
-        _isSelectionValidated = false;
+        MoveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
+        IsSelectionValidated = false;
+
+        IsSelectionValidated = false;
+        MoveToNextTurn = true;
 
         // Debug Mode
         if (IsDebugMode)
@@ -152,9 +155,9 @@ public class GRTPressClock : GRTPress
 
         if (!IsGRTTerminated)
         {
-            if (!_moveToNextTurn)
+            if (!MoveToNextTurn)
             {
-                if (_isSelectionValidated)
+                if (IsSelectionValidated)
                 {
                     CheckSolution();
                 }
@@ -162,7 +165,7 @@ public class GRTPressClock : GRTPress
             else
             {
                 PrepareTurn();
-                _moveToNextTurn = false;
+                MoveToNextTurn = false;
             }
         }
         else
@@ -191,7 +194,7 @@ public class GRTPressClock : GRTPress
             // Game Mechanic
             ResetArrow();
             _rotationIndex += 1;
-            _moveToNextTurn = true;
+            MoveToNextTurn = true;
         }
         else
         {
@@ -200,12 +203,14 @@ public class GRTPressClock : GRTPress
         }
 
         // Highlight + reset 
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, 
+            _selectionIndexNeutralPosition, _crossPieceIndex);
         SelectionIndex = _selectionIndexNeutralPosition;
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, 
+            _selectionIndexNeutralPosition, _crossPieceIndex);
 
         // Player's selection
-        _isSelectionValidated = false;
+        IsSelectionValidated = false;
     }
 
     public override void ResetGRT()
@@ -218,8 +223,8 @@ public class GRTPressClock : GRTPress
         TurnsLeft = 5;
         SelectionIndex = _selectionIndexNeutralPosition;
         _rotationIndex = 0;
-        _isSelectionValidated = false;
-        _moveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
+        IsSelectionValidated = false;
+        MoveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
 
     }
     #endregion
@@ -242,7 +247,7 @@ public class GRTPressClock : GRTPress
         }
 
         // Player's selection
-        _isSelectionValidated = false;
+        IsSelectionValidated = false;
     }
 
     /// <summary>
@@ -277,7 +282,7 @@ public class GRTPressClock : GRTPress
     private void ValidateChoice()
     {
         if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPressClock:ValidateChoice] User has validated her choice.");
-        _isSelectionValidated = true;
+        IsSelectionValidated = true;
 
         // Data
         _NbClickButtonValidate += 1;
@@ -288,9 +293,11 @@ public class GRTPressClock : GRTPress
     private void MoveCursorLeft()
     {
         // Mechanism
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, 
+            _selectionIndexNeutralPosition, _crossPieceIndex);
         SelectionIndex -= 1;
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection,
+            _selectionIndexNeutralPosition, _crossPieceIndex);
 
         // Data
         _NbClickButtonLeft += 1;
@@ -301,9 +308,11 @@ public class GRTPressClock : GRTPress
     private void MoveCursorRight()
     {
         // Mechanism
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, 
+            _selectionIndexNeutralPosition, _crossPieceIndex);
         SelectionIndex += 1;
-        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, 4);
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, 
+            _selectionIndexNeutralPosition, _crossPieceIndex);
 
         // Data
         _NbClickButtonRight += 1;
