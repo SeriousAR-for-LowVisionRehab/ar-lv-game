@@ -49,7 +49,7 @@ public class GRTPressClock : GRTPress
 
     // Clock
     private int _rotationIndex;                                              // an index for rotation, and piece on clock
-    [SerializeField] private int[] _rotationAngles = { -90, -270, 0, -180 }; // { 0, -90, -180, -270 }; // assume four pieces displayed    
+    [SerializeField] private int[] _rotationAngles = { 90, 270, 0, 180 }; // assume four pieces displayed    
     [SerializeField] private GameObject _arrow;
     private Vector3 _arrowInitPosition;
     private Quaternion _arrowInitRotation;
@@ -84,10 +84,6 @@ public class GRTPressClock : GRTPress
     }
     #endregion
 
-    #region Data
-    private int _NbClickButtonLeft, _NbClickButtonRight, _NbClickButtonValidate;
-    #endregion
-
     #region Overrides
     protected override void Start()
     {
@@ -119,6 +115,10 @@ public class GRTPressClock : GRTPress
         SelectionIndex = _selectionIndexNeutralPosition;
         _rotationIndex = 0;
         _crossPieceIndex = 0;
+        _arrowInitPosition = _arrow.transform.localPosition;
+        _arrowInitRotation = _arrow.transform.localRotation;
+        UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOnSelection, _selectionIndexNeutralPosition, _crossPieceIndex);
+        
 
         // Counters
         TurnsLeft = 5;
@@ -127,9 +127,6 @@ public class GRTPressClock : GRTPress
 
         MoveToNextTurn = true;// true at start, and then only if _remainingTime <= 0
         IsSelectionValidated = false;
-
-        IsSelectionValidated = false;
-        MoveToNextTurn = true;
 
         // Debug Mode
         if (IsDebugMode)
@@ -142,7 +139,7 @@ public class GRTPressClock : GRTPress
     protected override void OnEnterSolving()
     {
         base.OnEnterSolving();
-        _arrowInitRotation = _arrow.transform.rotation;
+        _arrowInitRotation = _arrow.transform.localRotation;
     }
 
     /// <summary>
@@ -151,20 +148,34 @@ public class GRTPressClock : GRTPress
     protected override void OnUpdateSolving()
     {
         base.OnUpdateSolving();
-        _arrowInitPosition = _arrow.transform.position;
+        //_arrowInitPosition = _arrow.transform.localPosition;
 
         if (!IsGRTTerminated)
         {
-            if (!MoveToNextTurn)
+            if (!MoveToNextTurn && RemainingTime >= 0)
             {
                 if (IsSelectionValidated)
                 {
                     CheckSolution();
                 }
+            } 
+            else if(RemainingTime < 0)
+            {
+                // Highlight + reset 
+                UpdateComponentsHighlight(_piecesToSelect, SelectionIndex,
+                    _materialPieceOffSelection, _selectionIndexNeutralPosition, _crossPieceIndex);
+                SelectionIndex = _selectionIndexNeutralPosition;
+                UpdateComponentsHighlight(_piecesToSelect, SelectionIndex,
+                    _materialPieceOnSelection, _selectionIndexNeutralPosition, _crossPieceIndex);
+
+                ResetArrow();
+                _rotationIndex += 1;
+                PrepareTurn();
+                MoveToNextTurn = false;
             }
             else
             {
-                PrepareTurn();
+                PrepareTurn();        
                 MoveToNextTurn = false;
             }
         }
@@ -175,7 +186,6 @@ public class GRTPressClock : GRTPress
             TextTurnsLeft.gameObject.SetActive(false);
             TextTimeLeft.gameObject.SetActive(false);
             TextPoints.gameObject.SetActive(false);
-            //ResetArrow();
         }
     }
 
@@ -186,20 +196,19 @@ public class GRTPressClock : GRTPress
     {
         if (_piecesOnClock[_rotationIndex].name == _piecesToSelect[SelectionIndex].name)
         {
+            // Audio
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
 
             // UI
-            Points += 1;
+            if (RemainingTime > 0)
+            {
+                Points += 1;
+            }
 
-            // Game Mechanic
+            // Mechanic
             ResetArrow();
             _rotationIndex += 1;
             MoveToNextTurn = true;
-        }
-        else
-        {
-            if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "Pieces: clock(index " + _rotationIndex + ") = " + _piecesOnClock[_rotationIndex].name +
-                ", selection (index " +  SelectionIndex + ") = " + _piecesToSelect[SelectionIndex].name);
         }
 
         // Highlight + reset 
@@ -257,10 +266,10 @@ public class GRTPressClock : GRTPress
     {
         Vector3 newAngle = new Vector3(0, 0, _rotationAngles[_rotationIndex]);
         _arrow.transform.Rotate(newAngle);
-        _arrow.transform.localScale = new Vector3(2, 2, 2);
+        //_arrow.transform.localScale = new Vector3(2, 2, 2);
 
         UpdateComponentsHighlight(_piecesOnClock, _rotationIndex, _materialPieceOnSelection, 3, 3);
-
+        _arrowInitPosition = _arrow.transform.localPosition;
     }
     
     /// <summary>
@@ -268,9 +277,8 @@ public class GRTPressClock : GRTPress
     /// </summary>
     private void ResetArrow()
     {
-        _arrow.transform.localScale = new Vector3(1, 1, 1);
-        _arrow.transform.position = _arrowInitPosition;
-        _arrow.transform.rotation = _arrowInitRotation;
+        _arrow.transform.localPosition = _arrowInitPosition;
+        _arrow.transform.localRotation = _arrowInitRotation;
         UpdateComponentsHighlight(_piecesOnClock, _rotationIndex, _materialPieceOffSelection, 3, 3);
     }
     #endregion
@@ -285,8 +293,7 @@ public class GRTPressClock : GRTPress
         IsSelectionValidated = true;
 
         // Data
-        _NbClickButtonValidate += 1;
-
+        ButtonTaskData.NbValidateClicks += 1;
         ButtonTaskData.NbSuccessClicks += 1;
     }
 
@@ -300,8 +307,7 @@ public class GRTPressClock : GRTPress
             _selectionIndexNeutralPosition, _crossPieceIndex);
 
         // Data
-        _NbClickButtonLeft += 1;
-
+        ButtonTaskData.NbLeftClicks += 1;
         ButtonTaskData.NbSuccessClicks += 1;
     }
 
@@ -315,8 +321,7 @@ public class GRTPressClock : GRTPress
             _selectionIndexNeutralPosition, _crossPieceIndex);
 
         // Data
-        _NbClickButtonRight += 1;
-
+        ButtonTaskData.NbRightClicks += 1;
         ButtonTaskData.NbSuccessClicks += 1;
     }
 

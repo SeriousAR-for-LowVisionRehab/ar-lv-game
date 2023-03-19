@@ -273,7 +273,7 @@ public class GameManager : MonoBehaviour
         // 6=Place Tasks On Marks, 7=Reset Game, 8=Return Home
         _creationButtons[1].ButtonPressed.AddListener(SaveCreation);
         _creationButtons[2].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
-        _creationButtons[3].ButtonPressed.AddListener(GameSettings.LoadMarkersPositionsFromFile);
+        _creationButtons[3].ButtonPressed.AddListener(delegate { GameSettings.LoadMarkersPositionsFromFile(true); });
         _creationButtons[4].ButtonPressed.AddListener(delegate { GameSettings.UpdateVector3UsingGameObjectsPositions(true); });        
         _creationButtons[5].ButtonPressed.AddListener(GameSettings.ResetSettingsToDefault);
         _creationButtons[6].ButtonPressed.AddListener(PlaceTasksOnMarkers);
@@ -287,10 +287,11 @@ public class GameManager : MonoBehaviour
         _textMarkerClockPosition = buttoncollectionregrouped.transform.Find("TextMarkerClockPosition").GetComponent<TextMesh>();
         _textMarkerTowerPosition = buttoncollectionregrouped.transform.Find("TextMarkerTowerPosition").GetComponent<TextMesh>();
 
-        //_creationButtons[3].ButtonPressed.AddListener(delegate { FreezeTasksInPlace(false); });
+        // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=ToggleGRTButtonsOnOff, 2=ToggleGRTSlidersOnOff 3=Home
+        _escapeRoomButtons[1].ButtonPressed.AddListener(ToggleGRTPressOnOff);
+        _escapeRoomButtons[2].ButtonPressed.AddListener(ToggleGRTPinchSlideOnOff);
+        _escapeRoomButtons[3].ButtonPressed.AddListener(SetStateHomeAndPauseEscapeRoom);
 
-        // Add Listeners to ESCAPEROOM buttons: 0=pin, 1=Home
-        _escapeRoomButtons[1].ButtonPressed.AddListener(SetStateHomeAndPauseEscapeRoom);
 
         // Set current state of the GameManager's state machine
         _gameStateMachine.SetCurrentState(GameState.HOME);
@@ -534,7 +535,7 @@ public class GameManager : MonoBehaviour
         // recall that tasks' prefab are set manually in the inspector:
         // e.g. marker[0] is for pipes with buttons (prefab 0) and with sliders (prefab 3)
         // e.g. marker[1] is for clocks with buttons (prefab 1) and with sliders (prefab 4)
-        for (int markerIndex = 0; markerIndex < markers.Count; markerIndex++)
+        for (int markerIndex = 0; markerIndex < markers.Count - 1; markerIndex++)
         {
             _tasksPrefabs[markerIndex].SetActive(true);
             _tasksPrefabs[markerIndex + 3].SetActive(true);
@@ -544,6 +545,14 @@ public class GameManager : MonoBehaviour
             _tasksPrefabs[markerIndex].transform.rotation = markers[markerIndex].transform.rotation;
             _tasksPrefabs[markerIndex + 3].transform.rotation = markers[markerIndex].transform.rotation;
         }
+
+        _tutorialPrefabs[0].SetActive(true);
+        _tutorialPrefabs[0].transform.position = markers[markers.Count - 1].transform.position + new Vector3(-0.1f, 0, 0);
+        _tutorialPrefabs[0].transform.rotation = markers[markers.Count - 1].transform.rotation;
+        _tutorialPrefabs[1].SetActive(true);
+        _tutorialPrefabs[1].transform.position = markers[markers.Count - 1].transform.position + new Vector3(0.1f, 0, 0);
+        _tutorialPrefabs[1].transform.rotation = markers[markers.Count - 1].transform.rotation;
+
         if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:SetTasksPositionFromMarkers] Tasks set on markers");
     }
 
@@ -639,6 +648,31 @@ public class GameManager : MonoBehaviour
 
         if (IsDebugVerbose) WriteDebugLog("Log", "[GameManager:ResetGame] Counters resetteds. Home Button/Slider updated.");
 
+    }
+
+    #endregion
+
+    #region EscapeRoom
+    private void ToggleGRTPressOnOff()
+    {
+        int nextTaskToSolveIndex = 0;
+        for (int grtIndex = nextTaskToSolveIndex; grtIndex < nextTaskToSolveIndex + 3; grtIndex++)
+        {
+            GameObject currentGrt = AvailableTasksPrefabs[grtIndex];
+            currentGrt.SetActive(!currentGrt.activeSelf);
+            //TODO: if activeSelf not working, check activeInHierarchy?
+        }
+    }
+
+    private void ToggleGRTPinchSlideOnOff()
+    {
+        int nextTaskToSolveIndex = 3;
+        for (int grtIndex = nextTaskToSolveIndex; grtIndex < nextTaskToSolveIndex + 3; grtIndex++)
+        {
+            GameObject currentGrt = AvailableTasksPrefabs[grtIndex];
+            currentGrt.SetActive(!currentGrt.activeSelf);
+            //TODO: if activeSelf not working, check activeInHierarchy?
+        }
     }
 
     #endregion

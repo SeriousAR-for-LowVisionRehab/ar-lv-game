@@ -32,8 +32,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
     }
  
     // Clock
-    private int _rotationIndex;                                              // an index chosen at random: for rotation, and piece on clock
-    private int[] _rotationsOrder = {1, 3, 0, 2};                            // pre-determined order of rotation
+    private int _rotationIndex;                                              // an index for rotation, and piece on clock
     [SerializeField] private int[] _rotationAngles = { 90, 270, 0, 180 }; // assume four pieces displayed    
     [SerializeField] private GameObject _arrow;
     private Vector3 _arrowInitPosition;
@@ -59,12 +58,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
             if (_selectionIndex > _piecesToSelect.Length - 1) _selectionIndex = _piecesToSelect.Length - 1;
         }
     }
-
-    private Transform _currentClockPieceHighlight;
-    #endregion
-
-    #region Data
-    private int _NbClickButtonLeft, _NbClickButtonRight, _NbClickButtonValidate;
     #endregion
 
     #region Overrides
@@ -79,7 +72,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
         IsSelectionValidated = false;
         MoveToNextTurn = true;
         _crossPieceIndex = 0;
-
+        SliderTaskData.NbPinchesPerIndex = new int[5];
 
         // Data listeners
         foreach ( var slider in Controller.ControllerButtons)
@@ -117,18 +110,38 @@ public class GRTPinchSlideClock : GRTPinchSlide
         }
     }
 
+    protected override void OnEnterSolving()
+    {
+        base.OnEnterSolving();
+        _arrowInitRotation = _arrow.transform.localRotation;
+    }
+
     protected override void OnUpdateSolving()
     {
         base.OnUpdateSolving();
+        //_arrowInitPosition = _arrow.transform.localPosition;
 
         if (!IsGRTTerminated)
         {
-            if (!MoveToNextTurn)
+            if (!MoveToNextTurn && RemainingTime >= 0)
             {
                 if (IsSelectionValidated)
                 {
                     CheckSolution();
                 }
+            }
+            else if (RemainingTime < 0)
+            {
+                // Highlight + reset 
+                UpdateComponentsHighlight(_piecesToSelect, SelectionIndex,
+                    _materialPieceOffSelection, _selectionIndexNeutralPosition, _crossPieceIndex);
+                SelectionIndex = _selectionIndexNeutralPosition;
+                UpdateComponentsHighlight(_piecesToSelect, SelectionIndex,
+                    _materialPieceOnSelection, _selectionIndexNeutralPosition, _crossPieceIndex);
+                ResetArrow();
+                _rotationIndex += 1;
+                PrepareTurn();
+                MoveToNextTurn = false;
             }
             else
             {
@@ -143,7 +156,6 @@ public class GRTPinchSlideClock : GRTPinchSlide
             TextTurnsLeft.gameObject.SetActive(false);
             TextTimeLeft.gameObject.SetActive(false);
             TextPoints.gameObject.SetActive(false);
-            //ResetArrow();
         }
     }
 
@@ -154,11 +166,16 @@ public class GRTPinchSlideClock : GRTPinchSlide
     {
         if (_piecesOnClock[_rotationIndex].name == _piecesToSelect[SelectionIndex].name)
         {
+            // Audio
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
-            // UI
-            Points += 1;
 
-            // Game Mechanic
+            // UI
+            if (RemainingTime > 0)
+            {
+                Points += 1;
+            }
+
+            // Mechanic
             ResetArrow();
             _rotationIndex += 1;
             MoveToNextTurn = true;
@@ -223,7 +240,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
     {
         Vector3 newAngle = new Vector3(0, 0, _rotationAngles[_rotationIndex]);
         _arrow.transform.Rotate(newAngle);
-        _arrow.transform.localScale = new Vector3(2, 2, 2);
+        // _arrow.transform.localScale = new Vector3(2, 2, 2);
 
         UpdateComponentsHighlight(_piecesOnClock, _rotationIndex, _materialPieceOnSelection, 3, 3);
         _arrowInitPosition = _arrow.transform.localPosition;
@@ -255,6 +272,7 @@ public class GRTPinchSlideClock : GRTPinchSlide
 
         // Data
         SliderTaskData.NbSuccessPinches += 1;
+        SliderTaskData.NbValidatePinches += 1;
     }
 
     
@@ -267,23 +285,28 @@ public class GRTPinchSlideClock : GRTPinchSlide
         UpdateComponentsHighlight(_piecesToSelect, SelectionIndex, _materialPieceOffSelection, 
             _selectionIndexNeutralPosition, _crossPieceIndex);
 
-        // slider to selectionIndex:  0->0, 0.25 -> 1, 0.5 -> middle/none, 0.75 -> 2, 1 -> 3
+        // slider to selectionIndex
         switch (SliderController.SliderValue)
         {
             case 0.00f:
                 SelectionIndex = 0;
+                SliderTaskData.NbPinchesPerIndex[0] += 1;
                 break;
             case 0.25f:
                 SelectionIndex = 1;
+                SliderTaskData.NbPinchesPerIndex[1] += 1;
                 break;
             case 0.50f:
                 SelectionIndex = _selectionIndexNeutralPosition;
+                SliderTaskData.NbPinchesPerIndex[2] += 1;
                 break;
             case 0.75f:
                 SelectionIndex = 3;
+                SliderTaskData.NbPinchesPerIndex[3] += 1;
                 break;
             case 1.00f:
                 SelectionIndex = 4;
+                SliderTaskData.NbPinchesPerIndex[4] += 1;
                 break;
             default:
                 if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");

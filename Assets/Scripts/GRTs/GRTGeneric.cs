@@ -153,11 +153,11 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         Support = transform.Find("Support");
         Controller = new GRTController<T>();
         Controller.Parent = transform.Find("Controller");
-        Debug.Log("Controller name: " + Controller.Parent);
+        // Debug.Log("Controller name: " + Controller.Parent);
         Controller.ControllerButtons = Controller.Parent.GetComponentsInChildren<T>();
         GrtCore = transform.Find("Core");
         ControllerStart = transform.Find("ControllerStart");
-        Debug.Log("ControllerStart name: " + ControllerStart.name);
+        // Debug.Log("ControllerStart name: " + ControllerStart.name);
     }
 
     /// <summary>
@@ -239,6 +239,7 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         }
         
         TimeInGRT = 0f;
+        Points = 0;
     }
 
     private void Update()
@@ -292,7 +293,14 @@ public abstract class GRTGeneric<T> : MonoBehaviour
         // Data
         TimeInGRT += Time.deltaTime;
 
-        RemainingTime -= Time.deltaTime;
+        if (RemainingTime >= 0)
+        {
+            RemainingTime -= Time.deltaTime;
+        }
+        else
+        {
+            RemainingTime = 0;
+        }
 
         // UI
         UpdateUI();

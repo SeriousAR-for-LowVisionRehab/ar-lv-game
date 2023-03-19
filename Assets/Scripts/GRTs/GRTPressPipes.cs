@@ -15,11 +15,6 @@ public class GRTPressPipes : GRTPress
             if (_turnsLeft == 0)
             {
                 IsGRTTerminated = true;
-                FinishedCover.gameObject.SetActive(true);
-                FinishedCover.GetComponent<Renderer>().material = CoverFinished;
-                TextTurnsLeft.gameObject.SetActive(false);
-                TextTimeLeft.gameObject.SetActive(false);
-                TextPoints.gameObject.SetActive(false);
             }
         }
     }
@@ -32,14 +27,8 @@ public class GRTPressPipes : GRTPress
         set
         {
             _remainingTime = value;
-            if (_remainingTime <= 0)
-            {
-                // _moveToNextTurn = true;
-                // Debug.Log("[GRTPressPipres:RemainingTime] Temps écoulé -> Fin de la tâche! ");
-            }
         }
     }
-    // private bool _moveToNextTurn = true;                                     // true at start, and then only if _remainingTime <= 0
 
     // Pipes
     [Header("Main Objects")]
@@ -50,7 +39,6 @@ public class GRTPressPipes : GRTPress
 
     private int _currentButtonIndex;
     private PressableButtonHoloLens2 _currentButton;
-    private Transform _currentButtonTransform;
     #endregion
 
     #region Overrides
@@ -60,7 +48,7 @@ public class GRTPressPipes : GRTPress
 
         // Initial setup
         TurnsLeft = 1;  // You only get the key out of the pipes once.
-        AllowedTime = 45.0f;
+        AllowedTime = 70.0f;
         RemainingTime = AllowedTime;
         _keyOriginalPosition = _key.transform.localPosition;
 
@@ -103,6 +91,14 @@ public class GRTPressPipes : GRTPress
         {
             CheckSolution();
         }
+        else
+        {
+            FinishedCover.gameObject.SetActive(true);
+            FinishedCover.GetComponent<Renderer>().material = CoverFinished;
+            TextTurnsLeft.gameObject.SetActive(false);
+            TextTimeLeft.gameObject.SetActive(false);
+            TextPoints.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -113,7 +109,8 @@ public class GRTPressPipes : GRTPress
         // index from 0 to 6 + final extra increment = 7 = nb of buttons
         if (_currentButtonIndex == _keyPositions.Length)
         {
-            IsGRTTerminated = true;
+            // IsGRTTerminated = true;
+            TurnsLeft -= 1;
             FinishedCover.gameObject.SetActive(true);
             FinishedCover.GetComponent<Renderer>().material = CoverFinished;
             if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GRTPerssPipes:CheckSolution] Check solution result = GRT is terminated!");
@@ -159,7 +156,10 @@ public class GRTPressPipes : GRTPress
         AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
 
         // Points
-        Points += 1;
+        if(RemainingTime > 0)
+        {
+            Points += 1;
+        }
 
         // Clicks
         ButtonTaskData.NbSuccessClicks += 1;

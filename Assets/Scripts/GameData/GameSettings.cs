@@ -40,9 +40,15 @@ public class GameSettings
     public List<Vector3> MarkersPositions
     {
         get { return _markersPositions; }
-        set { _markersPositions = value; }
+        private set { _markersPositions = value; }
     }
 
+    [SerializeField] private List<Quaternion> _markersLocalRotations;
+    public List<Quaternion> MarkersLocalRotations
+    {
+        get { return _markersLocalRotations; }
+        private set { _markersLocalRotations = value; }
+    }
 
 
     /// <summary>
@@ -60,15 +66,18 @@ public class GameSettings
         // Init lists
         Markers = new List<GameObject>();
         MarkersPositions = new List<Vector3>();
+        MarkersLocalRotations = new List<Quaternion>();
 
         // Fill in lists
         foreach (Transform marker in GameObject.Find("Markers").transform)
         {
             Markers.Add(marker.gameObject);
+            MarkersLocalRotations.Add(marker.localRotation);
         }
-        MarkersPositions.Add(new Vector3(-0.1f, 0, 0));
-        MarkersPositions.Add(new Vector3(0, 0, 0));
-        MarkersPositions.Add(new Vector3(0.1f, 0, 0));
+        MarkersPositions.Add(new Vector3(-0.1f, 0, 0));   // Pipes
+        MarkersPositions.Add(new Vector3(0, 0, 0));       // Clock
+        MarkersPositions.Add(new Vector3(0.1f, 0, 0));    // Tower
+        MarkersPositions.Add(new Vector3(-0.2f, 0, 0));   // Tutorial
 
         // Set Markers GameObjects' positions to the positions
         SetGameObjectPositionsUsingVector3();
@@ -86,6 +95,16 @@ public class GameSettings
         if (!File.Exists(_pathToDefaultSettings))
         {
             if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogAssertion", "[GameSettings:ResetSettingsToDefault] _pathToDefaultSettings not found: " + _pathToDefaultSettings + ". Save current settings as default.");
+            MarkersPositions.Clear();
+            MarkersPositions.Add(new Vector3(-0.1f, 0, 0));  // Pipes
+            MarkersPositions.Add(new Vector3(0, 0, 0));      // Clock
+            MarkersPositions.Add(new Vector3(0.1f, 0, 0));   // Tower
+            MarkersPositions.Add(new Vector3(-0.2f, 0, 0));  // Tutorial
+            MarkersLocalRotations.Clear();
+            for (int i = 0; i < MarkersPositions.Count; i++)
+            {
+                MarkersLocalRotations.Add(new Quaternion(0, 0, 0, 1));
+            }
             SaveGameSettingsToFile(_pathToDefaultSettings);
             return;
         }
@@ -95,6 +114,7 @@ public class GameSettings
         // Read file
         json = File.ReadAllText(_pathToDefaultSettings);
         MarkersPositions = JsonUtility.FromJson<GameSettings>(json).MarkersPositions;
+        MarkersLocalRotations = JsonUtility.FromJson<GameSettings>(json).MarkersLocalRotations;
 
         // Update GameObjects 
         SetGameObjectPositionsUsingVector3();
@@ -105,11 +125,15 @@ public class GameSettings
     /// <summary>
     /// Set this instance's MarkersPositions from an existing GameSettings file.
     /// </summary>
-    public void LoadMarkersPositionsFromFile()
+    public void LoadMarkersPositionsFromFile(bool SetGameObjectsWithNewPositions)
     {
         if (!File.Exists(_fullPath))
         {
             if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings:LoadMarkersPositionsFromFile] _fullPath not found: " + _fullPath + ". Creating a new one now...");
+            MarkersPositions.Add(new Vector3(-0.1f, 0, 0));  // Pipes
+            MarkersPositions.Add(new Vector3(0, 0, 0));      // Clock
+            MarkersPositions.Add(new Vector3(0.1f, 0, 0));   // Tower
+            MarkersPositions.Add(new Vector3(-0.2f, 0, 0));  // Tutorial
             SaveGameSettingsToFile(_fullPath);  // Create a first GameSettings JSON
             return;
         }
@@ -119,6 +143,10 @@ public class GameSettings
         // Read file
         json = File.ReadAllText(_fullPath);
         MarkersPositions = JsonUtility.FromJson<GameSettings>(json).MarkersPositions;
+        MarkersLocalRotations = JsonUtility.FromJson<GameSettings>(json).MarkersLocalRotations;
+
+        // Set GameObjects using the loaded MarkersPositions
+        if (SetGameObjectsWithNewPositions) SetGameObjectPositionsUsingVector3();
 
         if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings:LoadMarkersPositionsFromFile] new positions loaded. Markers count=" +Markers.Count + ", Positions count=" + MarkersPositions.Count);
     }
@@ -131,6 +159,7 @@ public class GameSettings
         for (int i = 0; i < Markers.Count; i++)
         {
             Markers[i].transform.position = MarkersPositions[i];
+            Markers[i].transform.localRotation = MarkersLocalRotations[i];
         }
         if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings] SetMarkersUsingJsonPositions done.");
     }
@@ -154,9 +183,11 @@ public class GameSettings
     public void UpdateVector3UsingGameObjectsPositions(bool saveToGameSettingsJSON)
     {
         MarkersPositions.Clear();
+        MarkersLocalRotations.Clear();
         foreach(GameObject marker in Markers)
         {
             MarkersPositions.Add(marker.transform.position);
+            MarkersLocalRotations.Add(marker.transform.localRotation);
         }
         if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "[GameSettings:SetMarkersPositions] new positions set.");
 

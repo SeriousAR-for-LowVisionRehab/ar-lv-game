@@ -7,6 +7,21 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     #endregion
 
     #region Mechanic
+    // Time
+    private int _turnsLeft;
+    public override int TurnsLeft
+    {
+        get { return _turnsLeft; }
+        set
+        {
+            _turnsLeft = value;
+            if (_turnsLeft == 0)
+            {
+                IsGRTTerminated = true;
+            }
+        }
+    }
+
     [Header("Main Objects")]
     [SerializeField] private GameObject _key;
     [SerializeField] private GameObject _endGoal;
@@ -22,7 +37,7 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         base.Start();
 
         TurnsLeft = 1;  // You only get the key out of the pipes once.
-        AllowedTime = 45.0f;
+        AllowedTime = 70.0f;
         RemainingTime = AllowedTime;
         _keyOriginalPosition = _key.transform.localPosition; // _key.transform.position;
         //Debug.LogAssertion("GRTPinchSlidePipes:Start] key original position (local) = " + _keyOriginalPosition);
@@ -66,8 +81,12 @@ public class GRTPinchSlidePipes : GRTPinchSlide
             MoveKeyToNextPosition();    
             SliderController.gameObject.SetActive(false);                            // Deactivate Used Slider
             _currentSliderIndex += 1;                                              // Increment Slider
-            Points = _currentSliderIndex;
-            //UpdateUI();
+
+            // Points
+            if (RemainingTime > 0)
+            {
+                Points += 1;
+            }
 
             // Call CheckSolution before preparing next move:
             CheckSolution();
@@ -84,7 +103,8 @@ public class GRTPinchSlidePipes : GRTPinchSlide
     {
         if (_currentSliderIndex == _keyPositions.Length)
         {
-            IsGRTTerminated = true;
+            // IsGRTTerminated = true;
+            TurnsLeft -= 1;
             FinishedCover.gameObject.SetActive(true);
             FinishedCover.GetComponent<Renderer>().material = CoverFinished;
         }

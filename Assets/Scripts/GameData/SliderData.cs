@@ -14,6 +14,20 @@ public class SliderData: ICommonDataTask
         set { _nbSuccessPinches = value; }
     }
 
+    [SerializeField] private int[] _nbPinchesPerIndex;
+    public int[] NbPinchesPerIndex
+    {
+        get { return _nbPinchesPerIndex; }
+        set { _nbPinchesPerIndex = value; }
+    }
+
+    [SerializeField] private int _nbValidatePinches;
+    public virtual int NbValidatePinches
+    {
+        get { return _nbValidatePinches; }
+        set { _nbValidatePinches = value; }
+    }
+
     [SerializeField] private float _hoverDuration;
     public float HoverDuration
     {

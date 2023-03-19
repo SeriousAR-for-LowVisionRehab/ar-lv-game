@@ -213,11 +213,11 @@ public class EscapeRoomStateMachine : FiniteStateMachine<EscapeRoomState>
         GameManager.Instance.NumberOfTasksSolved = 0;
 
         // Hide GRTs in this Escape Room
-        for(int grtIndex = NextTaskToSolveIndex; grtIndex < NextTaskToSolveIndex + 3; grtIndex++)
-        {
-            GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[grtIndex];
-            currentGrt.SetActive(false);
-        }
+        //for(int grtIndex = NextTaskToSolveIndex; grtIndex < NextTaskToSolveIndex + 3; grtIndex++)
+        //{
+        //    GameObject currentGrt = GameManager.Instance.AvailableTasksPrefabs[grtIndex];
+        //    currentGrt.SetActive(false);
+        //}
 
         // Change States
         GameManager.Instance.SaveGame(GameManager.Instance.CurrentGesture.ToString());

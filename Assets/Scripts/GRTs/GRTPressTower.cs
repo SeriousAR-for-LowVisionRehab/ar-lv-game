@@ -39,6 +39,32 @@ public class GRTPressTower : GRTPress
         private set { _currentSelectionRotationY = value; }
     }
 
+    private int _turnsLeft;
+    public override int TurnsLeft
+    {
+        get { return _turnsLeft; }
+        set
+        {
+            _turnsLeft = value;
+            if (_turnsLeft == 0)
+            {
+                IsGRTTerminated = true;
+            }
+        }
+    }
+
+    // Time per turn
+    private float _remainingTime;
+    public override float RemainingTime
+    {
+        get { return _remainingTime; }
+        set
+        {
+            _remainingTime = value;
+            if (_remainingTime <= 0) MoveToNextTurn = true;
+        }
+    }
+
     [Header("Tower's Components")]
     [SerializeField] private GameObject[] _towerComponents;
     [SerializeField] private Material _colorLevelOn;
@@ -68,7 +94,7 @@ public class GRTPressTower : GRTPress
         _towerComponentDefaultRotation = new List<Quaternion>();
         foreach (GameObject component in _towerComponents)
         {
-            _towerComponentDefaultRotation.Add(component.transform.rotation);
+            _towerComponentDefaultRotation.Add(component.transform.localRotation);
         }
         CurrentTowerLevelIndex = 0;   // start at the bottom
         buttonRight = Controller.ControllerButtons[0];
@@ -148,8 +174,7 @@ public class GRTPressTower : GRTPress
 
         float lowerBound = _solutionsDegrees[CurrentTowerLevelIndex] - _degreeThresholdVictory;
         float upperBound = _solutionsDegrees[CurrentTowerLevelIndex] + _degreeThresholdVictory;
-        if ((CurrentSelectionRotationY >= lowerBound && (CurrentSelectionRotationY <= upperBound))
-            )
+        if ((CurrentSelectionRotationY >= lowerBound && (CurrentSelectionRotationY <= upperBound)))
         {
             if (CurrentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
             {
@@ -159,9 +184,22 @@ public class GRTPressTower : GRTPress
                 FinishedCover.GetComponent<Renderer>().material = CoverFinished;
                 return;
             }
+
+            // Mechanism
             MoveToNextTurn = true;
-            Points += 1;
+
+            // Points
+            if (RemainingTime > 0)
+            {
+                Points += 1;
+            }
+
+            // Audio
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
+        }
+        else
+        {
+            _towerComponents[CurrentTowerLevelIndex].transform.localRotation = _towerComponentDefaultRotation[CurrentTowerLevelIndex];
         }
         IsSelectionValidated = false;
 
@@ -183,7 +221,7 @@ public class GRTPressTower : GRTPress
         // tower component
         for (int componentIndex = 0; componentIndex < _towerComponents.Length; componentIndex++)
         {
-            _towerComponents[componentIndex].transform.rotation = _towerComponentDefaultRotation[componentIndex];
+            _towerComponents[componentIndex].transform.localRotation = _towerComponentDefaultRotation[componentIndex];
         }
         _towerComponents[_towerComponents.Length - 1].GetComponent<Renderer>().material = _colorLevelOff;
 
@@ -235,6 +273,13 @@ public class GRTPressTower : GRTPress
     private void RotateLevel(int rotationSide)
     {
         ButtonTaskData.NbSuccessClicks += 1;
+        if(rotationSide == 1)
+        {
+            ButtonTaskData.NbRightClicks += 1;
+        } else if(rotationSide == -1)
+        {
+            ButtonTaskData.NbLeftClicks += 1;
+        }
 
         // Slider has more incremental rotation. But Buttons is eased a little bit to balance the gameplay
         float deltaDegree = 360.0f / (float) (TowerSelectSliderStepDivisions / TowerSelectButtonBalanceAgainstSlider); 
@@ -254,6 +299,7 @@ public class GRTPressTower : GRTPress
     {
         IsSelectionValidated = true;
         ButtonTaskData.NbSuccessClicks += 1;
+        ButtonTaskData.NbValidateClicks += 1;
     }
 
 
@@ -262,9 +308,9 @@ public class GRTPressTower : GRTPress
     /// </summary>
     private void PrepareTurn()
     {
-        CurrentTowerLevelIndex += 1;
-        // Counters
         TurnsLeft -= 1;
+        CurrentTowerLevelIndex += 1;
+        RemainingTime = AllowedTime;
 
         UpdateComponentsHighlight(CurrentTowerLevelIndex);
         UpdateHelpInformation(CurrentTowerLevelIndex);

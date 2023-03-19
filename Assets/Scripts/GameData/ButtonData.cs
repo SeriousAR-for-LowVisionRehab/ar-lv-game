@@ -18,11 +18,25 @@ public class ButtonData: ICommonDataTask
         }
     }
 
-    [SerializeField] private int _nbMissedClicks;
-    public virtual int NbMissedClicks
+    [SerializeField] private int _nbLeftClicks;
+    public virtual int NbLeftClicks
     {
-        get { return _nbMissedClicks; }
-        set { _nbMissedClicks = value; }
+        get { return _nbLeftClicks; }
+        set { _nbLeftClicks = value; }
+    }
+
+    [SerializeField] private int _nbRightClicks;
+    public virtual int NbRightClicks
+    {
+        get { return _nbRightClicks; }
+        set { _nbRightClicks = value; }
+    }
+
+    [SerializeField] private int _nbValidateClicks;
+    public virtual int NbValidateClicks
+    {
+        get { return _nbValidateClicks; }
+        set { _nbValidateClicks = value; }
     }
 
     [SerializeField] int _touchCount;
