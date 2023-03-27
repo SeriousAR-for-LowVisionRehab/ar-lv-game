@@ -17,6 +17,7 @@ public class PlayerData
     public string FileExtension;
     public int NumberOfTasksToSolve;
     public int NumberOfTasksSolved;
+    //public string EscapeRoomsOrder;
     public float EscapeRoomPressDuration;
     public float EscapeRoomPinchSlideDuration;
     public List<ButtonData> DataOfButtonTasks;
@@ -95,4 +96,35 @@ public class PlayerData
 
         if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("Log", "Player data is saved under: " + tempPath);
     }
+
+
+    //private void SaveDataToCSV()
+    //{
+    //    // Path
+    //    string tempNameWithExtension = String.Concat(
+    //        FileNameBase,
+    //        ".csv"
+    //    );
+    //    string tempPath = Path.Combine(_savePathDir, tempNameWithExtension);
+
+    //    // Init writer
+    //    StreamWriter writer = new StreamWriter(tempPath);
+
+    //    // HEADER
+    //    writer.WriteLine("PlayerAlias,EscapeRoomsOrder,EscapeRoomType,GestureType,TaskType,TaskDuration," +
+    //        "HoverCount,HoverDuration,StartInteractionCount,StartInteractionDuration,SuccessInteractionCount");
+
+    //    // Data
+
+    //    //if(GameManager.Instance.IsEscapeRoomButtonsSolved) 
+
+    //    string tempData = String.Concat(
+    //        PlayerAlias,
+    //        EscapeRoomsOrder
+            
+    //        );
+
+    //    // Close writer
+    //    writer.Close();
+    //}
 }

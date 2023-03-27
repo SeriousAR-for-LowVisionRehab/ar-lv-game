@@ -1,5 +1,6 @@
 using Microsoft.MixedReality.Toolkit.UI;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 /// <summary>
@@ -76,6 +77,33 @@ public class GRTPressTower : GRTPress
     [SerializeField] private GameObject[] _shapeSolutionPerLevel;
     #endregion
 
+    #region Animation
+    private List<Animator> _animatorTower;
+    public List<Animator> AnimatorTower
+    {
+        get { return _animatorTower; }
+        private set { _animatorTower = value; }
+    }
+    private int _rotateStep;
+    public int RotateStep
+    {
+        get { return _rotateStep; }
+        private set { 
+            _rotateStep = value;
+
+            // completed a 360° to the right (>4) or to the left (< -4)
+            if (_rotateStep == 5)
+            {
+                
+                _rotateStep = 1;
+            } else if (_rotateStep == -5)
+            {
+                _rotateStep = -1;
+            }
+        }
+    }
+    #endregion
+
     #region Overrides
     protected override void Start()
     {
@@ -84,21 +112,29 @@ public class GRTPressTower : GRTPress
         IsSelectionValidated = false;
         MoveToNextTurn = false;
 
+        // Animation
+        AnimatorTower = new List<Animator>();
+        RotateStep = 0;
+
         // Counters
         TurnsLeft = _towerComponents.Length;
-        AllowedTime = 30.0f;
+        AllowedTime = 1000.0f;
         RemainingTime = AllowedTime;
         _degreeThresholdVictory = 5.0f;
 
         // Set initial parameters and helper
         _towerComponentDefaultRotation = new List<Quaternion>();
+        
         foreach (GameObject component in _towerComponents)
         {
             _towerComponentDefaultRotation.Add(component.transform.localRotation);
+
+            // Animation
+            AnimatorTower.Add(component.GetComponent<Animator>());            
         }
         CurrentTowerLevelIndex = 0;   // start at the bottom
-        buttonRight = Controller.ControllerButtons[0];
-        buttonLeft = Controller.ControllerButtons[1];
+        buttonLeft = Controller.ControllerButtons[0];
+        buttonRight = Controller.ControllerButtons[1];        
         buttonValidation = Controller.ControllerButtons[2];
         buttonRight.ButtonReleased.AddListener(delegate { RotateLevel(1); });
         buttonLeft.ButtonReleased.AddListener(delegate { RotateLevel(-1); });
@@ -174,6 +210,14 @@ public class GRTPressTower : GRTPress
 
         float lowerBound = _solutionsDegrees[CurrentTowerLevelIndex] - _degreeThresholdVictory;
         float upperBound = _solutionsDegrees[CurrentTowerLevelIndex] + _degreeThresholdVictory;
+
+        // 0° vs 360°
+        if (CurrentSelectionRotationY > 350.0f)
+        {
+            lowerBound = -360.0f;
+            upperBound = 360.0f;
+        }
+
         if ((CurrentSelectionRotationY >= lowerBound && (CurrentSelectionRotationY <= upperBound)))
         {
             if (CurrentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
@@ -199,7 +243,29 @@ public class GRTPressTower : GRTPress
         }
         else
         {
-            _towerComponents[CurrentTowerLevelIndex].transform.localRotation = _towerComponentDefaultRotation[CurrentTowerLevelIndex];
+            // Animation: rotate to initial position
+            if (CurrentTowerLevelIndex == 0)
+            {
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 90 0", 0.0f);
+                RotateStep = 0;
+            }
+
+            if (CurrentTowerLevelIndex == 1)
+            {
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+                RotateStep = -1;
+            }
+            if (CurrentTowerLevelIndex == 2)
+            {
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
+                RotateStep = -2;
+            }
+            if (CurrentTowerLevelIndex == 3)
+            {
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
+                RotateStep = -3;
+            }
+            AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
         }
         IsSelectionValidated = false;
 
@@ -272,9 +338,16 @@ public class GRTPressTower : GRTPress
 
     private void RotateLevel(int rotationSide)
     {
+
+        // TODO: make one press button == one 90°C rotation
+        RotateStep += rotationSide;
+        AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+
+        // Data
         ButtonTaskData.NbSuccessClicks += 1;
         if(rotationSide == 1)
         {
+            
             ButtonTaskData.NbRightClicks += 1;
         } else if(rotationSide == -1)
         {
@@ -282,14 +355,14 @@ public class GRTPressTower : GRTPress
         }
 
         // Slider has more incremental rotation. But Buttons is eased a little bit to balance the gameplay
-        float deltaDegree = 360.0f / (float) (TowerSelectSliderStepDivisions / TowerSelectButtonBalanceAgainstSlider); 
+        //float deltaDegree = 360.0f / (float) (TowerSelectSliderStepDivisions / TowerSelectButtonBalanceAgainstSlider); 
 
-        // angles
-        float eulerX = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.x;
-        float eulerZ = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.z;
-        Transform tempTransform = _towerComponents[CurrentTowerLevelIndex].transform;
+        //// angles
+        //float eulerX = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.x;
+        //float eulerZ = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.z;
+        //Transform tempTransform = _towerComponents[CurrentTowerLevelIndex].transform;
 
-        tempTransform.Rotate(eulerX, rotationSide * deltaDegree, eulerZ);
+        //tempTransform.Rotate(eulerX, rotationSide * deltaDegree, eulerZ);
     }
 
     /// <summary>
@@ -308,9 +381,39 @@ public class GRTPressTower : GRTPress
     /// </summary>
     private void PrepareTurn()
     {
+        // Counter
         TurnsLeft -= 1;
         CurrentTowerLevelIndex += 1;
         RemainingTime = AllowedTime;
+
+        // TODO: animation: set the state of the new level
+        // AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", (-1) * CurrentTowerLevelIndex);
+        switch (CurrentTowerLevelIndex)
+        {
+            case 1:
+                Debug.Log("case 1: rotatestep -1; state 'Rotate left 0 90'");
+                RotateStep = -1;
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+                AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                break;
+            case 2:
+                Debug.Log("case 2: rotatestep -2; state 'Rotate left 90 180'");
+                RotateStep = -2;
+                AnimatorTower[CurrentTowerLevelIndex].CrossFadeInFixedTime("Rotate Left 90 180", 0.0f);
+                AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                break;
+            case 3:
+                RotateStep = -3;
+                AnimatorTower[CurrentTowerLevelIndex].CrossFadeInFixedTime("Rotate Left 180 270", 0.0f);
+                AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                break;
+            default:
+                Debug.Log("case default: rotatestep 0; state 'Idle 0'");
+                RotateStep = 0;
+                AnimatorTower[CurrentTowerLevelIndex].CrossFadeInFixedTime("Idle 0", 0.0f);
+                AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                break;
+        }
 
         UpdateComponentsHighlight(CurrentTowerLevelIndex);
         UpdateHelpInformation(CurrentTowerLevelIndex);

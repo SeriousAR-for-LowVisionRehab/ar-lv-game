@@ -90,6 +90,41 @@ public class GRTPinchSlideTower : GRTPinchSlide
     [SerializeField] private GameObject[] _shapeSolutionPerLevel;
     #endregion
 
+    #region Animation
+    private List<Animator> _animatorTower;
+    public List<Animator> AnimatorTower
+    {
+        get { return _animatorTower; }
+        private set { _animatorTower = value; }
+    }
+    private int _rotateStep;
+    public int RotateStep
+    {
+        get { return _rotateStep; }
+        private set
+        {
+            _rotateStep = value;
+
+            // completed a 360° to the right (>4) or to the left (< -4)
+            if (_rotateStep == 5)
+            {
+
+                _rotateStep = 1;
+            }
+            else if (_rotateStep == -5)
+            {
+                _rotateStep = -1;
+            }
+        }
+    }
+    private float _validationChoiceDelta;
+    public float ValidationChoiceDelta
+    {
+        get { return _validationChoiceDelta; }
+        private set { _validationChoiceDelta = value; }
+    }
+    #endregion
+
     #region Overrides
     protected override void Start()
     {
@@ -98,11 +133,15 @@ public class GRTPinchSlideTower : GRTPinchSlide
         IsSelectionValidated = false;
         MoveToNextTurn = false;
 
+        // Animation
+        AnimatorTower = new List<Animator>();
+        RotateStep = 0;
+
         // Counters
         TurnsLeft = _towerComponents.Length;
-        AllowedTime = 30.0f;
+        AllowedTime = 1000.0f;
         RemainingTime = AllowedTime;
-        _degreeThresholdVictory = 5.0f;
+        _degreeThresholdVictory = 10.0f;
 
         SliderTaskData.NbPinchesPerIndex = new int[5];
 
@@ -111,6 +150,9 @@ public class GRTPinchSlideTower : GRTPinchSlide
         foreach(GameObject component in _towerComponents)
         {
             _towerComponentDefaultRotation.Add(component.transform.localRotation);
+
+            // Animation
+            AnimatorTower.Add(component.GetComponent<Animator>());
         }
 
         CurrentTowerLevelIndex = 0;   // start at the bottom
@@ -121,7 +163,9 @@ public class GRTPinchSlideTower : GRTPinchSlide
         SliderValidation.SliderValue = 0.0f;
 
         //SliderController.OnInteractionEnded.AddListener(delegate { UpdateSelectionIndex(); });
-        SliderController.OnValueUpdated.AddListener(delegate { RotateLevel(); });
+        // SliderController.OnValueUpdated.AddListener(delegate { RotateLevel(); });
+        // TODO: Control the difference between "OnInteractionEnded" and the old way "OnValueUpdated"
+        SliderController.OnInteractionEnded.AddListener(delegate { RotateLevel(); });
         SliderValidation.OnInteractionEnded.AddListener(delegate { ValidateChoice(); });
 
         // Data listeners
@@ -196,6 +240,17 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
         float lowerBound = _solutionsDegrees[CurrentTowerLevelIndex] - _degreeThresholdVictory;
         float upperBound = _solutionsDegrees[CurrentTowerLevelIndex] + _degreeThresholdVictory;
+
+        // 0° vs 360°
+        if (CurrentSelectionRotationY > 350.0f)
+        {
+            lowerBound = -360.0f;
+            upperBound = 360.0f;
+        }
+
+        Debug.Log(" ::::::  CurrentSelectionRotationY >= lowerBound: " + CurrentSelectionRotationY + " >= " + lowerBound +
+            "CurrentSelectionRotationY <= upperBound: " + CurrentSelectionRotationY + "<=" + upperBound);
+
         if ( (CurrentSelectionRotationY >= lowerBound && (CurrentSelectionRotationY <= upperBound)) )
         {
             if (CurrentTowerLevelIndex == _towerComponents.Length - 1)  // the last level was solved.
@@ -218,6 +273,32 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
             // Audio
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
+        }
+        else
+        {
+            // Animation: rotate to initial position
+            if (CurrentTowerLevelIndex == 0)
+            {
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 90 0", 0.0f);
+                RotateStep = 0;
+            }
+
+            if (CurrentTowerLevelIndex == 1)
+            {
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+                RotateStep = -1;
+            }
+            if (CurrentTowerLevelIndex == 2)
+            {
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
+                RotateStep = -2;
+            }
+            if (CurrentTowerLevelIndex == 3)
+            {
+                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
+                RotateStep = -3;
+            }
+            AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
         }
 
         IsSelectionValidated = false;
@@ -252,36 +333,146 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
     private void RotateLevel()
     {
+        Debug.Log("GRTPinchSlideTower:RotateLevel] CurrentTowerLevelIndex = " + CurrentTowerLevelIndex);
+
+        SliderTaskData.NbSuccessPinches += 1;
+
         // change in slider value
         if (PreviousSliderValue - SliderController.SliderValue == 0) return;
+
         float currentValue = SliderController.SliderValue;
         float deltaSlider = PreviousSliderValue - currentValue;
         PreviousSliderValue = currentValue;
 
-        // angles
-        float eulerX = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.x;
-        float eulerZ = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.z;
-        Transform tempTransform = _towerComponents[CurrentTowerLevelIndex].transform;
+        //// angles
+        //float eulerX = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.x;
+        //float eulerZ = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.z;
+        //Transform tempTransform = _towerComponents[CurrentTowerLevelIndex].transform;
 
-        tempTransform.Rotate(eulerX, deltaSlider * 360f, eulerZ);
+        //tempTransform.Rotate(eulerX, deltaSlider * 360f, eulerZ);
 
+        // Animation
         // data
+        if (CurrentTowerLevelIndex == 0) UpdateAnimeLevel0(deltaSlider);
+        if (CurrentTowerLevelIndex == 1) UpdateAnimeLevel1(deltaSlider);
+        if (CurrentTowerLevelIndex == 2) UpdateAnimeLevel2(deltaSlider);
+        if (CurrentTowerLevelIndex == 3) UpdateAnimeLevel3(deltaSlider);
+
+    }
+
+    /// <summary>
+    /// Level0 is a cube rotated at +0° Y-axis (Inspector): its entry point is "Idle 0" state.
+    /// </summary>
+    /// <param name="deltaSlider"></param>
+    private void UpdateAnimeLevel0(float deltaSlider)
+    {
+        Debug.Log("[GRTPinchSlideTower:UpdateAnimeLevel0] Started...");
         switch (SliderController.SliderValue)
         {
             case 0.00f:
                 SliderTaskData.NbPinchesPerIndex[0] += 1;
+
+                if (deltaSlider > 0)
+                {
+                    // de 0.25 à 0: left 90°
+                    Debug.Log("case 0: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
+
+                }
+                else if (deltaSlider < 0)
+                {
+                    Debug.Log("case 0: delta<0: not possible to come from the left side of 0");
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -2;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
                 break;
             case 0.25f:
                 SliderTaskData.NbPinchesPerIndex[1] += 1;
+
+                if (deltaSlider > 0)
+                {
+                    // de 0.5 à 0.25: left 90°
+                    Debug.Log("case 0.25: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+
+                }
+                else if (deltaSlider < 0)
+                {
+                    Debug.Log("case 0.25: delta<0");
+                    // de 0.0 à 0.25: left back from 180 to 90°
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 180 90", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -1;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
                 break;
             case 0.50f:
                 SliderTaskData.NbPinchesPerIndex[2] += 1;
+
+                if (deltaSlider > 0)
+                {
+                    Debug.Log("case 0.5: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 90 0", 0.0f);
+
+                }
+                else if (deltaSlider < 0)
+                {
+                    Debug.Log("case 0.5: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 90 0", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 0;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+
                 break;
             case 0.75f:
                 SliderTaskData.NbPinchesPerIndex[3] += 1;
+
+                if (deltaSlider > 0)
+                {
+                    Debug.Log("case 0.75: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 180 90", 0.0f);
+                }
+                else if (deltaSlider < 0)
+                {
+                    Debug.Log("case 0.75: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right 0 90", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 1;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
                 break;
             case 1.00f:
                 SliderTaskData.NbPinchesPerIndex[4] += 1;
+
+                if (deltaSlider > 0)
+                {
+                    Debug.Log("case 1: delta>0: not possible to come from the right.");
+                }
+                else if (deltaSlider < 0)
+                {
+                    Debug.Log("case 1: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right 90 180", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 2;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
                 break;
             default:
                 if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
@@ -289,7 +480,358 @@ public class GRTPinchSlideTower : GRTPinchSlide
         }
     }
 
-   
+    /// <summary>
+    /// Level1 is a cube rotated at +90° Y-axis (Inspector): its entry point is "Rotate Left 0 90" state.
+    /// </summary>
+    /// <param name="deltaSlider"></param>
+    private void UpdateAnimeLevel1(float deltaSlider)
+    {
+        Debug.Log("[GRTPinchSlideTower:UpdateAnimeLevel1] Started...");
+
+        switch (SliderController.SliderValue)
+        {
+            case 0.00f: // cylinder
+                SliderTaskData.NbPinchesPerIndex[0] += 1;
+
+                if (deltaSlider > 0) // previous - 0 > 0: donc previous = 0.25 (sun)
+                {
+                    Debug.Log("case 0: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
+                }
+                else if (deltaSlider < 0)  // previous - 0 < 0: NOT POSSIBLE
+                {
+                    Debug.Log("case 0: delta<0: not possible to come from the left side of 0");
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -3;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 0.25f:  // sun
+                SliderTaskData.NbPinchesPerIndex[1] += 1;
+
+                if (deltaSlider > 0) // previous - 0.25 > 0: donc previous = 0.5 (diamond)
+                {
+                    Debug.Log("case 0.25: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
+
+                }
+                else if (deltaSlider < 0)  // previous - 0.25 < 0: donc previous = 0 (cylinder)
+                {
+                    Debug.Log("case 0.25: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 270 180", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -2;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 0.50f:  // diamond: it's like "Rotate Left 0 90", RotateStep = -1
+                SliderTaskData.NbPinchesPerIndex[2] += 1;
+
+                if (deltaSlider > 0)  // previous - 0.50 > 0:   donc previous = 0.75 (cube)
+                {
+                    Debug.Log("case 0.5: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+
+                }
+                else if (deltaSlider < 0) // previous - 0.50 < 0:   donc previous = 0.25 (sun)
+                {
+                    Debug.Log("case 0.5: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 180 90", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -1;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+
+                break;
+            case 0.75f:  // cube
+                SliderTaskData.NbPinchesPerIndex[3] += 1;
+
+                if (deltaSlider > 0) // previous - 0.75 > 0: donc previous = 1 (cylinder)
+                {
+                    Debug.Log("case 0.75: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 90 0", 0.0f);
+                }
+                else if (deltaSlider < 0) // previous - 0.75 < 0: donc previous = 0.5 (diamond)
+                {
+                    Debug.Log("case 0.75: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 90 0", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 0;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 1.00f: // cylinder
+                SliderTaskData.NbPinchesPerIndex[4] += 1;
+
+                if (deltaSlider > 0) // previous - 1 > 0: NOT POSSIBLE
+                {
+                    Debug.Log("case 1: delta>0: not possible to come from the right.");
+                }
+                else if (deltaSlider < 0) // previous - 1 < 0: donc previous = 0.75 (cube)
+                {
+                    Debug.Log("case 1: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right 0 90", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 1;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            default:
+                if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Level2 is a cube rotated at +180° Y-axis (Inspector): its entry point is "Rotate Left 90 180" state.
+    /// </summary>
+    /// <param name="deltaSlider"></param>
+    private void UpdateAnimeLevel2(float deltaSlider)
+    {
+        Debug.Log("[GRTPinchSlideTower:UpdateAnimeLevel2] Started...");
+
+        switch (SliderController.SliderValue)
+        {
+            case 0.00f: // cube
+                SliderTaskData.NbPinchesPerIndex[0] += 1;
+
+                if (deltaSlider > 0) // previous - 0 > 0: donc previous = 0.25 ()
+                {
+                    Debug.Log("case 0: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 270 360", 0.0f);
+                }
+                else if (deltaSlider < 0)  // previous - 0 < 0: NOT POSSIBLE
+                {
+                    Debug.Log("case 0: delta<0: not possible to come from the left side of 0");
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -4;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 0.25f:  // cylinder
+                SliderTaskData.NbPinchesPerIndex[1] += 1;
+
+                if (deltaSlider > 0) // previous - 0.25 > 0: donc previous = 0.5 ()
+                {
+                    Debug.Log("case 0.25: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
+
+                }
+                else if (deltaSlider < 0)  // previous - 0.25 < 0: donc previous = 0 (cube)
+                {
+                    Debug.Log("case 0.25: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right 0 90", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -3;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 0.50f:  // sun: it's like "Rotate Left 90 180", RotateStep = -2
+                SliderTaskData.NbPinchesPerIndex[2] += 1;
+
+                if (deltaSlider > 0)  // previous - 0.50 > 0:   donc previous = 0.75 (diamond)
+                {
+                    Debug.Log("case 0.5: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
+
+                }
+                else if (deltaSlider < 0) // previous - 0.50 < 0:   donc previous = 0.25 (cylinder)
+                {
+                    Debug.Log("case 0.5: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 270 180", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -2;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+
+                break;
+            case 0.75f:  // Diamond
+                SliderTaskData.NbPinchesPerIndex[3] += 1;
+
+                if (deltaSlider > 0) // previous - 0.75 > 0: donc previous = 1 ()
+                {
+                    Debug.Log("case 0.75: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+                }
+                else if (deltaSlider < 0) // previous - 0.75 < 0: donc previous = 0.5 (sun)
+                {
+                    Debug.Log("case 0.75: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 180 90", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -1;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 1.00f: // cube
+                SliderTaskData.NbPinchesPerIndex[4] += 1;
+
+                if (deltaSlider > 0) // previous - 1 > 0: NOT POSSIBLE
+                {
+                    Debug.Log("case 1: delta>0: not possible to come from the right.");
+                }
+                else if (deltaSlider < 0) // previous - 1 < 0: donc previous = 0.75 (diamond)
+                {
+                    Debug.Log("case 1: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 90 0", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 0;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            default:
+                if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Level3 is a cube rotated at +270° Y-axis (Inspector): its entry point is "Rotate Left 180 90" state.
+    /// </summary>
+    /// <param name="deltaSlider"></param>
+    private void UpdateAnimeLevel3(float deltaSlider)
+    {
+        Debug.Log("[GRTPinchSlideTower:UpdateAnimeLevel3] Started...");
+
+        switch (SliderController.SliderValue)
+        {
+            case 0.00f: // diamond
+                SliderTaskData.NbPinchesPerIndex[0] += 1;
+
+                if (deltaSlider > 0) // previous - 0 > 0: donc previous = 0.25 (cube)
+                {
+                    Debug.Log("case 0: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+                }
+                else if (deltaSlider < 0)  // previous - 0 < 0: NOT POSSIBLE
+                {
+                    Debug.Log("case 0: delta<0: not possible to come from the left side of 0");
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = -1;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 0.25f:  // cube
+                SliderTaskData.NbPinchesPerIndex[1] += 1;
+
+                if (deltaSlider > 0) // previous - 0.25 > 0: donc previous = 0.5 (cylinder)
+                {
+                    Debug.Log("case 0.25: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 90 0", 0.0f);
+
+                }
+                else if (deltaSlider < 0)  // previous - 0.25 < 0: donc previous = 0 (diamond)
+                {
+                    Debug.Log("case 0.25: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left Back 90 0", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 0;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 0.50f:  // cylinder : it's like "Rotate Right 0 90", RotateStep = 1
+                SliderTaskData.NbPinchesPerIndex[2] += 1;
+
+                if (deltaSlider > 0)  // previous - 0.50 > 0:   donc previous = 0.75 (sun)
+                {
+                    Debug.Log("case 0.5: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 180 90", 0.0f);
+
+                }
+                else if (deltaSlider < 0) // previous - 0.50 < 0:   donc previous = 0.25 (cube)
+                {
+                    Debug.Log("case 0.5: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right 0 90", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 1;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+
+                break;
+            case 0.75f:  // sun
+                SliderTaskData.NbPinchesPerIndex[3] += 1;
+
+                if (deltaSlider > 0) // previous - 0.75 > 0: donc previous = 1 (diamond)
+                {
+                    Debug.Log("case 0.75: delta>0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 270 180", 0.0f);
+                }
+                else if (deltaSlider < 0) // previous - 0.75 < 0: donc previous = 0.5 (cylinder)
+                {
+                    Debug.Log("case 0.75: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right 90 180", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 2;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            case 1.00f: // diamond
+                SliderTaskData.NbPinchesPerIndex[4] += 1;
+
+                if (deltaSlider > 0) // previous - 1 > 0: NOT POSSIBLE
+                {
+                    Debug.Log("case 1: delta>0: not possible to come from the right.");
+                }
+                else if (deltaSlider < 0) // previous - 1 < 0: donc previous = 0.75 ()
+                {
+                    Debug.Log("case 1: delta<0");
+                    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right 180 270", 0.0f);
+                }
+                if (deltaSlider != 0)
+                {
+                    RotateStep = 3;
+                    AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+                }
+
+                break;
+            default:
+                if (_gameManagerInstance.IsDebugVerbose) _gameManagerInstance.WriteDebugLog("LogError", "[GRTPinchSlideClock:MoveCursor] Current Slider Value not recognized. Cursor may not move as expected.");
+                break;
+        }
+    }
+
+
     /// <summary>
     /// Perform operations related to the validation of the user's choice.
     /// </summary>
@@ -298,6 +840,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
         if (SliderValidation.SliderValue != 1) return;
 
         IsSelectionValidated = true;
+        ValidationChoiceDelta = SliderValidation.SliderValue - 0.5f;  // will be use to Rotate from SliderValue to middle position
         SliderValidation.SliderValue = 0.0f;
 
         // Data
