@@ -1,7 +1,7 @@
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.WorldLocking.Core;
-using Microsoft.MixedReality.WorldLocking.Tools;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
@@ -44,7 +44,33 @@ public class GameManager : MonoBehaviour
     public WorldLockingManager WorldLockingManager { get { return _worldLockingManager; } }
 
     [Tooltip("Markers to place prefabs. These are NOT WLT anchors!")]
-    
+
+    #region Tutorial variables
+    [SerializeField] private GameObject _tutorialButtonFinishCover;
+    [SerializeField] private GameObject _tutorialSliderFinishCover;
+
+    private int _tutorialButtonCounter;
+    public int TutorialButtonCounter
+    {
+        get { return _tutorialButtonCounter; }
+        private set { 
+            _tutorialButtonCounter = value; 
+            if ( _tutorialButtonCounter == 5)
+            {
+                _tutorialButtonFinishCover.SetActive(true);
+                AudioSource.PlayOneShot(TaskCompletedSoundFX, TaskCompletedVolumeScale);
+                _tutorialPrefabs[0].GetComponent<PressableButtonHoloLens2>().enabled = false;
+            }
+        }
+    }
+
+    private bool[] _tutorialSliderChecks;
+    public bool[] TutorialSliderChecks
+    {
+        get { return _tutorialSliderChecks; }
+        private set { _tutorialSliderChecks = value; }
+    }
+    #endregion
 
     #region FSMs
     private FiniteStateMachine<GameState> _gameStateMachine; // = new FiniteStateMachine<GameStates>();
@@ -63,8 +89,12 @@ public class GameManager : MonoBehaviour
     private PressableButtonHoloLens2[] _creationButtons;           // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2[] _escapeRoomButtons;         // filled it using GetComponentsInChildren
     private PressableButtonHoloLens2 _tutorialGesturePressButton;  // the button to learn the gesture (used GetComponent)
+
+    // Audio
     [SerializeField] protected AudioClip CorrectChoiceSoundFX;
     [SerializeField] protected AudioSource AudioSource;
+    [SerializeField] protected AudioClip TaskCompletedSoundFX;
+    protected float TaskCompletedVolumeScale;
 
     private TextMesh _textMarkerPipesPosition;
     private TextMesh _textMarkerClockPosition;
@@ -199,6 +229,7 @@ public class GameManager : MonoBehaviour
         NumberOfTasksToSolve = 3;
         NumberOfTasksSolved = 0;
         PlayerData = new PlayerData(NumberOfTasksToSolve);
+        TaskCompletedVolumeScale = 0.5F;
 
         // Indices w.r.t. _menusUI list
         _menusUIIndexHome = 0;
@@ -263,9 +294,12 @@ public class GameManager : MonoBehaviour
         _homeButtons[2].ButtonPressed.AddListener(SetStateCreation);
 
         // Add Listeners to TUTORIAL controllers
+        TutorialSliderChecks = new bool[5];
         AudioSource = GetComponent<AudioSource>();
-        _tutorialPrefabs[0].GetComponent<PressableButtonHoloLens2>().ButtonPressed.AddListener(TutorialPlayOneShot);
-        _tutorialPrefabs[1].GetComponent<PinchSlider>().OnInteractionEnded.AddListener(delegate { TutorialPlayOneShot(); });        
+        _tutorialPrefabs[0].GetComponent<PressableButtonHoloLens2>().ButtonReleased.AddListener(TutorialPlayOneShot);
+        _tutorialPrefabs[0].GetComponent<PressableButtonHoloLens2>().ButtonReleased.AddListener(IncrementTutorialButtonCounter);
+        _tutorialPrefabs[1].GetComponent<PinchSlider>().OnInteractionEnded.AddListener(delegate { TutorialPlayOneShot(); });
+        _tutorialPrefabs[1].GetComponent<PinchSlider>().OnInteractionEnded.AddListener(delegate { CheckTutorialSliderCounter(); });
 
         // Add Listeners to CREATION buttons: 
         // 0=pin, 1=Save Creation, 2=Unfreeze Tasks,
@@ -478,6 +512,54 @@ public class GameManager : MonoBehaviour
     {
         AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
     }
+    private void IncrementTutorialButtonCounter()
+    {
+        TutorialButtonCounter += 1;
+    }
+    private void CheckTutorialSliderCounter()
+    {
+        float currentValude = _tutorialPrefabs[1].GetComponent<PinchSlider>().SliderValue;
+        if(currentValude == 0)
+        {
+            TutorialSliderChecks[0] = true;
+            //Debug.Log("TutorialSliderChecks[0] = true;");
+        } else if(currentValude == 0.25f)
+        {
+            TutorialSliderChecks[1] = true;
+            //Debug.Log("TutorialSliderChecks[1] = true;");
+        } else if(currentValude == 0.50f)
+        {
+            TutorialSliderChecks[2] = true;
+            //Debug.Log("TutorialSliderChecks[2] = true;");
+        } else if(currentValude == 0.75f)
+        {
+            TutorialSliderChecks[3] = true;
+            //Debug.Log("TutorialSliderChecks[3] = true;");
+        } else if(currentValude == 1.00f)
+        {
+            TutorialSliderChecks[4] = true;
+            //Debug.Log("TutorialSliderChecks[4] = true;");
+        }
+        //else
+        //{
+        //    Debug.Log("[GameManager:CheckTutorialSliderCounter] Error currentValue not handled.");
+        //}
+
+        // Check if all slider ticks have been released/tested in the tutorial
+        if (!_tutorialSliderChecks.Contains(false))
+        {
+            _tutorialSliderFinishCover.SetActive(true);
+            AudioSource.PlayOneShot(TaskCompletedSoundFX, TaskCompletedVolumeScale);
+            _tutorialPrefabs[1].GetComponent<PinchSlider>().enabled = false;
+        }
+        //else
+        //{
+        //    Debug.Log("TUTORIAL Keep going ....." + _tutorialSliderChecks[0] + ";" + _tutorialSliderChecks[1] + ";" +
+        //        _tutorialSliderChecks[2] + ";" + _tutorialSliderChecks[3] +
+        //        _tutorialSliderChecks[4] + ";");
+        //}
+
+    }
     #endregion
 
 
@@ -636,8 +718,15 @@ public class GameManager : MonoBehaviour
         EscapeRoomStateMachine.IsNextTaskPrepared = false;
         EscapeRoomStateMachine.NextTaskToSolveIndex = 0;
 
-        //TODO: reset all counters
-        foreach(var grt in _tasksPrefabs)
+        _tutorialSliderFinishCover.SetActive(false);
+        TutorialSliderChecks = new bool[5];
+        _tutorialButtonFinishCover.SetActive(false);
+        TutorialButtonCounter = 0;
+
+
+        
+
+        foreach (var grt in _tasksPrefabs)
         {
             if(grt.GetComponent<GRTPress>() != null) grt.GetComponent<GRTPress>().ResetGRT();
             if(grt.GetComponent<GRTPinchSlide>() != null) grt.GetComponent<GRTPinchSlide>().ResetGRT();
@@ -660,7 +749,6 @@ public class GameManager : MonoBehaviour
         {
             GameObject currentGrt = AvailableTasksPrefabs[grtIndex];
             currentGrt.SetActive(!currentGrt.activeSelf);
-            //TODO: if activeSelf not working, check activeInHierarchy?
         }
     }
 
@@ -671,7 +759,6 @@ public class GameManager : MonoBehaviour
         {
             GameObject currentGrt = AvailableTasksPrefabs[grtIndex];
             currentGrt.SetActive(!currentGrt.activeSelf);
-            //TODO: if activeSelf not working, check activeInHierarchy?
         }
     }
 

@@ -91,6 +91,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
     #endregion
 
     #region Animation
+    private float[] _positionsToSnapTo = { 0f, 0.25f, 0.5f, 0.75f, 1f };
+
     private List<Animator> _animatorTower;
     public List<Animator> AnimatorTower
     {
@@ -117,12 +119,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
             }
         }
     }
-    private float _validationChoiceDelta;
-    public float ValidationChoiceDelta
-    {
-        get { return _validationChoiceDelta; }
-        private set { _validationChoiceDelta = value; }
-    }
     #endregion
 
     #region Overrides
@@ -134,14 +130,14 @@ public class GRTPinchSlideTower : GRTPinchSlide
         MoveToNextTurn = false;
 
         // Animation
-        AnimatorTower = new List<Animator>();
+        // AnimatorTower = new List<Animator>();
         RotateStep = 0;
 
         // Counters
         TurnsLeft = _towerComponents.Length;
         AllowedTime = 1000.0f;
         RemainingTime = AllowedTime;
-        _degreeThresholdVictory = 10.0f;
+        _degreeThresholdVictory = 0.05f;
 
         SliderTaskData.NbPinchesPerIndex = new int[5];
 
@@ -152,7 +148,7 @@ public class GRTPinchSlideTower : GRTPinchSlide
             _towerComponentDefaultRotation.Add(component.transform.localRotation);
 
             // Animation
-            AnimatorTower.Add(component.GetComponent<Animator>());
+            // AnimatorTower.Add(component.GetComponent<Animator>());
         }
 
         CurrentTowerLevelIndex = 0;   // start at the bottom
@@ -162,10 +158,8 @@ public class GRTPinchSlideTower : GRTPinchSlide
         ResetControllerPosition(0.5f);
         SliderValidation.SliderValue = 0.0f;
 
-        //SliderController.OnInteractionEnded.AddListener(delegate { UpdateSelectionIndex(); });
-        // SliderController.OnValueUpdated.AddListener(delegate { RotateLevel(); });
-        // TODO: Control the difference between "OnInteractionEnded" and the old way "OnValueUpdated"
-        SliderController.OnInteractionEnded.AddListener(delegate { RotateLevel(); });
+        SliderController.OnValueUpdated.AddListener(delegate { RotateLevel(); });
+        SliderController.OnInteractionEnded.AddListener(delegate { ResetSliderToThisFloat(); });
         SliderValidation.OnInteractionEnded.AddListener(delegate { ValidateChoice(); });
 
         // Data listeners
@@ -207,6 +201,10 @@ public class GRTPinchSlideTower : GRTPinchSlide
         {
             if (!MoveToNextTurn)
             {
+                // Animation
+                // SliderController.SliderValue = ResetSliderToThisFloat(SliderController.SliderValue, _positionsToSnapTo);
+
+                // Validation check
                 if (IsSelectionValidated)
                 {
                     CheckSolution();
@@ -276,29 +274,29 @@ public class GRTPinchSlideTower : GRTPinchSlide
         }
         else
         {
-            // Animation: rotate to initial position
-            if (CurrentTowerLevelIndex == 0)
-            {
-                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 90 0", 0.0f);
-                RotateStep = 0;
-            }
+            //// Animation: rotate to initial position
+            //if (CurrentTowerLevelIndex == 0)
+            //{
+            //    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 90 0", 0.0f);
+            //    RotateStep = 0;
+            //}
 
-            if (CurrentTowerLevelIndex == 1)
-            {
-                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
-                RotateStep = -1;
-            }
-            if (CurrentTowerLevelIndex == 2)
-            {
-                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
-                RotateStep = -2;
-            }
-            if (CurrentTowerLevelIndex == 3)
-            {
-                AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
-                RotateStep = -3;
-            }
-            AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
+            //if (CurrentTowerLevelIndex == 1)
+            //{
+            //    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+            //    RotateStep = -1;
+            //}
+            //if (CurrentTowerLevelIndex == 2)
+            //{
+            //    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
+            //    RotateStep = -2;
+            //}
+            //if (CurrentTowerLevelIndex == 3)
+            //{
+            //    AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
+            //    RotateStep = -3;
+            //}
+            //AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
         }
 
         IsSelectionValidated = false;
@@ -333,8 +331,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
 
     private void RotateLevel()
     {
-        Debug.Log("GRTPinchSlideTower:RotateLevel] CurrentTowerLevelIndex = " + CurrentTowerLevelIndex);
-
         SliderTaskData.NbSuccessPinches += 1;
 
         // change in slider value
@@ -345,19 +341,51 @@ public class GRTPinchSlideTower : GRTPinchSlide
         PreviousSliderValue = currentValue;
 
         //// angles
-        //float eulerX = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.x;
-        //float eulerZ = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.z;
-        //Transform tempTransform = _towerComponents[CurrentTowerLevelIndex].transform;
+        float eulerX = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.x;
+        float eulerZ = _towerComponents[CurrentTowerLevelIndex].transform.localRotation.z;
+        Transform tempTransform = _towerComponents[CurrentTowerLevelIndex].transform;
 
-        //tempTransform.Rotate(eulerX, deltaSlider * 360f, eulerZ);
+        tempTransform.Rotate(eulerX, deltaSlider * 360, eulerZ);
 
         // Animation
         // data
-        if (CurrentTowerLevelIndex == 0) UpdateAnimeLevel0(deltaSlider);
-        if (CurrentTowerLevelIndex == 1) UpdateAnimeLevel1(deltaSlider);
-        if (CurrentTowerLevelIndex == 2) UpdateAnimeLevel2(deltaSlider);
-        if (CurrentTowerLevelIndex == 3) UpdateAnimeLevel3(deltaSlider);
+        //if (CurrentTowerLevelIndex == 0) UpdateAnimeLevel0(deltaSlider);
+        //if (CurrentTowerLevelIndex == 1) UpdateAnimeLevel1(deltaSlider);
+        //if (CurrentTowerLevelIndex == 2) UpdateAnimeLevel2(deltaSlider);
+        //if (CurrentTowerLevelIndex == 3) UpdateAnimeLevel3(deltaSlider);
 
+    }
+
+    /// <summary>
+    /// Given current slider position, return the closest snap-position.
+    /// (assume the slider is divided into 4 snap position: 0, 0.25, 0.5, 0.75, 1.)
+    /// </summary>
+    /// <param name="currentSliderValue"></param>
+    /// <returns></returns>
+    private void ResetSliderToThisFloat()
+    {
+        float currentSliderValue = SliderController.SliderValue;
+        float[] resetReferenceValue = { 0.125f, 0.375f, 0.625f, 0.875f };
+
+        if(currentSliderValue <= resetReferenceValue[0])
+        {
+            SliderController.SliderValue = _positionsToSnapTo[0];
+        } else if(currentSliderValue > resetReferenceValue[0] && currentSliderValue <= resetReferenceValue[1])
+        {
+            SliderController.SliderValue = _positionsToSnapTo[1];
+        }
+        else if (currentSliderValue > resetReferenceValue[1] && currentSliderValue <= resetReferenceValue[2])
+        {
+            SliderController.SliderValue = _positionsToSnapTo[2];
+        }
+        else if (currentSliderValue > resetReferenceValue[2] && currentSliderValue <= resetReferenceValue[3])
+        {
+            SliderController.SliderValue = _positionsToSnapTo[3];
+        }
+        else
+        {
+            SliderController.SliderValue = _positionsToSnapTo[4];
+        }
     }
 
     /// <summary>
@@ -840,7 +868,6 @@ public class GRTPinchSlideTower : GRTPinchSlide
         if (SliderValidation.SliderValue != 1) return;
 
         IsSelectionValidated = true;
-        ValidationChoiceDelta = SliderValidation.SliderValue - 0.5f;  // will be use to Rotate from SliderValue to middle position
         SliderValidation.SliderValue = 0.0f;
 
         // Data
