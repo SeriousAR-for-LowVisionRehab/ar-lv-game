@@ -18,6 +18,13 @@ public class ButtonData: ICommonDataTask
         }
     }
 
+    [SerializeField] private int[] _nbClicksPerIndex;
+    public int[] NbClicksPerIndex
+    {
+        get { return _nbClicksPerIndex; }
+        set { _nbClicksPerIndex = value; }
+    }
+
     [SerializeField] private int _nbLeftClicks;
     public virtual int NbLeftClicks
     {

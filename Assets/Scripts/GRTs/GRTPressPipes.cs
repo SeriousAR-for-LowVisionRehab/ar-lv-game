@@ -48,9 +48,10 @@ public class GRTPressPipes : GRTPress
 
         // Initial setup
         TurnsLeft = 1;  // You only get the key out of the pipes once.
-        AllowedTime = 70.0f;
+        AllowedTime = 60.0f;
         RemainingTime = AllowedTime;
         _keyOriginalPosition = _key.transform.localPosition;
+        ButtonTaskData.NbClicksPerIndex = new int[_keyPositions.Length];
 
         // Add listeners to controller's buttons
         foreach(var btn in Controller.ControllerButtons)
@@ -136,6 +137,10 @@ public class GRTPressPipes : GRTPress
     /// </summary>
     private void MoveKeyToThisButtonAndHideIt()
     {
+        // Data
+        ButtonTaskData.NbSuccessClicks += 1;
+        ButtonTaskData.NbClicksPerIndex[_currentButtonIndex] += 1;
+
         // Key
         var _keyNextPos = _keyPositions[_currentButtonIndex].transform.localPosition;
         _key.transform.localPosition = new Vector3(_keyNextPos.x, _keyNextPos.y, _key.transform.localPosition.z);
@@ -161,8 +166,6 @@ public class GRTPressPipes : GRTPress
             Points += 1;
         }
 
-        // Clicks
-        ButtonTaskData.NbSuccessClicks += 1;
     }
 
 }

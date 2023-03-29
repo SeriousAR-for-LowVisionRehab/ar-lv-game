@@ -719,12 +719,17 @@ public class GameManager : MonoBehaviour
         EscapeRoomStateMachine.NextTaskToSolveIndex = 0;
 
         _tutorialSliderFinishCover.SetActive(false);
+        _tutorialPrefabs[1].GetComponent<PinchSlider>().enabled = true;
+        _tutorialPrefabs[1].GetComponent<PinchSlider>().SliderValue = 0.5f;
         TutorialSliderChecks = new bool[5];
+
         _tutorialButtonFinishCover.SetActive(false);
+        _tutorialPrefabs[0].GetComponent<PressableButtonHoloLens2>().enabled = true;
         TutorialButtonCounter = 0;
-
-
         
+
+
+
 
         foreach (var grt in _tasksPrefabs)
         {

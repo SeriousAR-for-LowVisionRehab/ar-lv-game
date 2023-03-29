@@ -118,7 +118,7 @@ public class GRTPressTower : GRTPress
 
         // Counters
         TurnsLeft = _towerComponents.Length;
-        AllowedTime = 1000.0f;
+        AllowedTime = 30.0f;
         RemainingTime = AllowedTime;
         _degreeThresholdVictory = 5.0f;
 
@@ -148,19 +148,19 @@ public class GRTPressTower : GRTPress
             {
                 Debug.Log("case 2: rotatestep -2; state 'Rotate left 90 180'");
                 RotateStep = -2;
-                AnimatorTower[towerLevelIndex].CrossFadeInFixedTime("Rotate Left 90 180", 0.0f);
+                AnimatorTower[towerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
             }
             else if (towerLevelIndex == 3)
             {
                 Debug.Log("case 3: rotatestep -3; state 'Rotate left 180 270'");
                 RotateStep = -3;
-                AnimatorTower[towerLevelIndex].CrossFadeInFixedTime("Rotate Left 180 270", 0.0f);
+                AnimatorTower[towerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
             }
             else
             {
                 Debug.Log("case default: rotatestep 0; state 'Idle 0'");
                 RotateStep = 0;
-                AnimatorTower[towerLevelIndex].CrossFadeInFixedTime("Idle 0", 0.0f);
+                AnimatorTower[towerLevelIndex].CrossFade("Idle 0", 0.0f);
             }
             AnimatorTower[towerLevelIndex].SetInteger("RotateStep", RotateStep);
         }
@@ -289,25 +289,29 @@ public class GRTPressTower : GRTPress
         }
         else
         {
-            // Animation: rotate to initial position
+            // Animation: rotate to initial position because validation was incorrect
             if (CurrentTowerLevelIndex == 0)
             {
+                Debug.Log("[GRTPressTower:CheckSolution] Wrong. Lvl 0. reset");
                 AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Right Back 90 0", 0.0f);
                 RotateStep = 0;
             }
 
             if (CurrentTowerLevelIndex == 1)
             {
+                Debug.Log("[GRTPressTower:CheckSolution] Wrong. Lvl 1. reset");
                 AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
                 RotateStep = -1;
             }
             if (CurrentTowerLevelIndex == 2)
             {
+                Debug.Log("[GRTPressTower:CheckSolution] Wrong. Lvl 2. reset");
                 AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
                 RotateStep = -2;
             }
             if (CurrentTowerLevelIndex == 3)
             {
+                Debug.Log("[GRTPressTower:CheckSolution] Wrong. Lvl 3. reset");
                 AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
                 RotateStep = -3;
             }
@@ -439,31 +443,32 @@ public class GRTPressTower : GRTPress
             case 1:
                 //        Debug.Log("case 1: rotatestep -1; state 'Rotate left 0 90'");
                 RotateStep = -1;
-                Debug.Log("PrepareTurn 1: RotationStep = " + RotateStep);
-                //        AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
+                Debug.Log("[GRTPressTower:PrepareTurn] 1: RotationStep = " + RotateStep);
+                        AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 0 90", 0.0f);
                 //        AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
                 break;
             case 2:
                 //        Debug.Log("case 2: rotatestep -2; state 'Rotate left 90 180'");
                 RotateStep = -2;
-                Debug.Log("PrepareTurn 1: RotationStep = " + RotateStep);
-                //        AnimatorTower[CurrentTowerLevelIndex].CrossFadeInFixedTime("Rotate Left 90 180", 0.0f);
+                Debug.Log("[GRTPressTower:PrepareTurn] 2: RotationStep = " + RotateStep);
+                        AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 90 180", 0.0f);
                 //        AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
                 break;
             case 3:
                 RotateStep = -3;
-                Debug.Log("PrepareTurn 1: RotationStep = " + RotateStep);
-                //        AnimatorTower[CurrentTowerLevelIndex].CrossFadeInFixedTime("Rotate Left 180 270", 0.0f);
+                Debug.Log("[GRTPressTower:PrepareTurn] 3: RotationStep = " + RotateStep);
+                        AnimatorTower[CurrentTowerLevelIndex].CrossFade("Rotate Left 180 270", 0.0f);
                 //        AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
                 break;
             default:
         //        Debug.Log("case default: rotatestep 0; state 'Idle 0'");
                 RotateStep = 0;
-                Debug.Log("PrepareTurn 1: RotationStep = " + RotateStep);
-                //        AnimatorTower[CurrentTowerLevelIndex].CrossFadeInFixedTime("Idle 0", 0.0f);
+                Debug.Log("[GRTPressTower:PrepareTurn] 4: RotationStep = " + RotateStep);
+                        AnimatorTower[CurrentTowerLevelIndex].CrossFade("Idle 0", 0.0f);
                 //        AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
                 break;
         }
+        AnimatorTower[CurrentTowerLevelIndex].SetInteger("RotateStep", RotateStep);
 
         UpdateComponentsHighlight(CurrentTowerLevelIndex);
         UpdateHelpInformation(CurrentTowerLevelIndex);

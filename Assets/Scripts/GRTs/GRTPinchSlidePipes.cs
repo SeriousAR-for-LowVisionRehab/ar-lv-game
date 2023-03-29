@@ -37,10 +37,11 @@ public class GRTPinchSlidePipes : GRTPinchSlide
         base.Start();
 
         TurnsLeft = 1;  // You only get the key out of the pipes once.
-        AllowedTime = 70.0f;
+        AllowedTime = 60.0f;
         RemainingTime = AllowedTime;
         _keyOriginalPosition = _key.transform.localPosition; // _key.transform.position;
         //Debug.LogAssertion("GRTPinchSlidePipes:Start] key original position (local) = " + _keyOriginalPosition);
+        SliderTaskData.NbPinchesPerIndex = new int[_keyPositions.Length];
 
         // Slider
         foreach (var slider in Controller.ControllerButtons)
@@ -140,6 +141,8 @@ public class GRTPinchSlidePipes : GRTPinchSlide
             AudioSource.PlayOneShot(CorrectChoiceSoundFX, 0.5F);
 
             SliderTaskData.NbSuccessPinches += 1;
+            SliderTaskData.NbPinchesPerIndex[_currentSliderIndex] += 1;
+
             _isNextSliderReady = true;
             ResetControllerPosition(0.0f);
         }
